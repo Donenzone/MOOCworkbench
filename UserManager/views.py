@@ -5,10 +5,14 @@ from UserManager.serializer import *
 from django.contrib.auth import authenticate, login
 
 
-# Create your views here.
 class WorkbenchUserViewset(viewsets.ModelViewSet):
-    queryset = WorkbenchUser.objects.all().order_by('-created')
+    queryset = WorkbenchUser.objects.all()
     serializer_class = WorkbenchUserSerializer
+
+
+class UserViewset(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 # Create your views here.

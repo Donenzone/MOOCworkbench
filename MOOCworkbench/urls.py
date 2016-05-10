@@ -18,13 +18,14 @@ from django.contrib import admin
 from rest_framework import routers
 from ExperimentsManager.views import ExperimentViewSet, ScriptViewSet, index
 from GitManager.views import GitRepositoryViewSet
-from UserManager.views import WorkbenchUserViewset, sign_in
+from UserManager.views import WorkbenchUserViewset, sign_in, UserViewset
 
 router = routers.DefaultRouter()
 router.register(r'experiment', ExperimentViewSet)
 router.register(r'script', ScriptViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
-router.register(r'users', WorkbenchUserViewset)
+router.register(r'user', UserViewset)
+router.register(r'workbench-user', WorkbenchUserViewset)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

@@ -6,7 +6,10 @@ var Csrf = require('./csrf.jsx')
 var LoginForm = React.createClass({
   componentDidMount: function() {
     $('.register').click(function() {
-      ReactDOM.render(<RegisterComponent url="/register/" />, document.getElementById('react-app'))
+      ReactDOM.render(
+        <RegistrationComponent url1="/api/user/" url2="/api/workbench-user/" />,
+        document.getElementById('react-app')
+      )
     });
   },
   getInitialState: function() {
@@ -67,7 +70,7 @@ var LoginForm = React.createClass({
   }
 });
 
-var RegisterComponent = React.createClass({
+var RegistrationComponent = React.createClass({
   getInitialState: function() {
     return ({username: '', emailaddress: '', password_original: '', password_again: ''})
   },
@@ -79,6 +82,26 @@ var RegisterComponent = React.createClass({
     if (this.state.password_original.trim() == e.target.value.trim()) {
       $('.password-glypicon').addClass('glyphicon-ok')
     }
+  },
+  handleSubmit: function(e) {
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      url: this.props.url1,
+      data: {username: this.state.username, password: this.state.password, emailaddress: this.state.emailadress, csrfmiddlewaretoken: Csrf},
+      success: function(data) {
+        console.log('data')
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.log(this.props.url1, status, err.toString())
+      }.bind(this)
+    });
+  },
+  handleUsernameChange: function(e) {
+    this.setState({username: e.target.value})
+  },
+  handleEmailChange: function(e) {
+    this.setState({emailaddress: e.target.value})
   },
   render: function() {
     return (

@@ -1,0 +1,72 @@
+3243:C 26 Apr 10:32:08.496 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+3243:M 26 Apr 10:32:08.497 * Increased maximum number of open files to 10032 (it was originally set to 256).
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 3.0.7 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in standalone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 3243
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+3243:M 26 Apr 10:32:08.504 # Server started, Redis version 3.0.7
+3243:M 26 Apr 10:32:08.505 * DB loaded from disk: 0.001 seconds
+3243:M 26 Apr 10:32:08.505 * The server is now ready to accept connections on port 6379
+3243:M 26 Apr 10:50:51.135 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 10:50:51.142 * Background saving started by pid 3451
+3451:C 26 Apr 10:50:51.144 * DB saved on disk
+3243:M 26 Apr 10:50:51.243 * Background saving terminated with success
+3243:M 26 Apr 10:55:52.080 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 10:55:52.081 * Background saving started by pid 3499
+3499:C 26 Apr 10:55:52.081 * DB saved on disk
+3243:M 26 Apr 10:55:52.183 * Background saving terminated with success
+3243:M 26 Apr 11:01:21.548 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 11:01:21.549 * Background saving started by pid 3563
+3563:C 26 Apr 11:01:21.557 * DB saved on disk
+3243:M 26 Apr 11:01:21.651 * Background saving terminated with success
+3243:M 26 Apr 11:41:35.368 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 11:41:35.370 * Background saving started by pid 3969
+3969:C 26 Apr 11:41:35.371 * DB saved on disk
+3243:M 26 Apr 11:41:35.474 * Background saving terminated with success
+3243:M 26 Apr 11:46:36.045 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 11:46:36.046 * Background saving started by pid 4035
+4035:C 26 Apr 11:46:36.053 * DB saved on disk
+3243:M 26 Apr 11:46:36.148 * Background saving terminated with success
+3243:M 26 Apr 11:51:37.037 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 11:51:37.038 * Background saving started by pid 4083
+4083:C 26 Apr 11:51:37.045 * DB saved on disk
+3243:M 26 Apr 11:51:37.139 * Background saving terminated with success
+3243:M 26 Apr 11:56:38.100 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 11:56:38.101 * Background saving started by pid 4158
+4158:C 26 Apr 11:56:38.114 * DB saved on disk
+3243:M 26 Apr 11:56:38.204 * Background saving terminated with success
+3243:M 26 Apr 12:01:39.085 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 12:01:39.086 * Background saving started by pid 4195
+4195:C 26 Apr 12:01:39.093 * DB saved on disk
+3243:M 26 Apr 12:01:39.191 * Background saving terminated with success
+3243:M 26 Apr 12:09:28.410 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 12:09:28.410 * Background saving started by pid 4215
+4215:C 26 Apr 12:09:28.423 * DB saved on disk
+3243:M 26 Apr 12:09:28.515 * Background saving terminated with success
+3243:M 26 Apr 12:14:29.071 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 12:14:29.072 * Background saving started by pid 4243
+4243:C 26 Apr 12:14:29.079 * DB saved on disk
+3243:M 26 Apr 12:14:29.174 * Background saving terminated with success
+3243:M 26 Apr 12:19:30.017 * 100 changes in 300 seconds. Saving...
+3243:M 26 Apr 12:19:30.017 * Background saving started by pid 4268
+4268:C 26 Apr 12:19:30.019 * DB saved on disk
+3243:M 26 Apr 12:19:30.121 * Background saving terminated with success
+3243:signal-handler (1461749246) Received SIGTERM scheduling shutdown...
+3243:M 27 Apr 11:27:26.754 # User requested shutdown...
+3243:M 27 Apr 11:27:26.754 * Saving the final RDB snapshot before exiting.
+3243:M 27 Apr 11:27:26.757 * DB saved on disk
+3243:M 27 Apr 11:27:26.757 # Redis is now ready to exit, bye bye...

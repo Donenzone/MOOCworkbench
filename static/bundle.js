@@ -48,15 +48,28 @@
 
 	var ReactDOM = __webpack_require__(1);
 	var React = __webpack_require__(162);
-	var App = __webpack_require__(168);
+	var Dashboard = __webpack_require__(168);
 	var Csrf = __webpack_require__(169);
+
+	var Alert = React.createClass({
+	  displayName: 'Alert',
+
+	  render: function render() {
+	    var alerttype = 'alert alert-' + this.props.type;
+	    return React.createElement(
+	      'div',
+	      { className: alerttype },
+	      this.props.message
+	    );
+	  }
+	});
 
 	var LoginForm = React.createClass({
 	  displayName: 'LoginForm',
 
 	  componentDidMount: function componentDidMount() {
 	    $('.register').click(function () {
-	      ReactDOM.render(React.createElement(RegisterComponent, { url: '/register/' }), document.getElementById('react-app'));
+	      ReactDOM.render(React.createElement(RegistrationComponent, { url1: '/api/user/', url2: '/api/workbench-user/' }), document.getElementById('react-app'));
 	    });
 	  },
 	  getInitialState: function getInitialState() {
@@ -77,19 +90,27 @@
 	      data: { 'username': this.state.username, 'password': this.state.password, csrfmiddlewaretoken: Csrf },
 	      success: function (data) {
 	        // unload current component
-	        console.log(data);
-	        // move on to main Experiment page
-	        this.setState({ username: '', password: '' });
+	        if (data.login == true) {
+	          // move on to main Experiment page
+	          this.setState({ username: '', password: '' });
+	          ReactDOM.render(React.createElement(Dashboard, null), document.getElementById('react-app'));
+	        } else {
+	          ReactDOM.render(React.createElement(Alert, { type: 'warning', message: 'Incorrect username/password' }), document.getElementById('alerts'));
+	        }
 	      }.bind(this),
 	      error: function (xhr, status, error) {
 	        console.log(this.props.url, status, error.toString());
 	      }.bind(this)
 	    });
 	  },
+	  resetAlert: function resetAlert(e) {
+	    ReactDOM.unmountComponentAtNode(document.getElementById('alerts'));
+	  },
 	  render: function render() {
 	    return React.createElement(
 	      'form',
-	      { onSubmit: this.handleSubmit },
+	      { onSubmit: this.handleSubmit, onChange: this.resetAlert },
+	      React.createElement('div', { id: 'alerts' }),
 	      React.createElement(
 	        'h3',
 	        null,
@@ -113,7 +134,8 @@
 	          placeholder: 'Username',
 	          value: this.state.username,
 	          onChange: this.handleUsernameChange,
-	          className: 'form-control'
+	          className: 'form-control',
+	          required: true
 	        })
 	      ),
 	      React.createElement(
@@ -129,7 +151,8 @@
 	          placeholder: 'Password',
 	          value: this.state.password,
 	          onChange: this.handlePasswordChange,
-	          className: 'form-control'
+	          className: 'form-control',
+	          required: true
 	        })
 	      ),
 	      React.createElement('input', { type: 'submit', value: 'Sign in', className: 'form-control btn btn-success' })
@@ -137,8 +160,8 @@
 	  }
 	});
 
-	var RegisterComponent = React.createClass({
-	  displayName: 'RegisterComponent',
+	var RegistrationComponent = React.createClass({
+	  displayName: 'RegistrationComponent',
 
 	  getInitialState: function getInitialState() {
 	    return { username: '', emailaddress: '', password_original: '', password_again: '' };
@@ -151,6 +174,26 @@
 	    if (this.state.password_original.trim() == e.target.value.trim()) {
 	      $('.password-glypicon').addClass('glyphicon-ok');
 	    }
+	  },
+	  handleSubmit: function handleSubmit(e) {
+	    $.ajax({
+	      type: 'POST',
+	      dataType: 'json',
+	      url: this.props.url1,
+	      data: { username: this.state.username, password: this.state.password, emailaddress: this.state.emailadress, csrfmiddlewaretoken: Csrf },
+	      success: function (data) {
+	        console.log('data');
+	      }.bind(this),
+	      error: function (xhr, status, err) {
+	        console.log(this.props.url1, status, err.toString());
+	      }.bind(this)
+	    });
+	  },
+	  handleUsernameChange: function handleUsernameChange(e) {
+	    this.setState({ username: e.target.value });
+	  },
+	  handleEmailChange: function handleEmailChange(e) {
+	    this.setState({ emailaddress: e.target.value });
 	  },
 	  render: function render() {
 	    return React.createElement(
@@ -234,7 +277,12 @@
 	    );
 	  }
 	});
-	ReactDOM.render(React.createElement(LoginForm, { url: '/sign-in/' }), document.getElementById('react-app'));
+
+	if (!userInfo['authenticated']) {
+	  ReactDOM.render(React.createElement(LoginForm, { url: '/sign-in/' }), document.getElementById('react-app'));
+	} else {
+	  ReactDOM.render(React.createElement(Dashboard, { username: userInfo['username'] }), document.getElementById('react-app'));
+	}
 
 /***/ },
 /* 1 */
@@ -368,6 +416,9 @@
 	var queueIndex = -1;
 
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -2882,8 +2933,8 @@
 /* 23 */
 /***/ function(module, exports) {
 
-	/* eslint-disable no-unused-vars */
 	'use strict';
+	/* eslint-disable no-unused-vars */
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -2895,7 +2946,51 @@
 		return Object(val);
 	}
 
-	module.exports = Object.assign || function (target, source) {
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 		var from;
 		var to = toObject(target);
 		var symbols;
@@ -20289,15 +20384,130 @@
 	var React = __webpack_require__(162);
 
 	module.exports = React.createClass({
-	   displayName: 'exports',
+	  displayName: 'exports',
 
-	   render: function render() {
-	      return React.createElement(
-	         'h1',
-	         null,
-	         'Hello, world'
-	      );
-	   }
+	  render: function render() {
+	    var username = this.props.username;
+	    return React.createElement(
+	      'div',
+	      { id: 'main' },
+	      React.createElement(
+	        'h1',
+	        null,
+	        'MOOC Workbench'
+	      ),
+	      React.createElement(
+	        'p',
+	        null,
+	        'Welcome, ',
+	        username
+	      ),
+	      React.createElement(ExperimentWizard, null)
+	    );
+	  }
+	});
+
+	var ExperimentWizard = React.createClass({
+	  displayName: 'ExperimentWizard',
+
+	  getInitialState: function getInitialState() {
+	    return { 'title': '' };
+	  },
+	  handleTitleChange: function handleTitleChange(e) {
+	    this.setState({ title: e.target.value });
+	  },
+	  render: function render() {
+	    return React.createElement(
+	      'form',
+	      null,
+	      React.createElement(
+	        'h3',
+	        null,
+	        'Create a new experiment'
+	      ),
+	      React.createElement(TitleComponent, {
+	        value: this.state.title,
+	        onChange: this.handleTitleChange
+	      }),
+	      React.createElement(TextAreaComponent, {
+	        label: 'Description',
+	        type: 'text',
+	        placeholder: 'Description of the experiment you wish to work on...',
+	        required: 'required',
+	        value: this.state.description,
+	        onChange: this.handleDescriptionChange
+	      }),
+	      React.createElement(SubmitButtonComponent, { value: 'Submit', type: 'success' })
+	    );
+	  }
+	});
+
+	var TitleComponent = React.createClass({
+	  displayName: 'TitleComponent',
+
+	  render: function render() {
+	    return React.createElement(InputComponent, {
+	      label: 'Title',
+	      type: 'text',
+	      placeholder: 'Enter a title...',
+	      required: 'required'
+	    });
+	  }
+	});
+
+	var InputComponent = React.createClass({
+	  displayName: 'InputComponent',
+
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'form-group' },
+	      React.createElement(
+	        'label',
+	        null,
+	        this.props.label,
+	        ':'
+	      ),
+	      React.createElement('input', {
+	        type: this.props.type,
+	        placeholder: this.props.placeholder,
+	        className: 'form-control',
+	        required: this.props.required
+	      })
+	    );
+	  }
+	});
+
+	var SubmitButtonComponent = React.createClass({
+	  displayName: 'SubmitButtonComponent',
+
+	  render: function render() {
+	    var classes = 'form-control btn btn-' + this.props.type;
+	    return React.createElement('input', { type: 'submit', value: this.props.value, className: classes });
+	  }
+	});
+
+	var TextAreaComponent = React.createClass({
+	  displayName: 'TextAreaComponent',
+
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'form-group' },
+	      React.createElement(
+	        'label',
+	        null,
+	        this.props.label,
+	        ':'
+	      ),
+	      React.createElement('textarea', {
+	        placeholder: this.props.placeholder,
+	        className: 'form-control',
+	        required: this.props.required,
+	        rows: '5'
+	      })
+	    );
+	  }
 	});
 
 /***/ },

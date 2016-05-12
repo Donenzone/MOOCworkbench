@@ -1,7 +1,18 @@
 var ReactDOM = require('react-dom')
 var React = require('react')
-var App = require('./app.jsx')
+var Dashboard = require('./dashboard.jsx')
 var Csrf = require('./csrf.jsx')
+
+var Alert = React.createClass({
+  render: function() {
+    var alerttype = 'alert alert-' + this.props.type
+    return (
+      <div className={alerttype}>
+        {this.props.message}
+      </div>
+    )
+  }
+})
 
 var LoginForm = React.createClass({
   componentDidMount: function() {
@@ -30,18 +41,26 @@ var LoginForm = React.createClass({
       data: {'username': this.state.username, 'password': this.state.password, csrfmiddlewaretoken: Csrf},
       success: function(data) {
         // unload current component
-        console.log(data)
-        // move on to main Experiment page
-        this.setState({username: '', password: ''})
+        if (data.login == true) {
+          // move on to main Experiment page
+          this.setState({username: '', password: ''})
+          ReactDOM.render(<Dashboard />, document.getElementById('react-app'))
+        } else {
+          ReactDOM.render(<Alert type="warning" message="Incorrect username/password" />, document.getElementById('alerts'))
+        }
       }.bind(this),
       error: function(xhr, status, error) {
         console.log(this.props.url, status, error.toString());
       }.bind(this),
     });
   },
+  resetAlert: function(e) {
+    ReactDOM.unmountComponentAtNode(document.getElementById('alerts'));
+  },
   render: function() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} onChange={this.resetAlert}>
+        <div id="alerts"></div>
         <h3>Sign in to continue</h3>
         <a href="#" className="register">Create an account</a>
         <div className="form-group">
@@ -52,6 +71,7 @@ var LoginForm = React.createClass({
             value={this.state.username}
             onChange={this.handleUsernameChange}
             className="form-control"
+            required
             />
           </div>
           <div className="form-group">
@@ -62,6 +82,7 @@ var LoginForm = React.createClass({
               value={this.state.password}
               onChange={this.handlePasswordChange}
               className="form-control"
+              required
               />
           </div>
           <input type="submit" value="Sign in" className="form-control btn btn-success" />
@@ -157,6 +178,13 @@ var RegistrationComponent = React.createClass({
     )
   }
 })
-ReactDOM.render(<LoginForm url="/sign-in/" />,
-  document.getElementById('react-app')
-);
+
+if (!userInfo['authenticated']) {
+  ReactDOM.render(<LoginForm url="/sign-in/" />,
+    document.getElementById('react-app')
+  );
+} else {
+  ReactDOM.render(<Dashboard username={userInfo['username']} />,
+    document.getElementById('react-app')
+  );
+}

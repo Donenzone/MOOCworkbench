@@ -48,11 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'bootstrap3',
-    'webpack_loader',
     'rest_framework',
     'ExperimentsManager',
     'GitManager',
-    'UserManager'
+    'UserManager',
+    'bootstrapform'
 ]
 
 MIDDLEWARE_CLASSES = [

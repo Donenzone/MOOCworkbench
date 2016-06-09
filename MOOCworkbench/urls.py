@@ -16,20 +16,22 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
-from ExperimentsManager.views import ExperimentViewSet, ScriptViewSet, index
+from ExperimentsManager.views import ExperimentViewSet, ScriptViewSet
 from GitManager.views import GitRepositoryViewSet
-from UserManager.views import WorkbenchUserViewset, sign_in, UserViewset
+import UserManager.views
 
 router = routers.DefaultRouter()
 router.register(r'experiment', ExperimentViewSet)
 router.register(r'script', ScriptViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
-router.register(r'user', UserViewset)
-router.register(r'workbench-user', WorkbenchUserViewset)
+router.register(r'user', UserManager.views.UserViewset)
+router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
-    url(r'^sign-in/$', sign_in),
-    url(r'^$', index),
+    url(r'^accounts/login/$', UserManager.views.sign_in, name="sign_in"),
+    url(r'^accounts/logout/$', UserManager.views.sign_out, name="sign_out"),
+    url(r'^accounts/register/$', UserManager.views.register, name="register"),
+    url(r'^$', UserManager.views.index, name="index"),
 ]

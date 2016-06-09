@@ -8,7 +8,7 @@ class AbstractExperiment(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     version = models.CharField(max_length=200)
-    added = models.DateField()
+    added = models.DateField(auto_now_add=True)
     owner = models.ForeignKey(to=WorkbenchUser)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -21,5 +21,5 @@ class Script(AbstractExperiment):
 
 
 class Experiment(AbstractExperiment):
-    git_repo = models.ForeignKey(to=GitRepository)
+    git_repo = models.ForeignKey(to=GitRepository, null=True)
     type = 'experiment'

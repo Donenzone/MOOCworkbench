@@ -5,5 +5,4 @@ from .models import *
 class ExperimentTable(tables.Table):
     class Meta:
         model = Experiment
-        
         attrs = {'class': 'table'}

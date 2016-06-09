@@ -52,6 +52,12 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            print(form)
+            user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'], form.cleaned_data['password'])
+            workbench_user = WorkbenchUser()
+            workbench_user.netid = form.cleaned_data['tu_net_id']
+            workbench_user.can_run_experiments = True
+            workbench_user.user = user
+            workbench_user.save()
+            return redirect(to='/')
         else:
             return render(request, 'register.html', {'form': form})

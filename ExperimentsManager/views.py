@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from ExperimentsManager.serializer import *
+from django.contrib.auth.decorators import login_required
+from .tables import ExperimentTable
 
 
 # Create your views here.
@@ -14,5 +16,9 @@ class ScriptViewSet(viewsets.ModelViewSet):
     serializer_class = ScriptSerializer
 
 
+@login_required
 def index(request):
-    return render(request, 'index.html')
+    owner = WorkbenchUser.objects.get(user=request.user)
+    experiments = Experiment.objects.filter(owner=owner)
+    table = ExperimentTable(experiments)
+    return render(request, 'experiments_table.html', {'table': table})

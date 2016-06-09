@@ -9,7 +9,9 @@ class UserLoginForm(forms.Form):
 
 class RegisterForm(forms.ModelForm):
     password_again = forms.CharField(required=True, widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput())
     tu_net_id = forms.CharField(required=True, label="TU Delft Net ID")
+
     class Meta:
         model = User
         fields = ('username', 'email', 'password')

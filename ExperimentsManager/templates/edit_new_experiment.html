@@ -1,0 +1,8 @@
+{% extends "experiments_table.html" %}
+{% load bootstrap %}
+
+{% block content %}
+    <form action="{% url "edit_new_experiment" %}" method="post">
+        {{ form|bootstrap }}
+    </form>
+{% endblock %}

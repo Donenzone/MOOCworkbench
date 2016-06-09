@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'ExperimentsManager',
     'GitManager',
     'UserManager',
-    'bootstrapform'
+    'bootstrapform',
+    'django_tables2'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -80,6 +81,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.request',
+                'django.core.context_processors.static'
             ],
         },
     },
@@ -143,8 +146,9 @@ USE_TZ = True
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "mw_static"),
 ]
+STATIC_ROOT = '/home/jochem/Development/MOOCworkbench/static/'
 
 WEBPACK_LOADER = {
 'DEFAULT': {

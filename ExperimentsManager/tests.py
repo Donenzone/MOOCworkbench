@@ -21,5 +21,4 @@ class ExperimentTestCase(TestCase):
         c = Client()
         c.login(username='test', password='test')
         response = c.get('/experiments/')
-        print(response)
         self.assertIsNotNone(response.context['table'])

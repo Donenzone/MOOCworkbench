@@ -5,7 +5,8 @@ from UserManager.serializer import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import *
-
+from django.views.generic.detail import DetailView
+from django.utils import timezone
 
 class WorkbenchUserViewset(viewsets.ModelViewSet):
     queryset = WorkbenchUser.objects.all()
@@ -17,7 +18,6 @@ class UserViewset(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
-# Create your views here.
 @login_required
 def index(request):
     return render(request, 'index.html', {'message' : 'Hello, world!'})
@@ -40,6 +40,27 @@ def sign_in(request):
             return render(request, 'login.html', {'form': form})
 
 
+@login_required
+def view_my_profile(request):
+    workbench_user = WorkbenchUser.objects.get(user=request.user)
+    return render(request, "UserManager/workbenchuser_detail.html", {'workbench_user': workbench_user})
+
+
+@login_required
+def edit_profile(request):
+    workbench_user = WorkbenchUser.objects.get(user=request.user)
+    if request.method == 'GET':
+        form = WorkbenchUserForm(instance=workbench_user)
+        return render(request, "UserManager/workbenchuser_edit.html", {'form': form})
+    if request.method == 'POST':
+        form = WorkbenchUserForm(request.POST, instance=workbench_user)
+        if form.is_valid():
+            form.save()
+            return redirect(to='/')
+        else:
+            return render(request, "UserManager/workbenchuser_edit.html", {'form': form})
+
+
 def sign_out(request):
     logout(request)
     return redirect(to='/')
@@ -48,7 +69,7 @@ def sign_out(request):
 def register(request):
     if request.method == 'GET':
         form = RegisterForm()
-        return render(request, 'register.html', {'form': form})
+        return render(request, 'UserManager/register.html', {'form': form})
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -60,4 +81,4 @@ def register(request):
             workbench_user.save()
             return redirect(to='/')
         else:
-            return render(request, 'register.html', {'form': form})
+            return render(request, 'UserManager/register.html', {'form': form})

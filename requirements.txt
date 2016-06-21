@@ -5,3 +5,4 @@ djangorestframework
 django-bootstrap-form
 django-tables2
 gitpython
+requests

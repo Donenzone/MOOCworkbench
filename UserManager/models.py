@@ -14,3 +14,6 @@ class WorkbenchUser(models.Model):
         return self.user.username
 
 
+class SSHKeys(models.Model):
+    ssh_key = models.CharField(max_length=1000, null=True)
+    workbench_user = models.ManyToManyField(to=WorkbenchUser)

@@ -9,3 +9,10 @@ class GitRepository(models.Model):
     owner = models.ForeignKey(to=WorkbenchUser)
     subrepos = models.ManyToManyField(to='GitRepository', blank=True)
     created = models.DateTimeField(auto_now_add=True)
+
+
+class GitHubAuth(models.Model):
+    state = models.CharField(max_length=100)
+    code = models.CharField(max_length=100, null=True)
+    auth_token = models.CharField(max_length=100, null=True)
+    workbench_user = models.OneToOneField(to=WorkbenchUser)

@@ -2,16 +2,27 @@ from django import forms
 from .models import User, WorkbenchUser
 from django.contrib.auth.models import User
 
+
 class UserLoginForm(forms.Form):
     username = forms.CharField(required=True)
     password = forms.CharField(required=True, widget=forms.PasswordInput())
 
 
+class WorkbenchUserForm(forms.ModelForm):
+    netid = forms.CharField(required=True, label="TU Delft Net ID")
+    ssh_key = forms.MultipleChoiceField(required=False, label="SSH key (optional)")
+
+    class Meta:
+        model = WorkbenchUser
+        fields = ('netid', 'ssh_key')
+
+
 class RegisterForm(forms.ModelForm):
-    password_again = forms.CharField(required=True, widget=forms.PasswordInput())
+    email = forms.CharField(required=True)
     password = forms.CharField(widget=forms.PasswordInput())
-    tu_net_id = forms.CharField(required=True, label="TU Delft Net ID")
+    password_again = forms.CharField(required=True, widget=forms.PasswordInput(), label="Password (confirmation)")
+    netid = forms.CharField(required=True, label="TU Delft Net ID")
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ('username', 'email', 'password', 'password_again', 'netid')

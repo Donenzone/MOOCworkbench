@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+
+{% block content %}
+    <h1>{{ workbench_user.user.username }}</h1>
+    <table class="table">
+
+        <tr>
+            <td>Email address</td>
+            <td>{{ workbench_user.user.email }}</td>
+        </tr>
+
+        <tr>
+            <td>Net ID</td>
+            <td>{{ workbench_user.netid }}</td>
+        </tr>
+
+        <tr>
+            <td>SSH-key</td>
+            <td>{{ workbench_user.ssh_key }}</td>
+        </tr>
+
+    </table>
+
+    <a href="{% url "edit_profile" %}">Edit profile</a>
+{% endblock %}

@@ -19,6 +19,7 @@ from rest_framework import routers
 import ExperimentsManager.views
 from GitManager.views import GitRepositoryViewSet
 import UserManager.views
+import GitManager.views
 
 router = routers.DefaultRouter()
 router.register(r'experiment', ExperimentsManager.views.ExperimentViewSet)
@@ -33,7 +34,10 @@ urlpatterns = [
     url(r'^accounts/login/$', UserManager.views.sign_in, name="sign_in"),
     url(r'^accounts/logout/$', UserManager.views.sign_out, name="sign_out"),
     url(r'^accounts/register/$', UserManager.views.register, name="register"),
-
     url(r'^experiments/$', ExperimentsManager.views.index, name="experiments_index"),
+    url(r'^experiments/new$', ExperimentsManager.views.new_edit_experiment, name="new_experiment"),
+    url(r'^experiments/edit/(?P<experiment_id>\d+)$', ExperimentsManager.views.new_edit_experiment, name="edit_experiment"),
+    url(r'^experiment/(?P<pk>[-\w]+)/$', ExperimentsManager.views.ExperimentDetailView.as_view(), name='article-detail'),
     url(r'^$', UserManager.views.index, name="index"),
+    url(r'^git/$', GitManager.views.index, name="git_index"),
 ]

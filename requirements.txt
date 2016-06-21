@@ -4,3 +4,4 @@ django-bootstrap3
 djangorestframework
 django-bootstrap-form
 django-tables2
+gitpython

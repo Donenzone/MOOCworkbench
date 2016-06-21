@@ -10,5 +10,7 @@ class WorkbenchUser(models.Model):
 
     REQUIRED_FIELDS = ['netid',]
 
+    def __str__(self):
+        return self.user.username
 
 

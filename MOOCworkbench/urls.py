@@ -43,6 +43,6 @@ urlpatterns = [
     url(r'^$', UserManager.views.index, name="index"),
     url(r'^git/$', GitManager.views.index, name="git_index"),
 
-    url(r'^github/$', GitManager.views.authortize_github, name="authorize_github"),
+    url(r'^github/$', GitManager.views.authorize_github, name="authorize_github"),
     url(r'^github-callback/$', GitManager.views.callback_authorization_github, name="callback_github"),
 ]

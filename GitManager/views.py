@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from .Modules import Git
 import requests
 from django.utils.crypto import get_random_string
-import json
+from github import Github
 
 CLIENT_ID = '1697609f631820ff6ad3'
 CLIENT_SECRET = 'd466715a419f4f5511b2ad0575b3f9466c88176e'
@@ -27,21 +27,26 @@ def index(request):
 
 
 @login_required
-def authortize_github(request):
+def authorize_github(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     nr_of_github = GitHubAuth.objects.filter(workbench_user=workbench_user).count()
-    if nr_of_github != 0:
-        github_auth = GitHubAuth.objects.get(workbench_user=workbench_user)
-        github_auth.delete()
 
-    if nr_of_github == 0:
-        github_auth = GitHubAuth(state=get_random_string(length=32), workbench_user=workbench_user)
-        github_auth.save()
-        return redirect(
-            to='https://github.com/login/oauth/authorize?client_id=' + CLIENT_ID + '&state=' +
-               github_auth.state + '&redirect_uri=https://mooc.jochem.xyz/github-callback/')
-    else:
-        return redirect(to='/')
+    github_auth = GitHubAuth(state=get_random_string(length=32), workbench_user=workbench_user)
+    github_auth.save()
+    return redirect(
+        to='https://github.com/login/oauth/authorize?client_id=' + CLIENT_ID + '&state=' +
+           github_auth.state + '&scope=repo read:repo_hook' + '&redirect_uri=https://mooc.jochem.xyz/github-callback/')
+
+
+def get_user_repositories(user):
+    workbench_user = WorkbenchUser.objects.get(user=user)
+    git_auth = GitHubAuth.objects.get(workbench_user=workbench_user)
+    g = Github(git_auth.auth_token)
+
+    repo_list = []
+    for repo in g.get_user().get_repos(type='owner'):
+        repo_list.append(repo.name)
+    return repo_list
 
 
 @login_required
@@ -65,5 +70,5 @@ def callback_authorization_github(request):
             access_token = splitted_response[1].split('&scope')[0]
 
             github_auth.auth_token = access_token
-
+            github_auth.save()
             return redirect(to='/')

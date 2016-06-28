@@ -6,6 +6,8 @@ from .tables import ExperimentTable
 from .forms import ExperimentForm
 from django.views.generic.detail import DetailView
 from django.utils import timezone
+from GitManager.views import get_user_repositories
+
 
 # Create your views here.
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -39,7 +41,8 @@ def index(request):
 def new_edit_experiment(request, experiment_id=0):
     if request.method == 'GET':
         form = ExperimentForm()
-        return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id})
+        repository_list = get_user_repositories(request.user)
+        return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
     if request.method == 'POST':
         experiment = Experiment()
 

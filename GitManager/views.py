@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from .Modules import Git
 import requests
 from django.utils.crypto import get_random_string
+import json
 
 CLIENT_ID = '1697609f631820ff6ad3'
 CLIENT_SECRET = 'd466715a419f4f5511b2ad0575b3f9466c88176e'
@@ -28,10 +29,19 @@ def index(request):
 @login_required
 def authortize_github(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
-    github_auth = GitHubAuth(state=get_random_string(length=32), workbench_user=workbench_user)
-    github_auth.save()
-    return redirect(
-        to='https://github.com/login/oauth/authorize?client_id=' + CLIENT_ID + '&state=' + github_auth.state + '&redirect_uri=https://mooc.jochem.xyz/github-callback/')
+    nr_of_github = GitHubAuth.objects.filter(workbench_user=workbench_user).count()
+    if nr_of_github != 0:
+        github_auth = GitHubAuth.objects.get(workbench_user=workbench_user)
+        github_auth.delete()
+
+    if nr_of_github == 0:
+        github_auth = GitHubAuth(state=get_random_string(length=32), workbench_user=workbench_user)
+        github_auth.save()
+        return redirect(
+            to='https://github.com/login/oauth/authorize?client_id=' + CLIENT_ID + '&state=' +
+               github_auth.state + '&redirect_uri=https://mooc.jochem.xyz/github-callback/')
+    else:
+        return redirect(to='/')
 
 
 @login_required
@@ -47,6 +57,13 @@ def callback_authorization_github(request):
             github_auth = github_auth[0]
             github_auth.code = code
             github_auth.save()
-            data = {'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET, 'code': github_auth.code, 'redirect_uri': 'https://mooc.jochem.xyz/github-callback/', 'state': github_auth.state}
+            data = {'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET, 'code': github_auth.code,
+                    'redirect_uri': 'https://mooc.jochem.xyz/github-callback/', 'state': github_auth.state}
             response = requests.post('https://github.com/login/oauth/access_token', data=data)
-            return HttpResponse(response.content.decode("utf-8"))
+            print(response.content.decode("utf-8"))
+            splitted_response = response.content.decode("utf-8").split('=')
+            access_token = splitted_response[1].split('&scope')[0]
+
+            github_auth.auth_token = access_token
+
+            return redirect(to='/')

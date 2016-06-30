@@ -6,7 +6,9 @@
         <div class="col-md-4">
             <h2>Recent Experiments</h2>
             <ul>
-
+            {% for experiment in experiments %}
+                <li><a href="{% url "experiment_detail" experiment.id %}">{{ experiment.title }}</a></li>
+            {% endfor %}
             </ul>
             <a href="{% url "new_experiment" %}">Create new experiment</a>
         </div>

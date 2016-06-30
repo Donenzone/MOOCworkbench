@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 from django.views.generic.detail import DetailView
 from django.utils import timezone
+from ExperimentsManager.models import Experiment
+
 
 class WorkbenchUserViewset(viewsets.ModelViewSet):
     queryset = WorkbenchUser.objects.all()
@@ -20,7 +22,9 @@ class UserViewset(viewsets.ModelViewSet):
 
 @login_required
 def index(request):
-    return render(request, 'index.html', {'message' : 'Hello, world!'})
+    workbench_user = WorkbenchUser.objects.get(user=request.user)
+    experiments = Experiment.objects.filter(owner=workbench_user)[:5]
+    return render(request, 'index.html', {'experiments': experiments})
 
 
 def sign_in(request):

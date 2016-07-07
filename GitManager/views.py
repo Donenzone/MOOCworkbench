@@ -22,9 +22,7 @@ class GitRepositoryViewSet(viewsets.ModelViewSet):
 
 @login_required
 def index(request):
-    Git.create_new_repository('test', 'Python')
     return render(request, 'index.html')
-
 
 @login_required
 def authorize_github(request):
@@ -72,3 +70,10 @@ def callback_authorization_github(request):
             github_auth.auth_token = access_token
             github_auth.save()
             return redirect(to='/')
+
+
+def create_new_repository(repository_name, user, type):
+    if repository_name and user:
+        Git.create_new_repository(repository_name, user, type)
+    else:
+        return Exception("Repository name and/or username empty!")

@@ -6,8 +6,7 @@ from .tables import ExperimentTable
 from .forms import ExperimentForm
 from django.views.generic.detail import DetailView
 from django.utils import timezone
-from GitManager.views import get_user_repositories
-
+from GitManager.views import get_user_repositories, create_new_repository
 
 # Create your views here.
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -52,8 +51,9 @@ def new_edit_experiment(request, experiment_id=0):
         form = ExperimentForm(request.POST, instance=experiment)
         if form.is_valid():
             if form.cleaned_data['new_git_repo']:
-                print("Create new git repo")
+                create_new_repository(experiment.title, request.user.username, 'python')
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
+
             experiment.save()
             return redirect(to=index)
         else:

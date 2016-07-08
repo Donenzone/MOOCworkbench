@@ -5,7 +5,7 @@ from .models import GitRepository, GitHubAuth
 from UserManager.models import WorkbenchUser
 from GitManager.serializer import GitRepositorySerializer
 from django.shortcuts import render, redirect, HttpResponse
-from .Modules import Git
+from .Modules.Git import GitRepo
 import requests
 from django.utils.crypto import get_random_string
 from github import Github
@@ -74,6 +74,37 @@ def callback_authorization_github(request):
 
 def create_new_repository(repository_name, user, type):
     if repository_name and user:
-        Git.create_new_repository(repository_name, user, type)
+        git_repo = GitRepo(repository_name, user, type)
+        return git_repo.create_new_repository()
     else:
-        return Exception("Repository name and/or username empty!")
+        return Exception("Repository name and/or username is empty!")
+
+
+def list_files_in_repo(repository_name, user):
+    if repository_name and user:
+        git_repo = GitRepo(repository_name, user, 'python')
+        return git_repo.list_files_in_repo()
+    else:
+        return Exception("Repository name and/or username is empty!")
+
+
+def view_file_in_repo(repository_name, file_name, user):
+    if repository_name and user and file_name:
+        git_repo = GitRepo(repository_name, user, 'python')
+        return git_repo.view_file_in_repo(file_name)
+    else:
+        return Exception("Repository name and/or username is empty!")
+
+
+def list_files_in_repo_folder(repository_name, user, folder):
+    if repository_name and user:
+        git_repo = GitRepo(repository_name, user, 'python')
+        return git_repo.list_files_in_repo_folder(folder)
+
+
+def commits_in_repository(repository_name, user):
+    if repository_name and user:
+        git_repo = GitRepo(repository_name, user, 'python')
+        return git_repo.list_git_commits()
+    else:
+        return Exception("Repository name and/or username is empty!")

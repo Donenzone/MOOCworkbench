@@ -40,6 +40,8 @@ urlpatterns = [
     url(r'^experiments/new$', ExperimentsManager.views.new_edit_experiment, name="new_experiment"),
     url(r'^experiments/edit/(?P<experiment_id>\d+)$', ExperimentsManager.views.new_edit_experiment, name="edit_experiment"),
     url(r'^experiment/(?P<pk>[-\w]+)/$', ExperimentsManager.views.ExperimentDetailView.as_view(), name='experiment_detail'),
+    url(r'^experiment/file/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_file_in_git_repository, name='file_detail'),
+    url(r'^experiment/folder/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
     url(r'^$', UserManager.views.index, name="index"),
     url(r'^git/$', GitManager.views.index, name="git_index"),
 

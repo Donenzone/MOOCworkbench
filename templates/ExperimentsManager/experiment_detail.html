@@ -24,4 +24,64 @@
         <td>{{ object.owner }}</td>
     </tr>
     </table>
+
+    <h2>Files in Git repository</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    File/Folder name
+                </th>
+                <th>
+                    Git commit
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in git_list %}
+            <tr>
+                <td>
+                    {% if not item.isdir %}
+                        <a href="/experiment/file/{{ object.id }}?file_name={{ item.file }}">{{ item.file }}</a>
+                    {% else %}
+                        <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.file }}">{{ item.file }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ item.hash }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Recent commits</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Message
+                </th>
+                <th>
+                    Hash
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Author
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commit in commit_list %}
+            <tr>
+                <td>{{ commit.message }}</td>
+                <td>{{ commit.hash }}</td>
+                <td>{{ commit.date }}</td>
+                <td>{{ commit.author }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

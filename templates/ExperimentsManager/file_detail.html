@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h2>File contents of {{ name }}</h2>
+    <pre><code class="python">
+    {{ contents|linebreaks }}
+        </code></pre>
+{% endblock %}

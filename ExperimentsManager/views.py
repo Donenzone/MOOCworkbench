@@ -6,9 +6,10 @@ from .tables import ExperimentTable
 from .forms import ExperimentForm
 from django.views.generic.detail import DetailView
 from django.utils import timezone
-from GitManager.views import get_user_repositories, create_new_repository
+from GitManager.views import *
 
 # Create your views here.
+
 class ExperimentViewSet(viewsets.ModelViewSet):
     queryset = Experiment.objects.all().order_by('-created')
     serializer_class = ExperimentSerializer
@@ -25,6 +26,8 @@ class ExperimentDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         context['now'] = timezone.now()
+        context['git_list'] = list_files_in_repo('gitrepository1', self.request.user.username)
+        context['commit_list'] = commits_in_repository('gitrepository1', self.request.user.username)
         return context
 
 
@@ -58,3 +61,21 @@ def new_edit_experiment(request, experiment_id=0):
             return redirect(to=index)
         else:
             return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id})
+
+
+@login_required
+def view_file_in_git_repository(request, pk):
+    if request.method == 'GET':
+        file_name = request.GET['file_name']
+        expirement = Experiment.objects.get(id=pk)
+        data = view_file_in_repo('gitrepository1', file_name, request.user.username)
+        return render(request, 'ExperimentsManager/file_detail.html', {'contents': data, 'name': file_name})
+
+
+def view_list_files_in_repo_folder(request, pk):
+    if request.method == 'GET':
+        folder_name = request.GET['folder_name']
+        expirement = Experiment.objects.get(id=pk)
+        data = list_files_in_repo_folder('gitrepository1', request.user.username, folder_name)
+        print(data)
+        return render(request, 'ExperimentsManager/folder_detail.html', {'contents': data, 'pk': pk})

@@ -7,7 +7,9 @@ from .forms import ExperimentForm
 from django.views.generic.detail import DetailView
 from django.utils import timezone
 from GitManager.views import *
-
+from django.views import View
+from MOOCworkbench.celery import app
+from .tasks import *
 # Create your views here.
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -33,19 +35,21 @@ class ExperimentDetailView(DetailView):
 
 @login_required
 def index(request):
+    res = add.delay(2,2)
     owner = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=owner)
     table = ExperimentTable(experiments)
+    print(res.get(timeout=1))
     return render(request, 'experiments_table.html', {'table': table})
 
 
-@login_required
-def new_edit_experiment(request, experiment_id=0):
-    if request.method == 'GET':
+class CreateExperimentView(View):
+    def get(self, request, experiment_id=0):
         form = ExperimentForm()
         repository_list = get_user_repositories(request.user)
         return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
-    if request.method == 'POST':
+
+    def post(self, request, experiment_id=0):
         experiment = Experiment()
 
         if int(experiment_id) != 0:
@@ -56,7 +60,6 @@ def new_edit_experiment(request, experiment_id=0):
             if form.cleaned_data['new_git_repo']:
                 create_new_repository(experiment.title, request.user.username, 'python')
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
-
             experiment.save()
             return redirect(to=index)
         else:
@@ -72,6 +75,7 @@ def view_file_in_git_repository(request, pk):
         return render(request, 'ExperimentsManager/file_detail.html', {'contents': data, 'name': file_name})
 
 
+@login_required
 def view_list_files_in_repo_folder(request, pk):
     if request.method == 'GET':
         folder_name = request.GET['folder_name']

@@ -7,3 +7,5 @@ django-tables2
 gitpython
 requests
 pygithub
+Celery
+django-celery

@@ -26,6 +26,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# 0 for MASTER, 1 for WORKER
+MASTER_OR_WORKER = 0
+
+MASTER_URL = 'https://mooc.jochem.xyz'
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
@@ -51,6 +56,7 @@ INSTALLED_APPS = [
     'ExperimentsManager',
     'GitManager',
     'UserManager',
+    'WorkerManager',
     'bootstrapform',
     'django_tables2'
 ]
@@ -80,8 +86,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.core.context_processors.request',
-                'django.core.context_processors.static'
+                'django.template.context_processors.request',
+                'django.template.context_processors.static'
             ],
         },
     },
@@ -148,4 +154,3 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "mw_static"),
 ]
 STATIC_ROOT = '/home/jochem/Development/MOOCworkbench/static/'
-

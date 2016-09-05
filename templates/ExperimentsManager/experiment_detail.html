@@ -25,7 +25,7 @@
     </tr>
     </table>
 
-    <h2>Files in Git repository</h2>
+    <h3>Files in Git repository</h3>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -76,7 +76,7 @@
         <tbody>
         {% for commit in commit_list %}
             <tr>
-                <td>{{ commit.message }}</td>
+                <td><b>{{ commit.message }}</b></td>
                 <td>{{ commit.hash }}</td>
                 <td>{{ commit.date }}</td>
                 <td>{{ commit.author }}</td>

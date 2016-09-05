@@ -5,7 +5,7 @@ from .models import GitRepository, GitHubAuth
 from UserManager.models import WorkbenchUser
 from GitManager.serializer import GitRepositorySerializer
 from django.shortcuts import render, redirect, HttpResponse
-from .Modules.Git import GitRepo
+from .modules.Git import GitRepo
 import requests
 from django.utils.crypto import get_random_string
 from github import Github

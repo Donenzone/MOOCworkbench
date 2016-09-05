@@ -1,6 +1,10 @@
 from django.shortcuts import render, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.views import View
 from .models import Worker
+import random
+import string
 # Create your views here.
 
 # Finds a suitable worker available for the job
@@ -17,15 +21,10 @@ def submit_job_to_worker(worker, experiment):
     worker.submit(experiment)
 
 # Registration for new worker available for work
+@method_decorator(csrf_exempt, name='dispatch')
 class WorkerManagerRegistrationView(View):
     def post(self, request):
-        if 'name' in request.POST:
-            name = request.POST['name']
-        if 'location' in request.POST:
-            location = request.POST['location']
-        if 'status' in request.POST:
-            status = request.POST['status']
-        if 'communication_key' in request.POST:
-            communication_key = request.POST['communication_key']
-        Worker.objects.save(name=name, location=name, status=status, communication_key=communication_key)
+        name = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(20))
+        worker = Worker.objects.create(name=name, location='', status=Worker.AVAILABLE, communication_key=name)
+        worker.save()
         return HttpResponse()

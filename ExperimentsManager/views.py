@@ -9,7 +9,6 @@ from django.utils import timezone
 from GitManager.views import *
 from django.views import View
 from MOOCworkbench.celery import app
-from .tasks import *
 # Create your views here.
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -35,11 +34,9 @@ class ExperimentDetailView(DetailView):
 
 @login_required
 def index(request):
-    res = add.delay(2,2)
     owner = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=owner)
     table = ExperimentTable(experiments)
-    print(res.get(timeout=1))
     return render(request, 'experiments_table.html', {'table': table})
 
 

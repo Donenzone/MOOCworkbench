@@ -21,6 +21,7 @@ from ExperimentsManager.views import CreateExperimentView
 from GitManager.views import GitRepositoryViewSet
 import UserManager.views
 import GitManager.views
+from WorkerManager.views import WorkerManagerRegistrationView
 
 router = routers.DefaultRouter()
 router.register(r'experiment', ExperimentsManager.views.ExperimentViewSet)
@@ -48,4 +49,5 @@ urlpatterns = [
 
     url(r'^github/$', GitManager.views.authorize_github, name="authorize_github"),
     url(r'^github-callback/$', GitManager.views.callback_authorization_github, name="callback_github"),
+    url(r'^worker/registration/$', WorkerManagerRegistrationView.as_view(), name="worker_registration")
 ]

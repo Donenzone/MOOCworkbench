@@ -29,7 +29,10 @@ ALLOWED_HOSTS = []
 # 0 for MASTER, 1 for WORKER
 MASTER_OR_WORKER = 0
 
-MASTER_URL = 'https://mooc.jochem.xyz'
+if DEBUG:
+    MASTER_URL = 'http://localhost:8000/'
+else:
+    MASTER_URL = 'https://mooc.jochem.xyz/'
 
 CHANNEL_LAYERS = {
     "default": {
@@ -57,8 +60,10 @@ INSTALLED_APPS = [
     'GitManager',
     'UserManager',
     'WorkerManager',
+    'Worker',
     'bootstrapform',
-    'django_tables2'
+    'django_tables2',
+    'djcelery'
 ]
 
 MIDDLEWARE_CLASSES = [

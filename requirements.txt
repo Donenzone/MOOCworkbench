@@ -9,3 +9,4 @@ requests
 pygithub
 Celery
 django-celery
+pycryptodome

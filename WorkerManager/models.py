@@ -1,5 +1,6 @@
 from django.db import models
 import requests
+from helpers.url_helper import build_url
 # Create your models here.
 
 class Worker(models.Model):
@@ -25,5 +26,5 @@ class Worker(models.Model):
 
     def submit(self, experiment_git_repo_url):
         data = {'git_url': experiment_git_repo_url}
-        response = requests.post(self.location, data=data)
+        response = requests.post(build_url(self.location, ['worker', 'submit']), data=data)
         return response

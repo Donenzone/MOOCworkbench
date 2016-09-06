@@ -27,7 +27,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # 0 for MASTER, 1 for WORKER
-MASTER_OR_WORKER = 0
+MASTER_OR_WORKER = 1
+WORKER = 1
+MASTER = 0
+
+
 
 if DEBUG:
     MASTER_URL = 'http://localhost:8000/'

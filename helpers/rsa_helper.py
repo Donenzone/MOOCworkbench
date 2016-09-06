@@ -10,7 +10,3 @@ def generate_ssh_private_public_key_pair():
 
     file_out = open(os.path.expanduser("~/.ssh/mooc_workbench_rsa.pub"), "wb")
     file_out.write(key.publickey().exportKey('OpenSSH'))
-
-def add_key_to_ssh_agent():
-    os.system("some_command with args")
-generate_ssh_private_public_key_pair()

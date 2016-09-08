@@ -7,6 +7,7 @@ import requests
 from .views import *
 from celery.signals import celeryd_init
 from helpers.url_helper import build_url
+from helpers.ssh_helper import generate_ssh_private_public_key_pair
 
 @periodic_task(run_every=timedelta(seconds=30))
 def report_status_to_master():
@@ -16,5 +17,6 @@ def report_status_to_master():
 
 @celeryd_init.connect()
 def configure_worker(conf=None, **kwargs):
-    data = {'new': True, 'location': MASTER_URL}
+    ssh_pub_key = generate_ssh_private_public_key_pair()
+    data = {'new': True, 'location': MASTER_URL, 'ssh': ssh_pub_key}
     requests.post(build_url(MASTER_URL, ['worker-manager', 'registration'], 'POST'), data=data)

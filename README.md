@@ -17,3 +17,4 @@ Set up a virtuelenv or install the dependencies globally:
 - Migrate the database: `python3 manage.py migrate`
 - Start the Redis server: `redis-server &`
 - Run the local version of the MOOC workbench: `python3 manage.py runserver`
+- In order to start the worker and receive jobs from the master, start Celery with: `celery -A MOOCworkbench worker -l info --beat`

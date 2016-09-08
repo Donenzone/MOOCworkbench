@@ -10,6 +10,7 @@ import string
 import requests
 from datetime import datetime
 from helpers.url_helper import build_url
+from helpers.ssh_helper import add_public_key_to_auth_keys
 # Create your views here.
 
 # Finds a suitable worker available for the job
@@ -39,14 +40,13 @@ class WorkerManagerInformationReceiver(View):
             worker_list = Worker.objects.filter(name=name)
             if worker_list.count() is not 0:
                 worker = worker_list[0]
-        if worker is not None:
-            worker.last_ping = datetime.now()
-            worker.status = status
-            worker.save()
-            return HttpResponse()
-        else:
-            print("No worker found! Invalid status report " + name)
-            return HttpResponse("registration")
+                worker.last_ping = datetime.now()
+                worker.status = status
+                worker.save()
+                return HttpResponse()
+            else:
+                print("No worker found! Invalid status report " + name)
+                return HttpResponse("registration")
 
 # Registration for new worker available for work
 @method_decorator(csrf_exempt, name='dispatch')
@@ -54,17 +54,21 @@ class WorkerManagerRegistrationView(View):
     def post(self, request):
         if 'location' in request.POST:
             location = request.POST['location']
+        if 'ssh' in request.POST:
+            ssh = request.POST['ssh']
         worker = find_existing_worker_from_location(location)
         if worker is not None:
             print("Existing worker added")
             worker.status = Worker.AVAILABLE
+            worker.ssh = ssh
             worker.save()
         else:
             # else create new worker
             name = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(20))
             print("New worker created with name " + name)
-            worker = Worker.objects.create(name=name, location=location, status=Worker.AVAILABLE, communication_key=name)
+            worker = Worker.objects.create(name=name, location=location, status=Worker.AVAILABLE, communication_key=ssh)
             worker.save()
+            add_public_key_to_auth_keys(ssh)
         requests.post(build_url(worker.location, ['worker', 'info'], 'POST'), data={'name': worker.name})
         return HttpResponse()
 

@@ -79,7 +79,7 @@ def register(request):
         if form.is_valid():
             user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'], form.cleaned_data['password'])
             workbench_user = WorkbenchUser()
-            workbench_user.netid = form.cleaned_data['tu_net_id']
+            workbench_user.netid = form.cleaned_data['netid']
             workbench_user.can_run_experiments = True
             workbench_user.user = user
             workbench_user.save()

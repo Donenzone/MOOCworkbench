@@ -38,13 +38,15 @@ def authorize_github(request):
 
 def get_user_repositories(user):
     workbench_user = WorkbenchUser.objects.get(user=user)
-    git_auth = GitHubAuth.objects.get(workbench_user=workbench_user)
-    g = Github(git_auth.auth_token)
-
-    repo_list = []
-    for repo in g.get_user().get_repos(type='owner'):
-        repo_list.append(repo.name)
-    return repo_list
+    git_auth = GitHubAuth.objects.filter(workbench_user=workbench_user)
+    if git_auth.count() is not 0:
+        git_auth = git_auth[0]
+        g = Github(git_auth.auth_token)
+        repo_list = []
+        for repo in g.get_user().get_repos(type='owner'):
+            repo_list.append(repo.name)
+        return repo_list
+    return []
 
 
 @login_required

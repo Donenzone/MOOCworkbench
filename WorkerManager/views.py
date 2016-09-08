@@ -60,7 +60,7 @@ class WorkerManagerRegistrationView(View):
         if worker is not None:
             print("Existing worker added")
             worker.status = Worker.AVAILABLE
-            worker.ssh = ssh
+            worker.communication_key = ssh
             worker.save()
         else:
             # else create new worker

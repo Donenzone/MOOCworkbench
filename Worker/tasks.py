@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from celery import task
 from celery.decorators import periodic_task
 from datetime import timedelta
-from MOOCworkbench.settings import MASTER_URL, MASTER_URL
+from MOOCworkbench.settings import MASTER_URL, WORKER_URL
 import requests
 from .views import *
 from celery.signals import celeryd_init

@@ -18,5 +18,5 @@ def report_status_to_master():
 @celeryd_init.connect()
 def configure_worker(conf=None, **kwargs):
     ssh_pub_key = generate_ssh_private_public_key_pair()
-    data = {'new': True, 'location': MASTER_URL, 'ssh': ssh_pub_key}
+    data = {'new': True, 'location': WORKER_URL, 'ssh': ssh_pub_key}
     requests.post(build_url(MASTER_URL, ['worker-manager', 'registration'], 'POST'), data=data)

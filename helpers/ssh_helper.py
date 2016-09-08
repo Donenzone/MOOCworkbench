@@ -19,4 +19,4 @@ def add_public_key_to_auth_keys(ssh_pub_key):
         auth_key_file.write(ssh_pub_key + '\n')
 
 def clone_repo_via_ssh(git_path, repo_name):
-    Repo.clone_from('jochem@192.168.29.128:' + git_path, repo_name)
+    Repo.clone_from('jochem@192.168.2.100:' + git_path, repo_name)

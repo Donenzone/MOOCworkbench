@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db.models import Q
+from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh
 # Create your views here.
 
 
@@ -29,6 +30,7 @@ class ReceiveWorkerInformationView(View):
             name = request.POST['name']
         worker = WorkerInformation.objects.create(name=name, location=MASTER_URL)
         worker.save()
+        clone_repo_via_ssh('/home/jochem/Development/MOOCworkbench/gitrepositories/jochem/Test', 'Test')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ReceiveNewExperiment(View):

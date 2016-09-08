@@ -10,7 +10,7 @@ import string
 import requests
 from datetime import datetime
 from helpers.url_helper import build_url
-from helpers.ssh_helper import add_public_key_to_auth_keys
+from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh
 # Create your views here.
 
 # Finds a suitable worker available for the job
@@ -60,6 +60,7 @@ class WorkerManagerRegistrationView(View):
         if worker is not None:
             print("Existing worker added")
             worker.status = Worker.AVAILABLE
+            worker.location = location
             worker.communication_key = ssh
             worker.save()
         else:

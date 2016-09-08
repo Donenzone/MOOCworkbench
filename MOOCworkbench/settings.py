@@ -32,9 +32,9 @@ WORKER = 1
 MASTER = 0
 
 
-
+WORKER_URL = 'http://192.168.2.99/'
 if DEBUG:
-    MASTER_URL = 'http://localhost:8000/'
+    MASTER_URL = 'http://192.168.2.100/'
 else:
     MASTER_URL = 'https://mooc.jochem.xyz/'
 

@@ -84,8 +84,7 @@ class Gitolite():
                 self.add_repo(active_repo, None)
             elif line.startswith('R'):
                 user = line.split('=')
-                print('{0} {1} {2}'.format(active_repo, use[1], user[0]))
-                self.add_user_to_repo(active_repo, user[1], user[0])
+                self.add_user_to_repo(active_repo, user[1].strip(), user[0].strip())
             elif line.startswith('@'):
                 print("Group")
 
@@ -93,7 +92,7 @@ class Gitolite():
         updated_config = open("gitolite.conf", 'w+')
 
         for repo in self.repos:
-            updated_config.write('{0}\n'.format(repo.pretty_print()))
+            updated_config.write('{0}\n\n'.format(repo.pretty_print()))
         updated_config.close()
 
 git = Gitolite()

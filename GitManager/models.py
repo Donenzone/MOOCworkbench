@@ -18,3 +18,18 @@ class GitHubAuth(models.Model):
     code = models.CharField(max_length=100, null=True)
     auth_token = models.CharField(max_length=100, null=True)
     workbench_user = models.OneToOneField(to=WorkbenchUser)
+
+class GitRights(models.Model):
+    READ = 0
+    WRITE = 1
+    RW = 2
+
+    rights = (
+        (READ, 'Read'),
+        (WRITE, 'Write'),
+        (RW, 'Read/Write')
+    )
+
+    user = models.ForeignKey(to=WorkbenchUser)
+    repo = models.ForeignKey(to=GitRepository)
+    rights = models.CharField(choices=rights, max_length=2, default=READ)

@@ -22,7 +22,7 @@ from GitManager.views import GitRepositoryViewSet
 import UserManager.views
 import GitManager.views
 from WorkerManager.views import WorkerManagerRegistrationView, WorkerManagerInformationReceiver, WorkerList
-from Worker.views import ReceiveWorkerInformationView
+from Worker.views import ReceiveWorkerInformationView, ReceiveNewExperiment
 from django.contrib.auth.decorators import login_required
 
 router = routers.DefaultRouter()
@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^experiments/new$', CreateExperimentView.as_view(), name="new_experiment"),
     url(r'^experiments/edit/(?P<experiment_id>\d+)$', CreateExperimentView.as_view(), name="edit_experiment"),
     url(r'^experiment/(?P<pk>[-\w]+)/$', ExperimentsManager.views.ExperimentDetailView.as_view(), name='experiment_detail'),
+    url(r'^experiment/run/(?P<pk>[-\w]+)/$', ExperimentsManager.views.run_experiment_view, name='run_experiment'),
     url(r'^experiment/file/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_file_in_git_repository, name='file_detail'),
     url(r'^experiment/folder/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
     url(r'^$', UserManager.views.index, name="index"),
@@ -56,7 +57,8 @@ urlpatterns = [
     url(r'^worker-manager/status-report/$', WorkerManagerInformationReceiver.as_view(), name="worker_manager_registration"),
 
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
-    url(r'^worker/info/$', ReceiveWorkerInformationView.as_view(), name="worker_info")
+    url(r'^worker/info/$', ReceiveWorkerInformationView.as_view(), name="worker_info"),
+    url(r'^worker/submit/$', ReceiveNewExperiment.as_view(), name="worker_submit")
 
 
 ]

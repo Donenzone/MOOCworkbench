@@ -7,10 +7,10 @@
         {{ form|bootstrap }}
 
         <div class="form-group">
-          <label for="github_repo">...Or select an existing GitHub repository:</label>
-          <select class="form-control" id="github_repo">
+          <label for="github">...Or select an existing GitHub repository:</label>
+          <select class="form-control" id="github" name="github">
               {% for repo in repository_list %}
-            <option>{{ repo }}</option>
+            <option value="{{ repo.1 }}">{{ repo.0 }}</option>
               {% endfor %}
           </select>
         </div>

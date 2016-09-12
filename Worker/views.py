@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db.models import Q
 from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh
+from git import Repo
 # Create your views here.
 
 

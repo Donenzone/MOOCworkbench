@@ -9,6 +9,7 @@ from django.utils import timezone
 from GitManager.views import *
 from django.views import View
 from MOOCworkbench.celery import app
+from WorkerManager.views import run_experiment
 # Create your views here.
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -40,6 +41,13 @@ def index(request):
     return render(request, 'experiments_table.html', {'table': table})
 
 
+@login_required
+def run_experiment_view(request, pk):
+    owner = WorkbenchUser.objects.get(user=request.user)
+    experiment = Experiment.objects.get(pk=pk)
+    run_experiment(experiment, owner)
+    return render(request, 'experiment_run.html', {'status': 'Started'})
+
 class CreateExperimentView(View):
     def get(self, request, experiment_id=0):
         form = ExperimentForm()
@@ -53,14 +61,23 @@ class CreateExperimentView(View):
             experiment = Experiment.objects.get(id=experiment_id)
 
         form = ExperimentForm(request.POST, instance=experiment)
+        print(request.POST['github'])
         if form.is_valid():
+            experiment.owner = WorkbenchUser.objects.get(user=request.user)
             if form.cleaned_data['new_git_repo']:
                 create_new_repository(experiment.title, request.user.username, 'python')
-            experiment.owner = WorkbenchUser.objects.get(user=request.user)
+            elif request.POST['github'] is not '':
+                git_repo = GitRepository()
+                git_repo.title = experiment.title
+                git_repo.git_url = request.POST['github']
+                git_repo.owner = experiment.owner
+                git_repo.save()
+                experiment.git_repo = git_repo
             experiment.save()
             return redirect(to=index)
         else:
-            return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id})
+            repository_list = get_user_repositories(request.user)
+            return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
 
 
 @login_required

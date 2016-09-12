@@ -44,7 +44,7 @@ def get_user_repositories(user):
         g = Github(git_auth.auth_token)
         repo_list = []
         for repo in g.get_user().get_repos(type='owner'):
-            repo_list.append(repo.name)
+            repo_list.append((repo.name, repo.clone_url))
         return repo_list
     return []
 
@@ -77,10 +77,10 @@ def callback_authorization_github(request):
 def create_new_repository(repository_name, user, type):
     if repository_name and user:
         git_repo = GitRepo(repository_name, user, type)
-        return git_repo.create_new_repository()
+        git_repo.create_new_repository()
+        return git_repo
     else:
         return Exception("Repository name and/or username is empty!")
-
 
 def list_files_in_repo(repository_name, user):
     if repository_name and user:

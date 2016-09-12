@@ -26,5 +26,7 @@ class Worker(models.Model):
 
     def submit(self, experiment_git_repo_url, repo_name):
         data = {'git_url': experiment_git_repo_url, 'repo_name': repo_name}
-        response = requests.post(build_url(self.location, ['worker', 'submit']), data=data)
+        response = requests.post(build_url(self.location, ['worker', 'submit'], 'POST'), data=data)
+        self.status = self.BUSY
+        self.save()
         return response

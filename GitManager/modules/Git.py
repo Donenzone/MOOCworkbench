@@ -8,7 +8,7 @@ BASE_REPO_FOLDER = 'bare_repos'
 
 class GitRepo():
 
-    def __init__(self, repository_name, user, type):
+    def __init__(self, repository_name, user, type='python'):
         self.repository_name = repository_name
         self.user = user
         self.type = type

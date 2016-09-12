@@ -32,9 +32,9 @@ WORKER = 1
 MASTER = 0
 
 
-WORKER_URL = 'http://192.168.2.99/'
+WORKER_URL = 'http://127.0.0.1:8000/' # set here the host name if the current server is a Worker
 if DEBUG:
-    MASTER_URL = 'http://192.168.2.100/'
+    MASTER_URL = 'http://127.0.0.1:8000/'
 else:
     MASTER_URL = 'https://mooc.jochem.xyz/'
 

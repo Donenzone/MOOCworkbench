@@ -24,7 +24,7 @@ class Worker(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNKNOWN)
     communication_key = models.CharField(max_length=200)
 
-    def submit(self, experiment_git_repo_url):
-        data = {'git_url': experiment_git_repo_url}
+    def submit(self, experiment_git_repo_url, repo_name):
+        data = {'git_url': experiment_git_repo_url, 'repo_name': repo_name}
         response = requests.post(build_url(self.location, ['worker', 'submit']), data=data)
         return response

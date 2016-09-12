@@ -28,12 +28,19 @@ class ReceiveWorkerInformationView(View):
     def post(self, request):
         if 'name' in request.POST:
             name = request.POST['name']
+        if 'repo_url' in request.POST:
+            repo_url = request.POST['repo_url']
         worker = WorkerInformation.objects.create(name=name, location=MASTER_URL)
         worker.save()
         clone_repo_via_ssh('/home/jochem/Development/MOOCworkbench/gitrepositories/jochem/Test', 'Test')
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class ReceiveNewExperiment(View):
     def post(self, request):
-        print(request.POST)
         print("New job received")
+        if 'repo_name' in request.POST:
+            repo_name = request.POST['repo_name']
+        if 'git_url' in request.POST:
+            repo_url = request.POST['git_url']
+            Repo.clone_from(repo_url, to_path='gitrepositories/{0}'.format(repo_name))

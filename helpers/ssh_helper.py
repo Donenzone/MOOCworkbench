@@ -1,6 +1,7 @@
 from Crypto.PublicKey import RSA
 import os
 from git import Repo
+from GitManager.models import *
 
 def generate_ssh_private_public_key_pair():
     key = RSA.generate(2048)
@@ -20,3 +21,9 @@ def add_public_key_to_auth_keys(ssh_pub_key):
 
 def clone_repo_via_ssh(git_path, repo_name):
     Repo.clone_from('jochem@192.168.2.100:' + git_path, repo_name)
+
+def get_repo_url_for_worker(repo_url, user):
+    workbench_user = WorkbenchUser.objects.get(user=user)
+    github = GitHubAuth.objects.get(workbench_user=workbench_user)
+    repo_url = repo_url.replace('github.com', '{0}@github.com'.format(github.auth_token))
+    return repo_url

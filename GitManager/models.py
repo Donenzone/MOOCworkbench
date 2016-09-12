@@ -1,7 +1,6 @@
 from django.db import models
 from UserManager.models import WorkbenchUser
 
-
 # Create your models here.
 class GitRepository(models.Model):
     title = models.CharField(max_length=200)
@@ -10,8 +9,8 @@ class GitRepository(models.Model):
     subrepos = models.ManyToManyField(to='GitRepository', blank=True)
     created = models.DateTimeField(auto_now_add=True)
     github_id = models.IntegerField(null=True)
+    github_clone_url = models.CharField(max_length=200, null=True)
     hooks_url = models.CharField(max_length=100, null=True)
-
 
 class GitHubAuth(models.Model):
     state = models.CharField(max_length=100)

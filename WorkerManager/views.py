@@ -10,7 +10,7 @@ import string
 import requests
 from datetime import datetime
 from helpers.url_helper import build_url
-from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh
+from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh, get_repo_url_for_worker
 # Create your views here.
 
 # Finds a suitable worker available for the job
@@ -24,7 +24,11 @@ def find_suitable_worker():
 
 # Submits job to the worker
 def submit_job_to_worker(worker, experiment):
-    worker.submit(experiment)
+    repo_url = experiment.git_repo.github_clone_url
+    repo_name = experiment.git_repo.title
+    if repo_url is None:
+        repo_url = experiment.git_repo.git_url
+    worker.submit(repo_url, repo_name)
 
 class WorkerList(ListView):
     model = Worker

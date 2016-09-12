@@ -94,6 +94,3 @@ class Gitolite():
         for repo in self.repos:
             updated_config.write('{0}\n\n'.format(repo.pretty_print()))
         updated_config.close()
-
-git = Gitolite()
-git.write_config_file()

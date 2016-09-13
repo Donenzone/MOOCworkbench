@@ -13,10 +13,12 @@ from helpers.url_helper import build_url
 from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh, get_repo_url_for_worker
 # Create your views here.
 
+
 def run_experiment(experiment, user):
     print("About to run experiment")
     worker = find_suitable_worker()
     submit_job_to_worker(worker, experiment)
+
 
 # Finds a suitable worker available for the job
 def find_suitable_worker():
@@ -27,14 +29,17 @@ def find_suitable_worker():
     else:
         return None
 
+
 # Submits job to the worker
 def submit_job_to_worker(worker, experiment):
     repo_url = experiment.git_repo.git_url
     repo_name = experiment.git_repo.title
     worker.submit(repo_url, repo_name)
 
+
 class WorkerList(ListView):
     model = Worker
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class WorkerManagerInformationReceiver(View):
@@ -54,6 +59,7 @@ class WorkerManagerInformationReceiver(View):
             else:
                 print("No worker found! Invalid status report " + name)
                 return HttpResponse("registration")
+
 
 # Registration for new worker available for work
 @method_decorator(csrf_exempt, name='dispatch')
@@ -79,6 +85,7 @@ class WorkerManagerRegistrationView(View):
             add_public_key_to_auth_keys(ssh)
         requests.post(build_url(worker.location, ['worker', 'info'], 'POST'), data={'name': worker.name})
         return HttpResponse()
+
 
 def find_existing_worker_from_location(location):
     workers = Worker.objects.filter(location=location)

@@ -20,9 +20,11 @@ def get_current_status():
         status = Worker.BUSY
     return status
 
+
 def get_worker_name():
     worker = WorkerInformation.objects.first()
     return worker.name
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ReceiveWorkerInformationView(View):
@@ -33,7 +35,6 @@ class ReceiveWorkerInformationView(View):
             repo_url = request.POST['repo_url']
         worker = WorkerInformation.objects.create(name=name, location=MASTER_URL)
         worker.save()
-        clone_repo_via_ssh('/home/jochem/Development/MOOCworkbench/gitrepositories/jochem/Test', 'Test')
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -45,3 +46,4 @@ class ReceiveNewExperiment(View):
         if 'git_url' in request.POST:
             repo_url = request.POST['git_url']
             Repo.clone_from(repo_url, to_path='gitrepositories/{0}'.format(repo_name))
+

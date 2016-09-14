@@ -1,10 +1,5 @@
 from __future__ import absolute_import
 from celery import task
-from shutil import copyfile
-import fileinput
-from docker import Client
-from io import BytesIO
-import os
 from subprocess import Popen, PIPE
 
 dockerfile_str = '''
@@ -15,7 +10,12 @@ RUN pip install -r requirements.txt
 '''
 
 @task
-def setup_docker_image(path_to_repo, repo_name):
+def start_code_execution(repo_name):
+    setup_docker_image(repo_name)
+    start_code_run()
+
+
+def setup_docker_image(repo_name):
     print("Setting up Docker environment")
     create_docker_file(repo_name)
     p = Popen(['docker', 'build', '-t', 'moocworkbench', '.', '--tag', 'moocworkbench/mooc'],

@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db.models import Q
-from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh
+from RunManager.run_manager import start_code_execution
 from git import Repo
 # Create your views here.
 
@@ -45,5 +45,5 @@ class ReceiveNewExperiment(View):
             repo_name = request.POST['repo_name']
         if 'git_url' in request.POST:
             repo_url = request.POST['git_url']
-            Repo.clone_from(repo_url, to_path='gitrepositories/{0}'.format(repo_name))
-
+            Repo.clone_from(repo_url, to_path='RunManager/gitrepositories/{0}'.format(repo_name))
+            start_code_execution.delay(repo_name)

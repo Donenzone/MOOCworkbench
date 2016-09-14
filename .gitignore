@@ -37,7 +37,9 @@ var/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+
 gitrepositories/
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
@@ -48,6 +50,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+
 
 # Translations
 *.mo
@@ -72,3 +75,4 @@ static/bundle.js
 celerybeat-schedule.db
 
 dump.rdb
+

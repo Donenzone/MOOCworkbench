@@ -23,7 +23,6 @@ def clone_repo_via_ssh(git_path, repo_name):
     Repo.clone_from('jochem@192.168.2.100:' + git_path, repo_name)
 
 def get_repo_url_for_worker(repo_url, user):
-    workbench_user = WorkbenchUser.objects.get(user=user)
-    github = GitHubAuth.objects.get(workbench_user=workbench_user)
+    github = GitHubAuth.objects.get(workbench_user=user)
     repo_url = repo_url.replace('github.com', '{0}@github.com'.format(github.auth_token))
     return repo_url

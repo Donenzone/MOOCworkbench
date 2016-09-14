@@ -1,6 +1,7 @@
 from git import Repo
 from MOOCworkbench.settings import BASE_DIR
 from os import listdir, path
+from .modules import Gitolite, GitoliteRepo
 
 REPOSITORY_FOLDER = 'gitrepositories'
 BASE_REPO_FOLDER = 'bare_repos'
@@ -12,18 +13,16 @@ class GitRepo():
         self.repository_name = repository_name
         self.user = user
         self.type = type
+        self.gitolite = Gitolite()
+        self.gitolite_repo = None
         self.PATH = '{0}/{1}/{2}/{3}'.format(BASE_DIR, REPOSITORY_FOLDER, self.user, self.repository_name)
         self.BARE_PATH = '{0}/{1}/{2}/{3}/{4}'.format(BASE_DIR, REPOSITORY_FOLDER, user, BASE_REPO_FOLDER, repository_name)
         if path.isdir(self.PATH):
             self.repo = Repo(self.PATH)
 
     def create_new_repository(self):
-        try:
-            bare_repo = Repo.init(self.BARE_PATH, bare=True)
-            return self.clone_bare_repo(bare_repo)
-        except Exception as e:
-            return "Could not create new repo: {0}".format(e)
-
+        self.gitolite_repo = self.gitolite.add_repo(self.repository_name, self.user)
+        
     def clone_bare_repo(self, repo):
         self.repo = repo.clone(self.PATH)
 
@@ -34,6 +33,13 @@ class GitRepo():
         # commit and push base file
         self.repo.index.add([file_name])
         self.repo.index.commit("Initial commit by MOOC workbench")
+        self.repo.remote().push()
+
+    def commit(files, commit_message):
+        self.repo.index.add(files)
+        self.repo.index.commit(commit_message)
+
+    def push():
         self.repo.remote().push()
 
     def add_submodule_to_repo(self):

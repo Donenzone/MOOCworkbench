@@ -1,3 +1,6 @@
+from MOOCworkbench.settings import BASE_DIR
+from git import Repo
+
 class GitoliteRepo():
     def __init__(self, repo_name, username):
         self.repo_name = repo_name
@@ -24,6 +27,33 @@ class GitoliteRepo():
             right_str += 'RW+'
         return right_str
 
+    def list_files_in_repo(self):
+        # check if this user repository exists
+        file_list = []
+        for obj in self.repo.tree():
+            file_list.append({'file': obj.name, 'hash': obj, 'isdir': path.isdir('{0}/{1}'.format(self.PATH, obj.name))})
+        return file_list
+
+    def list_git_commits(self):
+        commit_list = []
+        for commit in self.repo.iter_commits():
+            commit_list.append({'date': commit.authored_date, 'author': commit.author, 'hash': commit.hexsha, 'message': commit.message})
+        return commit_list
+
+    def view_file_in_repo(self, file_name):
+        tree = self.repo.tree()
+        blob = tree / file_name
+        data = blob.data_stream.read()
+        return data
+
+    def list_files_in_repo_folder(self, folder_name):
+        tree = self.repo.tree()
+        folder = tree / folder_name
+        file_list = []
+        for obj in folder:
+            file_list.append({'file': obj.name, 'hash': obj, 'isdir': path.isdir('{0}/{1}'.format(self.PATH, obj.name))})
+        return file_list
+
     def pretty_print(self):
         config_file = "repo {0}\n".format(self.repo_name)
         for key, value in self.users.items():
@@ -40,7 +70,8 @@ class Gitolite():
     def add_repo(self, repo_name, username):
         repo = GitoliteRepo(repo_name, username)
         self.repos.append(repo)
-        return True
+        self.write_config_file()
+        return repo
 
     def add_user_to_repo(self, repo_name, username, rights):
         repo = self.find_repo(repo_name)
@@ -69,14 +100,13 @@ class Gitolite():
         new_key_file.close()
 
     def read_config_file(self):
-        with open("/Users/jochem/Development/gitolite-admin/conf/gitolite.conf") as f:
+        with open("{0}/gitrepositories/gitolite-admin/conf/gitolite.conf".format(BASE_DIR)) as f:
             config = f.readlines()
 
         active_repo = ''
         for line in config:
             line = line.replace('\n', '')
             line = line.strip()
-            print(line)
             if line.startswith('repo'):
                 repo = line.split(' ')
                 del repo[0]
@@ -89,8 +119,19 @@ class Gitolite():
                 print("Group")
 
     def write_config_file(self):
-        updated_config = open("gitolite.conf", 'w+')
+        updated_config = open("{0}/gitrepositories/gitolite-admin/conf/gitolite.conf".format(BASE_DIR), 'w+')
 
         for repo in self.repos:
             updated_config.write('{0}\n\n'.format(repo.pretty_print()))
         updated_config.close()
+
+    def push_config_changes(self):
+        print("Activate new changes")
+        admin_repo = Repo("{0}/gitrepositories/gitolite-admin/".format(BASE_DIR))
+        admin_repo.index.add(['conf/gitolite.conf',])
+        admin_repo.index.commit("Added new repository")
+        admin_repo.remote().push()
+
+git = Gitolite()
+git.add_repo('new_test', 'jochem')
+git.push_config_changes()

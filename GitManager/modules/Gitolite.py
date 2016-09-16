@@ -1,5 +1,7 @@
 from MOOCworkbench.settings import BASE_DIR
 from git import Repo
+from os import path
+
 
 class GitoliteRepo():
     def __init__(self, repo_name, username):
@@ -19,12 +21,12 @@ class GitoliteRepo():
 
     def extract_rights(self, rights):
         right_str = ''
-        if 'READ' in rights:
-            right_str += 'R'
-        if 'WRITE' in rights:
-            right_str += 'W'
-        if 'RW' in rights:
+        if 'RW+' in rights:
             right_str += 'RW+'
+        elif 'R' in rights:
+            right_str += 'R'
+        elif 'W' in rights:
+            right_str += 'W'
         return right_str
 
     def list_files_in_repo(self):
@@ -56,10 +58,15 @@ class GitoliteRepo():
 
     def pretty_print(self):
         config_file = "repo {0}\n".format(self.repo_name)
+        worker_already_included = False
         for key, value in self.users.items():
             config_file += "\t{0} \t= \t{1}\n".format(self.extract_rights(value), key)
-        config_file += "\tR \t= \t@workers"
+            if 'workers' in key:
+                worker_already_included = True
+        if not worker_already_included:
+            config_file += "\tR \t= \t@workers"
         return config_file
+
 
 class Gitolite():
     def __init__(self):
@@ -67,11 +74,14 @@ class Gitolite():
         self.user_groups = []
         self.read_config_file()
 
-    def add_repo(self, repo_name, username):
-        repo = GitoliteRepo(repo_name, username)
-        self.repos.append(repo)
-        self.write_config_file()
-        return repo
+    def add_repo(self, repo_name, username, from_config=False):
+        existing_repo = self.find_repo(repo_name)
+        if not from_config and existing_repo is not None:
+            print("Existing repo found: " + str(existing_repo))
+        else:
+            repo = GitoliteRepo(repo_name, username)
+            self.repos.append(repo)
+            return repo
 
     def add_user_to_repo(self, repo_name, username, rights):
         repo = self.find_repo(repo_name)
@@ -92,7 +102,7 @@ class Gitolite():
         repo = next((x for x in self.repos if x.repo_name == repo_name), None)
         if repo is not None:
             return repo
-        return Exception("Repository not found")
+        return None
 
     def add_ssh_key(self, username, ssh_public_key):
         new_key_file = open("{0}.pub".format(username), 'w+')
@@ -111,7 +121,7 @@ class Gitolite():
                 repo = line.split(' ')
                 del repo[0]
                 active_repo = repo[0]
-                self.add_repo(active_repo, None)
+                self.add_repo(active_repo, None, from_config=True)
             elif line.startswith('R'):
                 user = line.split('=')
                 self.add_user_to_repo(active_repo, user[1].strip(), user[0].strip())
@@ -133,5 +143,6 @@ class Gitolite():
         admin_repo.remote().push()
 
 git = Gitolite()
-git.add_repo('new_test', 'jochem')
+git.add_repo('new_test6', 'jochem')
 git.push_config_changes()
+git.write_config_file()

@@ -64,8 +64,9 @@ class CreateExperimentView(View):
         form = ExperimentForm(request.POST, instance=experiment)
         if form.is_valid():
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
+            experiment.save()
             if form.cleaned_data['new_git_repo']:
-                create_new_repository(experiment.title, request.user.username, 'python')
+                create_new_repository(experiment.title, request.user, 'python', experiment)
             elif request.POST['github'] is not '':
                 git_repo = GitRepository()
                 git_repo.title = experiment.title
@@ -73,7 +74,6 @@ class CreateExperimentView(View):
                 git_repo.owner = experiment.owner
                 git_repo.save()
                 experiment.git_repo = git_repo
-            experiment.save()
             return redirect(to=index)
         else:
             repository_list = get_user_repositories(request.user)

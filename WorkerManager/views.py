@@ -34,7 +34,6 @@ def find_suitable_worker():
 def submit_job_to_worker(worker, experiment, user):
     repo_url = get_repo_url_for_worker(experiment.git_repo.git_url, user)
     repo_name = experiment.git_repo.title
-    print(repo_url)
     worker.submit(repo_url, repo_name)
 
 

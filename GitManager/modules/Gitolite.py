@@ -67,7 +67,7 @@ class GitoliteRepo():
         return config_file
 
     def get_path(self):
-        return "jochem@localhost:{0}".format(self.repo_name)
+        return "git@localhost:{0}".format(self.repo_name)
 
 
 class Gitolite():
@@ -80,6 +80,7 @@ class Gitolite():
         existing_repo = self.find_repo(repo_name)
         if not from_config and existing_repo is not None:
             print("Existing repo found: " + str(existing_repo))
+            return existing_repo
         else:
             repo = GitoliteRepo(repo_name, username)
             self.repos.append(repo)
@@ -141,7 +142,6 @@ class Gitolite():
         self.write_config_file()
         print("Committing and pushing new changes")
         admin_repo = Repo("{0}/gitrepositories/gitolite-admin/".format(BASE_DIR))
-        print(admin_repo)
         admin_repo.index.add(['conf/gitolite.conf',])
         admin_repo.index.commit("Added new repository")
         admin_repo.remote().push()

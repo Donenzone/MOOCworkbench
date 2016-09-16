@@ -75,14 +75,22 @@ def callback_authorization_github(request):
             return redirect(to='/')
 
 
-def create_new_repository(repository_name, user, type):
+def create_new_repository(repository_name, user, type, experiment):
     if repository_name and user:
         print("Creating git repo")
         gitolite = Gitolite()
         gitolite_repo = gitolite.add_repo(repository_name, user)
         gitolite.push_config_changes()
+
         git_repo = GitRepo(repository_name, user, gitolite_repo.get_path())
         git_repo.clone_bare_repo()
+
+        owner = WorkbenchUser.objects.get(user=user)
+        git_db = GitRepository(git_url=gitolite_repo.get_path(), owner=owner, title=repository_name)
+        git_db.save()
+
+        experiment.git_repo = git_db
+        experiment.save()
         return git_repo
     else:
         return Exception("Repository name and/or username is empty!")

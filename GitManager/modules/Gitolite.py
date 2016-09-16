@@ -30,7 +30,6 @@ class GitoliteRepo():
         return right_str
 
     def list_files_in_repo(self):
-        # check if this user repository exists
         file_list = []
         for obj in self.repo.tree():
             file_list.append({'file': obj.name, 'hash': obj, 'isdir': path.isdir('{0}/{1}'.format(self.PATH, obj.name))})
@@ -136,13 +135,8 @@ class Gitolite():
         updated_config.close()
 
     def push_config_changes(self):
-        print("Activate new changes")
+        print("Committing and pushing new changes")
         admin_repo = Repo("{0}/gitrepositories/gitolite-admin/".format(BASE_DIR))
         admin_repo.index.add(['conf/gitolite.conf',])
         admin_repo.index.commit("Added new repository")
         admin_repo.remote().push()
-
-git = Gitolite()
-git.add_repo('new_test6', 'jochem')
-git.push_config_changes()
-git.write_config_file()

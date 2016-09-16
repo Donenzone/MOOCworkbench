@@ -66,6 +66,9 @@ class GitoliteRepo():
             config_file += "\tR \t= \t@workers"
         return config_file
 
+    def get_path(self):
+        return "jochem@localhost:{0}".format(self.repo_name)
+
 
 class Gitolite():
     def __init__(self):
@@ -135,8 +138,10 @@ class Gitolite():
         updated_config.close()
 
     def push_config_changes(self):
+        self.write_config_file()
         print("Committing and pushing new changes")
         admin_repo = Repo("{0}/gitrepositories/gitolite-admin/".format(BASE_DIR))
+        print(admin_repo)
         admin_repo.index.add(['conf/gitolite.conf',])
         admin_repo.index.commit("Added new repository")
         admin_repo.remote().push()

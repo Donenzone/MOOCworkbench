@@ -5,7 +5,8 @@ from .models import GitRepository, GitHubAuth
 from UserManager.models import WorkbenchUser
 from GitManager.serializer import GitRepositorySerializer
 from django.shortcuts import render, redirect, HttpResponse
-from .modules.Gitolite import Gitolite, GitoliteRepo
+from .modules.Gitolite import Gitolite
+from .modules.Git import GitRepo
 import requests
 from django.utils.crypto import get_random_string
 from github import Github
@@ -76,11 +77,16 @@ def callback_authorization_github(request):
 
 def create_new_repository(repository_name, user, type):
     if repository_name and user:
+        print("Creating git repo")
         gitolite = Gitolite()
-        git_repo = gitolite.add_repo(repository_name, user)
+        gitolite_repo = gitolite.add_repo(repository_name, user)
+        gitolite.push_config_changes()
+        git_repo = GitRepo(repository_name, user, gitolite_repo.get_path())
+        git_repo.clone_bare_repo()
         return git_repo
     else:
         return Exception("Repository name and/or username is empty!")
+
 
 def list_files_in_repo(repository_name, user):
     if repository_name and user:

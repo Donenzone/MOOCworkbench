@@ -48,6 +48,7 @@ def run_experiment_view(request, pk):
     run_experiment(experiment, owner)
     return render(request, 'experiment_run.html', {'status': 'Started'})
 
+
 class CreateExperimentView(View):
     def get(self, request, experiment_id=0):
         form = ExperimentForm()
@@ -61,7 +62,6 @@ class CreateExperimentView(View):
             experiment = Experiment.objects.get(id=experiment_id)
 
         form = ExperimentForm(request.POST, instance=experiment)
-        print(request.POST['github'])
         if form.is_valid():
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
             if form.cleaned_data['new_git_repo']:

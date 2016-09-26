@@ -3,4 +3,5 @@ python:
   - "3.4"
 install:
   - pip install -r requirements.txt
+  - sudo apt-get -y install redis-server
 script: python3 manage.py test

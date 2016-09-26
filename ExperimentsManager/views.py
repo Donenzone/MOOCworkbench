@@ -1,16 +1,14 @@
-from django.shortcuts import render, redirect
-from rest_framework import viewsets
 from ExperimentsManager.serializer import *
-from django.contrib.auth.decorators import login_required
 from .tables import ExperimentTable
 from .forms import ExperimentForm
 from django.views.generic.detail import DetailView
 from django.utils import timezone
 from GitManager.views import *
 from django.views import View
-from MOOCworkbench.celery import app
 from WorkerManager.views import run_experiment
+from .consumers import *
 # Create your views here.
+
 
 class ExperimentViewSet(viewsets.ModelViewSet):
     queryset = Experiment.objects.all().order_by('-created')
@@ -38,6 +36,10 @@ def index(request):
     owner = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=owner)
     table = ExperimentTable(experiments)
+
+    content = Content('worker')
+    content.send({'text': 'Hello, world!'})
+
     return render(request, 'experiments_table.html', {'table': table})
 
 
@@ -53,7 +55,8 @@ class CreateExperimentView(View):
     def get(self, request, experiment_id=0):
         form = ExperimentForm()
         repository_list = get_user_repositories(request.user)
-        return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+        return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id,
+                                                            'repository_list': repository_list})
 
     def post(self, request, experiment_id=0):
         experiment = Experiment()

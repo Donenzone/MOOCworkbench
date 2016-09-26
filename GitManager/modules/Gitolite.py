@@ -67,7 +67,7 @@ class GitoliteRepo():
         return config_file
 
     def get_path(self):
-        return "git@localhost:{0}".format(self.repo_name)
+        return "jochem@localhost:{0}".format(self.repo_name)
 
 
 class Gitolite():

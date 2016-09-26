@@ -16,8 +16,8 @@ class Content:
 
 
 def connect_worker_output(message, worker):
-    Group(worker).add(message.reply_channel)
+    Group('worker').add(message.reply_channel)
 
 
 def disconnect_worker_output(message, worker):
-    Group(worker).discard(message.reply_channel)
+    Group('worker').discard(message.reply_channel)

@@ -41,7 +41,7 @@ class ExperimentRun(models.Model):
 
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=CREATED)
     experiment = models.ForeignKey(to=Experiment)
-    created = models.DateTimeField(auto_created=True)
+    created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(to=WorkbenchUser)
     output = models.TextField(blank=True)
     selected_worker = models.ForeignKey(to=Worker, null=True)

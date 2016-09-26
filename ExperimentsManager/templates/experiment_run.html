@@ -10,7 +10,7 @@ Status: {{ status }}
     $(function () {
         // Correctly decide between ws:// and wss://
         var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var ws_path = ws_scheme + '://' + window.location.host + window.location.pathname + "worker/";
+        var ws_path = ws_scheme + '://' + window.location.host + "/experiments/worker/";
         console.log("Connecting to " + ws_path);
         var socket = new WebSocket(ws_path);
         // Handle incoming messages

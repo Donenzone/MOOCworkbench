@@ -6,7 +6,6 @@ from django.utils import timezone
 from GitManager.views import *
 from django.views import View
 from WorkerManager.views import run_experiment
-from .consumers import *
 # Create your views here.
 
 
@@ -26,8 +25,9 @@ class ExperimentDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         context['now'] = timezone.now()
-        context['git_list'] = list_files_in_repo('gitrepository1', self.request.user.username)
-        context['commit_list'] = commits_in_repository('gitrepository1', self.request.user.username)
+        experiment = Experiment.objects.get(id=self.kwargs['pk'])
+        context['git_list'] = list_files_in_repo(experiment.title, self.request.user.username)
+        context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
         return context
 
 
@@ -37,9 +37,6 @@ def index(request):
     experiments = Experiment.objects.filter(owner=owner)
     table = ExperimentTable(experiments)
 
-    content = Content('worker')
-    content.send({'text': 'Hello, world!'})
-
     return render(request, 'experiments_table.html', {'table': table})
 
 
@@ -47,7 +44,8 @@ def index(request):
 def run_experiment_view(request, pk):
     owner = WorkbenchUser.objects.get(user=request.user)
     experiment = Experiment.objects.get(pk=pk)
-    experiment_run = ExperimentRun(experiment=experiment, started_by=owner)
+    experiment_run = ExperimentRun(experiment=experiment, owner=owner)
+    experiment_run.save()
     run_experiment(experiment_run)
     return render(request, 'experiment_run.html', {'status': 'Started'})
 

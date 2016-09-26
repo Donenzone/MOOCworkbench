@@ -1,29 +1,12 @@
-from django.shortcuts import render
-import requests
 from .models import SubmittedExperiments, WorkerInformation
 from MOOCworkbench.settings import MASTER_URL
-from WorkerManager.models import Worker
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from django.db.models import Q
-from RunManager.run_manager import start_code_execution
+from .tasks import start_code_execution
 from git import Repo
+from django.shortcuts import HttpResponse
 # Create your views here.
-
-
-def get_current_status():
-    current_experiments = SubmittedExperiments.objects.filter(Q(status=SubmittedExperiments.RUNNING)
-                                                            | Q(status=SubmittedExperiments.PENDING))
-    status = Worker.AVAILABLE
-    if current_experiments.count() is not 0:
-        status = Worker.BUSY
-    return status
-
-
-def get_worker_name():
-    worker = WorkerInformation.objects.first()
-    return worker.name
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -31,10 +14,9 @@ class ReceiveWorkerInformationView(View):
     def post(self, request):
         if 'name' in request.POST:
             name = request.POST['name']
-        if 'repo_url' in request.POST:
-            repo_url = request.POST['repo_url']
         worker = WorkerInformation.objects.create(name=name, location=MASTER_URL)
         worker.save()
+        return HttpResponse()
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -51,8 +33,9 @@ class ReceiveNewExperiment(View):
         submitted_experiment = SubmittedExperiments(experiment_git_url=repo_url, repo_name=repo_name, run_id=run_id)
         submitted_experiment.save()
         clone_repo_and_start_execution(submitted_experiment)
+        return HttpResponse()
 
 
 def clone_repo_and_start_execution(submitted_experiment):
     Repo.clone_from(submitted_experiment.experiment_git_url, to_path='RunManager/gitrepositories/{0}'.format(submitted_experiment.repo_name))
-    start_code_execution.delay(submitted_experiment.repo_name)
+    start_code_execution.delay(submitted_experiment)

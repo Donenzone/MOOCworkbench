@@ -24,7 +24,7 @@ class SubmittedExperiments(models.Model):
 
     def append_to_output(self, line):
         output = self.output
-        output += line + '\n'
+        output += str(line) + '\n'
         self.output = output
         self.save()
 

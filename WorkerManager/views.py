@@ -1,23 +1,23 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView
-from django.urls import reverse
 from .models import Worker
+from ExperimentsManager.models import ExperimentRun
 import random
 import string
 import requests
 from datetime import datetime
 from helpers.url_helper import build_url
-from helpers.ssh_helper import add_public_key_to_auth_keys, clone_repo_via_ssh, get_repo_url_for_worker
+from helpers.ssh_helper import add_public_key_to_auth_keys, get_repo_url_for_worker
 # Create your views here.
 
 
-def run_experiment(experiment, user):
+def run_experiment(experiment_run):
     print("About to run experiment")
-    worker = find_suitable_worker()
-    submit_job_to_worker(worker, experiment, user)
+    experiment_run.worker = find_suitable_worker()
+    submit_job_to_worker(experiment_run)
 
 
 # Finds a suitable worker available for the job
@@ -31,10 +31,10 @@ def find_suitable_worker():
 
 
 # Submits job to the worker
-def submit_job_to_worker(worker, experiment, user):
-    repo_url = get_repo_url_for_worker(experiment.git_repo.git_url, user)
-    repo_name = experiment.git_repo.title
-    worker.submit(repo_url, repo_name)
+def submit_job_to_worker(experiment_run):
+    repo_url = get_repo_url_for_worker(experiment_run.experiment.git_repo.git_url, experiment_run.started_by)
+    repo_name = experiment_run.experiment.git_repo.title
+    experiment_run.worker.submit(repo_url, repo_name, experiment_run.id)
 
 
 class WorkerList(ListView):
@@ -84,6 +84,21 @@ class WorkerManagerRegistrationView(View):
             worker.save()
             add_public_key_to_auth_keys(ssh)
         requests.post(build_url(worker.location, ['worker', 'info'], 'POST'), data={'name': worker.name})
+        return HttpResponse()
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ReceiveWorkerOutputView(View):
+    def post(self, request):
+        run_id, line = None, None
+        if 'run_id' in request.POST:
+            run_id = request.POST['run_id']
+        if 'line' in request.POST:
+            line = request.POST['line']
+
+        run = ExperimentRun.objects.get(id=run_id)
+        run.append_to_output(line)
+
         return HttpResponse()
 
 

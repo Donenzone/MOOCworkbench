@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from celery import task
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
+from Worker.tasks import *
 
 dockerfile_str = '''
 FROM python:3
@@ -9,9 +10,10 @@ WORKDIR /repo
 RUN pip install -r requirements.txt
 '''
 
+
 @task
-def start_code_execution(repo_name):
-    setup_docker_image(repo_name)
+def start_code_execution(submitted_experiment):
+    setup_docker_image(submitted_experiment.repo_name)
     start_code_run()
 
 
@@ -23,11 +25,17 @@ def setup_docker_image(repo_name):
     print(p.stdout.read().decode('utf-8'))
 
 
-def start_code_run():
+def start_code_run(submitted_experiment):
     print("Starting code execution")
     p_run = Popen(['docker', 'run', 'moocworkbench/mooc', 'python', 'main.py'],
               stdout=PIPE)
-    print(p_run.stdout.read().decode('utf-8'))
+    return_docker_output(submitted_experiment, iter(p_run.stdout.readline.decode('utf-8')))
+
+
+def return_docker_output(submitted_experiment, iterator):
+    for line in iterator:
+        submitted_experiment.append_to_output(line)
+        send_output_to_master(submitted_experiment.run_id, line)
 
 
 def create_docker_file(repo_name):

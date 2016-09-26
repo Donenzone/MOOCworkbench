@@ -45,5 +45,14 @@ class ReceiveNewExperiment(View):
             repo_name = request.POST['repo_name']
         if 'git_url' in request.POST:
             repo_url = request.POST['git_url']
-            Repo.clone_from(repo_url, to_path='RunManager/gitrepositories/{0}'.format(repo_name))
-            start_code_execution.delay(repo_name)
+        if 'run_id' in request.POST:
+            run_id = request.POST['run_id']
+
+        submitted_experiment = SubmittedExperiments(experiment_git_url=repo_url, repo_name=repo_name, run_id=run_id)
+        submitted_experiment.save()
+        clone_repo_and_start_execution(submitted_experiment)
+
+
+def clone_repo_and_start_execution(submitted_experiment):
+    Repo.clone_from(submitted_experiment.experiment_git_url, to_path='RunManager/gitrepositories/{0}'.format(submitted_experiment.repo_name))
+    start_code_execution.delay(submitted_experiment.repo_name)

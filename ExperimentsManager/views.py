@@ -47,7 +47,8 @@ def index(request):
 def run_experiment_view(request, pk):
     owner = WorkbenchUser.objects.get(user=request.user)
     experiment = Experiment.objects.get(pk=pk)
-    run_experiment(experiment, owner)
+    experiment_run = ExperimentRun(experiment=experiment, started_by=owner)
+    run_experiment(experiment_run)
     return render(request, 'experiment_run.html', {'status': 'Started'})
 
 

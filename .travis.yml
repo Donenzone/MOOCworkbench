@@ -1,7 +1,8 @@
 language: python
 python:
   - "3.4"
+services:
+  - redis-server
 install:
   - pip install -r requirements.txt
-  - sudo apt-get -y install redis-server
 script: python3 manage.py test

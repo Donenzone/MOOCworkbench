@@ -28,7 +28,23 @@ class SubmittedExperiments(models.Model):
         self.output = output
         self.save()
 
+    def __str__(self):
+        return "Experiment submitted on {0} with run ID {1}, current status: {2}".format(self.submit_date, str(self.run_id), self.status)
+
 
 class WorkerInformation(models.Model):
+    ACCEPT_INCOMING = 1
+    DENY_INCOMING = 0
+
     name = models.CharField(max_length=200)
     location = models.CharField(max_length=200, null=True)
+    status = models.IntegerField(default=ACCEPT_INCOMING)
+
+    def __str__(self):
+        return "Worker {0} at {1} with current status {2}".format(self.name, self.location, self.get_current_status())
+
+    def get_current_status(self):
+        if self.status == self.DENY_INCOMING:
+            return"Not accepting incoming jobs"
+        return "Accepting incoming jobs"
+

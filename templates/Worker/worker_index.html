@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>MOOC worker</h1>
+    This server is configured as a worker instance for the MOOC workbench.
+    If active, it will accept incoming experiments for MOOC research.
+
+    <h2>Configuration</h2>
+    {% if worker.status == 1 %}
+        <a href="?accept=0">Set this worker to stop accepting incoming experiments and jobs</a>
+    {% else %}
+        <a href="?accept=1">Set this Worker to accept incoming experiments and jobs</a>
+    {% endif %}
+
+    <h2>Worker information</h2>
+    <ul>
+        <li><b>{{ worker }}</b></li>
+        <li>Currently executing the following experiment: {{ current_experiment }}</li>
+    </ul>
+
+    <h2>Experiment history</h2>
+    Last 10 submitted experiments:
+    <ul>
+    {% for exp in past_experiments %}
+        <li>{{ exp }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

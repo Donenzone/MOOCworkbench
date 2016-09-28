@@ -37,7 +37,7 @@ def index(request):
     experiments = Experiment.objects.filter(owner=owner)
     table = ExperimentTable(experiments)
 
-    return render(request, 'experiments_table.html', {'table': table})
+    return render(request, 'ExperimentsManager/experiments_table.html', {'table': table})
 
 
 @login_required
@@ -47,14 +47,14 @@ def run_experiment_view(request, pk):
     experiment_run = ExperimentRun(experiment=experiment, owner=owner)
     experiment_run.save()
     run_experiment(experiment_run)
-    return render(request, 'experiment_run.html', {'status': 'Started'})
+    return render(request, 'ExperimentsManager/experiment_run.html', {'status': 'Started'})
 
 
 class CreateExperimentView(View):
     def get(self, request, experiment_id=0):
         form = ExperimentForm()
         repository_list = get_user_repositories(request.user)
-        return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id,
+        return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id,
                                                             'repository_list': repository_list})
 
     def post(self, request, experiment_id=0):
@@ -79,7 +79,7 @@ class CreateExperimentView(View):
             return redirect(to=index)
         else:
             repository_list = get_user_repositories(request.user)
-            return render(request, "edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+            return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
 
 
 @login_required

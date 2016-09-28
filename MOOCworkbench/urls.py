@@ -21,8 +21,8 @@ from ExperimentsManager.views import CreateExperimentView
 from GitManager.views import GitRepositoryViewSet
 import UserManager.views
 import GitManager.views
-from WorkerManager.views import WorkerManagerRegistrationView, WorkerManagerInformationReceiver, WorkerList, ReceiveWorkerOutputView
-from Worker.views import ReceiveWorkerInformationView, ReceiveNewExperiment
+from WorkerManager.views import *
+from Worker.views import *
 from django.contrib.auth.decorators import login_required
 
 router = routers.DefaultRouter()
@@ -57,6 +57,7 @@ urlpatterns = [
     url(r'^worker-manager/status-report/$', WorkerManagerInformationReceiver.as_view(), name="worker_manager_registration"),
     url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
 
+    url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
     url(r'^worker/info/$', ReceiveWorkerInformationView.as_view(), name="worker_info"),
     url(r'^worker/submit/$', ReceiveNewExperiment.as_view(), name="worker_submit"),

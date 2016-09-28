@@ -11,13 +11,20 @@ import requests
 from datetime import datetime
 from helpers.url_helper import build_url
 from helpers.ssh_helper import add_public_key_to_auth_keys, get_repo_url_for_worker
+from django.core import serializers
+from ExperimentsManager.consumers import Content
 # Create your views here.
 
 
 def run_experiment(experiment_run):
     print("About to run experiment")
-    experiment_run.worker = find_suitable_worker()
-    submit_job_to_worker(experiment_run)
+    run_worker = find_suitable_worker()
+    if run_worker is not None:
+        experiment_run.selected_worker = find_suitable_worker()
+        experiment_run.save()
+        submit_job_to_worker(experiment_run)
+    else:
+        print("No suitable worker available")
 
 
 # Finds a suitable worker available for the job
@@ -32,9 +39,9 @@ def find_suitable_worker():
 
 # Submits job to the worker
 def submit_job_to_worker(experiment_run):
-    repo_url = get_repo_url_for_worker(experiment_run.experiment.git_repo.git_url, experiment_run.started_by)
+    repo_url = get_repo_url_for_worker(experiment_run.experiment.git_repo.git_url, experiment_run.owner)
     repo_name = experiment_run.experiment.git_repo.title
-    experiment_run.worker.submit(repo_url, repo_name, experiment_run.id)
+    experiment_run.selected_worker.submit(repo_url, repo_name, experiment_run.id)
 
 
 class WorkerList(ListView):
@@ -44,6 +51,7 @@ class WorkerList(ListView):
 @method_decorator(csrf_exempt, name='dispatch')
 class WorkerManagerInformationReceiver(View):
     def post(self, request):
+        name, status = None, None
         if 'status' in request.POST:
             status = request.POST['status']
         if 'name' in request.POST:
@@ -65,6 +73,7 @@ class WorkerManagerInformationReceiver(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class WorkerManagerRegistrationView(View):
     def post(self, request):
+        location, ssh = None, None
         if 'location' in request.POST:
             location = request.POST['location']
         if 'ssh' in request.POST:
@@ -90,16 +99,42 @@ class WorkerManagerRegistrationView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class ReceiveWorkerOutputView(View):
     def post(self, request):
-        run_id, line = None, None
-        if 'run_id' in request.POST:
-            run_id = request.POST['run_id']
-        if 'line' in request.POST:
-            line = request.POST['line']
+        if 'complete' in request.POST:
+            process_experiment_output(request.POST)
+        else:
+            run_id, line = None, None
+            if 'run_id' in request.POST:
+                run_id = request.POST['run_id']
+            if 'line' in request.POST:
+                line = request.POST['line']
 
-        run = ExperimentRun.objects.get(id=run_id)
-        run.append_to_output(line)
+            run = ExperimentRun.objects.get(id=run_id)
+            run.append_to_output(line)
+
+            # send output to client
+            content = Content('worker')
+            content.send(line)
 
         return HttpResponse()
+
+
+def process_experiment_output(post_data):
+    submitted_experiment = get_submitted_experiment(post_data['submitted_experiment'])
+    experiment_run = ExperimentRun.objects.get(pk=submitted_experiment.run_id)
+
+    worker = Worker.objects.get(pk=experiment_run.selected_worker.id)
+    worker.status = Worker.AVAILABLE
+    worker.save()
+
+    experiment_run.status = submitted_experiment.status
+    experiment_run.save()
+
+
+def get_submitted_experiment(data):
+    submitted_experiment = None
+    for obj in serializers.deserialize("json", data):
+        submitted_experiment = obj
+    return submitted_experiment.object
 
 
 def find_existing_worker_from_location(location):

@@ -17,7 +17,7 @@ Status: {{ status }}
         socket.onmessage = function(message) {
             var data = JSON.parse(message.data);
             // Create the inner content of the post div
-            $('.output').append("<p>" + data.text + "</p>")
+            $('.output').append("<p>" + data + "</p>")
         };
         // Helpful debugging
         socket.onopen = function() { console.log("Connected to notification socket"); }

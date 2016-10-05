@@ -7,4 +7,5 @@ def serializer_factory(worker_model):
         class Meta:
             model = worker_model
             fields = [x.name for x in AbstractWorker._meta.fields]
+
     return WorkerSerializer

@@ -24,6 +24,7 @@ import GitManager.views
 from WorkerManager.views import *
 from Worker.views import *
 from django.contrib.auth.decorators import login_required
+from WorkerManager import views
 
 router = routers.DefaultRouter()
 router.register(r'experiment', ExperimentsManager.views.ExperimentViewSet)
@@ -31,6 +32,7 @@ router.register(r'script', ExperimentsManager.views.ScriptViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
 router.register(r'user', UserManager.views.UserViewset)
 router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)
+router.register(r'workers', views.WorkerViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

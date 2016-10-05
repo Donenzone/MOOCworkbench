@@ -14,7 +14,7 @@ from helpers.ssh_helper import add_public_key_to_auth_keys, get_repo_url_for_wor
 from django.core import serializers
 from ExperimentsManager.consumers import Content
 from WorkerHelper.serializer import serializer_factory
-from rest_framework import generics
+from rest_framework import generics, viewsets, mixins
 # Create your views here.
 
 
@@ -51,7 +51,7 @@ class WorkerPostView(generics.CreateAPIView):
     serializer_class = serializer_factory(Worker)
 
 
-class WorkerUpdateView(generics.RetrieveUpdateAPIView):
+class WorkerViewSet(viewsets.ModelViewSet):
     queryset = Worker.objects.all()
     serializer_class = serializer_factory(Worker)
 

@@ -35,4 +35,3 @@ class WorkerIndexView(View):
             worker.save()
         except Exception as e:
             print("Changing status failed: {0}".format(e))
-

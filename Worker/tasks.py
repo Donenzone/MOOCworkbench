@@ -4,7 +4,6 @@ from celery.decorators import periodic_task
 from datetime import timedelta
 from MOOCworkbench.settings import MASTER_URL, WORKER_URL
 import requests
-from .worker_helper import get_current_status, get_worker_name
 from celery.signals import celeryd_init
 from helpers.url_helper import build_url
 from helpers.ssh_helper import generate_ssh_private_public_key_pair
@@ -17,7 +16,6 @@ import io
 from .models import Worker
 import string, random
 from rest_framework.renderers import JSONRenderer
-from datetime import datetime
 
 @task
 def clone_repo_and_start_execution(submitted_experiment):
@@ -30,9 +28,8 @@ def clone_repo_and_start_execution(submitted_experiment):
 
 @periodic_task(run_every=timedelta(seconds=30))
 def report_status_to_master():
-    status = get_current_status()
-    data = {'status': status, 'name': get_worker_name()}
-    requests.post(build_url(MASTER_URL, ['worker-manager', 'status-report'], 'POST'), data=data)
+    existing_worker = Worker.objects.first()
+    update_worker_information(existing_worker)
 
 
 @celeryd_init.connect()

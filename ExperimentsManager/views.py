@@ -1,22 +1,19 @@
 from ExperimentsManager.serializer import *
 from .tables import ExperimentTable
 from .forms import ExperimentForm
+from .models import *
 from django.views.generic.detail import DetailView
 from django.utils import timezone
 from GitManager.views import *
 from django.views import View
 from WorkerManager.views import run_experiment
+from .serializer import serializer_experiment_run_factory
 # Create your views here.
 
 
-class ExperimentViewSet(viewsets.ModelViewSet):
-    queryset = Experiment.objects.all().order_by('-created')
-    serializer_class = ExperimentSerializer
-
-
-class ScriptViewSet(viewsets.ModelViewSet):
-    queryset = Script.objects.all().order_by('-created')
-    serializer_class = ScriptSerializer
+class ExperimentRunViewSet(viewsets.ModelViewSet):
+    queryset = ExperimentRun.objects.all()
+    serializer_class = serializer_experiment_run_factory(ExperimentRun)
 
 
 class ExperimentDetailView(DetailView):

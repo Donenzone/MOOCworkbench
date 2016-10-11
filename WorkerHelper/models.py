@@ -22,5 +22,7 @@ class AbstractWorker(models.Model):
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=UNKNOWN)
     communication_key = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return "Worker '{0}' @ {1} with status {2}".format(self.name, self.location, self.status)
     class Meta:
         abstract = True

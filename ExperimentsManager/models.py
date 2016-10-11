@@ -51,3 +51,8 @@ class ExperimentRun(models.Model):
         output += line + '\n'
         self.output = output
         self.save()
+
+    def __str__(self):
+        return "ExperimentRun from {0} created at {1} with current status {2}".format(self.owner, self.created, self.status)
+
+

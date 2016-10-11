@@ -27,8 +27,7 @@ from django.contrib.auth.decorators import login_required
 from WorkerManager import views
 
 router = routers.DefaultRouter()
-router.register(r'experiment', ExperimentsManager.views.ExperimentViewSet)
-router.register(r'script', ExperimentsManager.views.ScriptViewSet)
+router.register(r'experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
 router.register(r'user', UserManager.views.UserViewset)
 router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)

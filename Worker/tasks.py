@@ -6,15 +6,10 @@ import requests
 from celery.signals import celeryd_init
 from helpers.url_helper import build_url
 from helpers.ssh_helper import generate_ssh_private_public_key_pair
-from RunManager.run_manager import setup_docker_image, start_code_run
-from helpers.dir_helpers import *
-from git import Repo
-from django.core import serializers
 from WorkerHelper.serializer import serializer_factory
 from .models import Worker
 import string, random
 from rest_framework.renderers import JSONRenderer
-
 
 
 @periodic_task(run_every=timedelta(seconds=30), queue="default")

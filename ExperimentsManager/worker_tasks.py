@@ -11,13 +11,19 @@ from .models import ExperimentWorkerRun
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from MOOCworkbench.settings import MASTER_OR_WORKER, WORKER
+from RunManager.run_manager import setup_docker_image, start_code_run
+from helpers.dir_helpers import *
+from git import Repo
+from django.core import serializers
 
 
 @receiver(post_save, sender=ExperimentWorkerRun)
 def start_experiment_run(sender, instance, **kwargs):
     if MASTER_OR_WORKER is WORKER and instance.status is not ExperimentWorkerRun.RUNNING: # then after a POST run the experiment
         clone_repo_and_start_execution.delay(instance)
-    elif MASTER_OR_WORKER is WORKER:
+    elif MASTER_OR_WORKER is WORKER and instance.status is ExperimentWorkerRun.CANCELLED:
+        pass # cancel the current run
+    elif MASTER_OR_WORKER is WORKER and instance.status is  ExperimentWorkerRun.SUCCESS:
         send_completion_information_to_master.delay(instance) # post updated results to master
 
 @task
@@ -31,7 +37,7 @@ def clone_repo_and_start_execution(submitted_experiment):
 
 @task
 def send_completion_information_to_master(submitted_experiment):
-    json = serializer_experiment_run_factory(ExperimentRun)(submitted_experiment)
+    json = serializer_experiment_run_factory(ExperimentWorkerRun)(submitted_experiment)
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     requests.post(build_url(MASTER_URL, ['api', 'master', 'experiment-run', submitted_experiment.id], 'POST'), data=json, headers=headers)
 

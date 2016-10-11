@@ -52,6 +52,13 @@ def run_experiment_view(request, pk):
     return render(request, 'ExperimentsManager/experiment_run.html', {'status': 'Started'})
 
 
+@login_required
+def cancel_experiment_run(request, pk):
+    experiment_run = ExperimentRun.objects.get(pk=pk)
+    experiment_run.status = ExperimentRun.CANCELLED
+    experiment_run.save()
+
+
 class CreateExperimentView(View):
     def get(self, request, experiment_id=0):
         form = ExperimentForm()

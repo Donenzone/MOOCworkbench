@@ -16,6 +16,11 @@ class ExperimentRunViewSet(viewsets.ModelViewSet):
     serializer_class = serializer_experiment_run_factory(ExperimentRun)
 
 
+class ExperimentWorkerRunViewSet(viewsets.ModelViewSet):
+    queryset = ExperimentWorkerRun.objects.all()
+    serializer_class = serializer_experiment_run_factory(ExperimentWorkerRun)
+
+
 class ExperimentDetailView(DetailView):
     model = Experiment
 

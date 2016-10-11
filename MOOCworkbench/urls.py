@@ -27,11 +27,12 @@ from django.contrib.auth.decorators import login_required
 from WorkerManager import views
 
 router = routers.DefaultRouter()
-router.register(r'experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
+router.register(r'master/experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
+router.register(r'worker/experiment-run', ExperimentsManager.views.ExperimentWorkerRunViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
 router.register(r'user', UserManager.views.UserViewset)
 router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)
-router.register(r'workers', views.WorkerViewSet)
+router.register(r'master/workers', views.WorkerViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

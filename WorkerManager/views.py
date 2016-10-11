@@ -24,7 +24,7 @@ def run_experiment(experiment_run):
     if run_worker is not None:
         experiment_run.selected_worker = find_suitable_worker()
         experiment_run.save()
-        submit_job_to_worker(experiment_run)
+        experiment_run.submit()
     else:
         print("No suitable worker available")
 
@@ -37,13 +37,6 @@ def find_suitable_worker():
         return suitable_worker
     else:
         return None
-
-
-# Submits job to the worker
-def submit_job_to_worker(experiment_run):
-    repo_url = get_repo_url_for_worker(experiment_run.experiment.git_repo.git_url, experiment_run.owner)
-    repo_name = experiment_run.experiment.git_repo.title
-    experiment_run.selected_worker.submit(repo_url, repo_name, experiment_run.id)
 
 
 class WorkerPostView(generics.CreateAPIView):

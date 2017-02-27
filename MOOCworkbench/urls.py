@@ -24,13 +24,15 @@ import GitManager.views
 from WorkerManager.views import *
 from Worker.views import *
 from django.contrib.auth.decorators import login_required
+from WorkerManager import views
 
 router = routers.DefaultRouter()
-router.register(r'experiment', ExperimentsManager.views.ExperimentViewSet)
-router.register(r'script', ExperimentsManager.views.ScriptViewSet)
+router.register(r'master/experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
+router.register(r'worker/experiment-run', ExperimentsManager.views.ExperimentWorkerRunViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
 router.register(r'user', UserManager.views.UserViewset)
 router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)
+router.register(r'master/workers', views.WorkerViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -40,6 +42,7 @@ urlpatterns = [
     url(r'^my-account/$', UserManager.views.view_my_profile, name="view_my_profile"),
     url(r'^accounts/edit/$', UserManager.views.edit_profile, name="edit_profile"),
     url(r'^accounts/register/$', UserManager.views.register, name="register"),
+
     url(r'^experiments/$', ExperimentsManager.views.index, name="experiments_index"),
     url(r'^experiments/new$', CreateExperimentView.as_view(), name="new_experiment"),
     url(r'^experiments/edit/(?P<experiment_id>\d+)$', CreateExperimentView.as_view(), name="edit_experiment"),
@@ -47,20 +50,18 @@ urlpatterns = [
     url(r'^experiment/run/(?P<pk>[-\w]+)/$', ExperimentsManager.views.run_experiment_view, name='run_experiment'),
     url(r'^experiment/file/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_file_in_git_repository, name='file_detail'),
     url(r'^experiment/folder/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
-    url(r'^$', UserManager.views.index, name="index"),
-    url(r'^git/$', GitManager.views.index, name="git_index"),
 
+    url(r'^$', UserManager.views.index, name="index"),
+
+    url(r'^git/$', GitManager.views.index, name="git_index"),
     url(r'^github/$', GitManager.views.authorize_github, name="authorize_github"),
     url(r'^github-callback/$', GitManager.views.callback_authorization_github, name="callback_github"),
 
-    url(r'^worker-manager/registration/$', WorkerManagerRegistrationView.as_view(), name="worker_manager_registration"),
-    url(r'^worker-manager/status-report/$', WorkerManagerInformationReceiver.as_view(), name="worker_manager_registration"),
     url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
 
     url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
-    url(r'^worker/info/$', ReceiveWorkerInformationView.as_view(), name="worker_info"),
-    url(r'^worker/submit/$', ReceiveNewExperiment.as_view(), name="worker_submit"),
 
 
 ]
+

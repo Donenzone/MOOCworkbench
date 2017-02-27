@@ -27,7 +27,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # 0 for MASTER, 1 for WORKER
-MASTER_OR_WORKER = 1
+MASTER_OR_WORKER = 0
 WORKER = 1
 MASTER = 0
 
@@ -103,11 +103,12 @@ TEMPLATES = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
     'PAGE_SIZE': 10
 }
 
 WSGI_APPLICATION = 'MOOCworkbench.wsgi.application'
+
 
 
 # Database

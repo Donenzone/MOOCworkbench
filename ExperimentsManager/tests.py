@@ -4,7 +4,6 @@ from UserManager.models import WorkbenchUser
 from django.contrib.auth.models import User
 from django.test import Client
 
-# Create your tests here
 
 class ExperimentTestCase(TestCase):
     def setUp(self):

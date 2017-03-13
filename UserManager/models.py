@@ -13,6 +13,9 @@ class WorkbenchUser(models.Model):
     def __str__(self):
         return self.user.username
 
+def get_workbench_user(user):
+    return WorkbenchUser.objects.get(user=user)
+
 
 class SSHKeys(models.Model):
     ssh_key = models.CharField(max_length=1000, null=True)

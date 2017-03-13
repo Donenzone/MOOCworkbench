@@ -65,9 +65,9 @@ INSTALLED_APPS = [
     'UserManager',
     'WorkerManager',
     'Worker',
+    'Marketplace',
     'bootstrapform',
     'django_tables2',
-    'djcelery'
 ]
 
 MIDDLEWARE_CLASSES = [

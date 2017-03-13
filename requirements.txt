@@ -8,6 +8,5 @@ gitpython
 requests
 pygithub
 Celery
-django-celery
 pycryptodome
 asgi_redis

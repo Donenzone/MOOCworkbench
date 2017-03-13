@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Packages</h2>
+  <ul>
+    {% for package in object_list %}
+      <li><b>{{ package.title }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

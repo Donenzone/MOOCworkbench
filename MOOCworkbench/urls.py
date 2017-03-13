@@ -25,6 +25,7 @@ from WorkerManager.views import *
 from Worker.views import *
 from django.contrib.auth.decorators import login_required
 from WorkerManager import views
+from Marketplace.views import PackageListView, PackageCreateView, PackageDetailView
 
 router = routers.DefaultRouter()
 router.register(r'master/experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
@@ -63,5 +64,8 @@ urlpatterns = [
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
 
 
-]
+    url(r'^marketplace/$', login_required(PackageListView.as_view()), name="package_list"),
+    url(r'^marketplace/new$', login_required(PackageCreateView.as_view(success_url='/marketplace')), name="package_new"),
+    url(r'^marketplace/view/(?P<pk>[-\w]+)/$', login_required(PackageDetailView.as_view()), name="package_detail"),
 
+]

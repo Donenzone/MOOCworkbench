@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+{% block content %}
+
+<h2>View Package {{ object.title }}</h2>
+<table class="table">
+  <tr>
+    <td>Description</td>
+    <td>{{ object.description }}
+  </tr>
+  <tr>
+    <td>Project page</td>
+    <td>{{ object.project_page }}
+  </tr>
+  <tr>
+    <td>Added at</td>
+    <td>{{ object.created }}
+  </tr>
+</table>
+
+<h3>Version history</h3>
+{% for package_version in object.package_versions %}
+{% endfor %}
+<h3>Package resources</h3>
+
+{% endblock %}

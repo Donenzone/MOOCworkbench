@@ -49,6 +49,7 @@ CHANNEL_LAYERS = {
 }
 
 # Application definition
+SITE_ID = 1
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'channels',
     'bootstrap3',
     'rest_framework',
@@ -68,6 +70,8 @@ INSTALLED_APPS = [
     'Marketplace',
     'bootstrapform',
     'django_tables2',
+    'markdownx',
+    'django_comments',
 ]
 
 MIDDLEWARE_CLASSES = [

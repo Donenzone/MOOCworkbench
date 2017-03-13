@@ -1,6 +1,6 @@
 from django.db import models
 from UserManager.models import WorkbenchUser
-
+from markdownx.models import MarkdownxField
 
 class Package(models.Model):
     title = models.CharField(max_length=255)
@@ -22,7 +22,7 @@ class PackageVersion(models.Model):
 
 class PackageResource(models.Model):
     package = models.ForeignKey(to=Package)
-    resource = models.TextField()
+    resource = MarkdownxField()
     url = models.URLField(null=True)
     added_by = models.ForeignKey(to=WorkbenchUser)
     created = models.DateTimeField(auto_now_add=True)

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap %}
+{% load comments %}
 {% block content %}
 
 <h2>View Package: {{ object.title }}</h2>
@@ -50,4 +51,8 @@
   Found a useful blog, website or other information that you wish to share with others?
   <a href="{% url 'packageresource_new' object.pk %}" class="btn btn-default">Add a New Resource!</a>
 </p>
+
+{% render_comment_form for object %}
+{% render_comment_list for object %}
+
 {% endblock %}

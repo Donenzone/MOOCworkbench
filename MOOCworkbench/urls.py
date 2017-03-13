@@ -70,4 +70,6 @@ urlpatterns = [
     url(r'^marketplace/(?P<package_id>[-\w]+)/version/new/$', login_required(PackageVersionCreateView.as_view()), name="packageversion_new"),
     url(r'^marketplace/(?P<package_id>[-\w]+)/resource/new/$', login_required(PackageResourceCreateView.as_view()), name="packageresource_new"),
 
+    url(r'^markdownx/', include('markdownx.urls')),
+    url(r'^comments/', include('django_comments.urls')),
 ]

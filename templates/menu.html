@@ -1,3 +1,5 @@
+{% load notifications_tags %}
+
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -32,6 +34,9 @@
       <li><a href="/my-account/">My Account</a></li>
       <li><a href="/accounts/logout">Sign out</a></li>
       </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/inbox/notifications/">Notifications <span class="badge">{% notifications_unread %}</span></a></li>
+    </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>

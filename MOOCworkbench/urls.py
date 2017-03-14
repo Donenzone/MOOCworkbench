@@ -26,6 +26,7 @@ from Worker.views import *
 from django.contrib.auth.decorators import login_required
 from WorkerManager import views
 from Marketplace.views import *
+import notifications.urls
 
 router = routers.DefaultRouter()
 router.register(r'master/experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
@@ -69,7 +70,10 @@ urlpatterns = [
     url(r'^marketplace/view/(?P<pk>[-\w]+)/$', login_required(PackageDetailView.as_view()), name="package_detail"),
     url(r'^marketplace/(?P<package_id>[-\w]+)/version/new/$', login_required(PackageVersionCreateView.as_view()), name="packageversion_new"),
     url(r'^marketplace/(?P<package_id>[-\w]+)/resource/new/$', login_required(PackageResourceCreateView.as_view()), name="packageresource_new"),
+    url(r'^marketplace/subscribe/(?P<package_id>[-\w]+)/$', login_required(PackageSubscriptionView.as_view()), name="package_subscribe"),
+
 
     url(r'^markdownx/', include('markdownx.urls')),
     url(r'^comments/', include('django_comments.urls')),
+    url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
 ]

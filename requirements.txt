@@ -12,3 +12,4 @@ pycryptodome
 asgi_redis
 django-markdownx
 django-contrib-comments
+django-notifications-hq

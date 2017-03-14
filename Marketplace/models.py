@@ -2,6 +2,9 @@ from django.db import models
 from UserManager.models import WorkbenchUser
 from markdownx.models import MarkdownxField
 import xmlrpc.client
+from notifications.signals import notify
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 PYPI_URL = 'https://pypi.python.org/pypi'
 
@@ -11,6 +14,7 @@ class Package(models.Model):
     internal_package = models.BooleanField(default=False)
     project_page = models.URLField()
     created = models.DateTimeField(auto_now_add=True)
+    subscribed_users = models.ManyToManyField(to=WorkbenchUser)
 
     def __str__(self):
         return self.package_name
@@ -34,6 +38,14 @@ class PackageVersion(models.Model):
 
     def __str__(self):
         return '{0}v{1} added at {2}'.format(self.package, self.version_nr, self.created)
+
+@receiver(post_save, sender=PackageVersion)
+def send_notification(sender, instance, created, **kwargs):
+    if created:
+        subscribed_users = instance.package.subscribed_users.all()
+        message = 'Package {0} is updated to {1}'.format(instance.package, instance.version_nr)
+        for user in subscribed_users:
+            notify.send(user, recipient=user.user, verb=message)
 
 def update_all_versions():
     for package in Package.objects.all():

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Package, PackageVersion, PackageResource
+from .models import Package, PackageVersion, PackageResource, update_all_versions
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, DetailView
 from UserManager.models import get_workbench_user
@@ -15,6 +15,7 @@ class PackageDetailView(DetailView):
     model = Package
 
     def get_context_data(self, **kwargs):
+        update_all_versions()
         context = super(PackageDetailView, self).get_context_data(**kwargs)
         context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk'])
         context['resources'] = PackageResource.objects.filter(package=self.kwargs['pk'])

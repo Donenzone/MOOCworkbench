@@ -3,7 +3,7 @@
   <h2>Packages</h2>
   <ul>
     {% for package in object_list %}
-      <li><b><a href="{% url 'package_detail' package.pk %}">{{ package.title }}</a></li>
+      <li><b><a href="{% url 'package_detail' package.pk %}">{{ package.package_name }}</a></li>
     {% endfor %}
   </ul>
 

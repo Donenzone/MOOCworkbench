@@ -16,6 +16,7 @@ class Package(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
 
+
     def __str__(self):
         return self.package_name
 

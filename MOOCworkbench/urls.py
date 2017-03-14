@@ -65,7 +65,8 @@ urlpatterns = [
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
 
 
-    url(r'^marketplace/$', login_required(PackageListView.as_view()), name="package_list"),
+    url(r'^marketplace/$', login_required(MarketplaceIndex.as_view()), name="marketplace_index"),
+    url(r'^marketplace/list$', login_required(PackageListView.as_view()), name="package_list"),
     url(r'^marketplace/new$', login_required(PackageCreateView.as_view(success_url='/marketplace')), name="package_new"),
     url(r'^marketplace/view/(?P<pk>[-\w]+)/$', login_required(PackageDetailView.as_view()), name="package_detail"),
     url(r'^marketplace/(?P<package_id>[-\w]+)/version/new/$', login_required(PackageVersionCreateView.as_view()), name="packageversion_new"),

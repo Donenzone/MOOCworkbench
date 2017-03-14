@@ -7,12 +7,21 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
+class MarketplaceIndex(View):
+    def get(self, request):
+        context = {}
+        context['new_packages'] = Package.objects.all().order_by('-created')[:10]
+        context['new_internal_packages'] = Package.objects.filter(internal_package=True).order_by('-created')[:10]
+        context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:10]
+        context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:10]
+        return render(request, 'Marketplace/marketplace_index.html', context=context)
+
 class PackageListView(ListView):
     model = Package
 
 class PackageCreateView(CreateView):
     model = Package
-    fields = ('__all__')
+    fields = ['package_name', 'description', 'internal_package', 'project_page']
 
 class PackageDetailView(DetailView):
     model = Package

@@ -9,7 +9,7 @@ from django.dispatch import receiver
 PYPI_URL = 'https://pypi.python.org/pypi'
 
 class Package(models.Model):
-    package_name = models.CharField(max_length=255)
+    package_name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     internal_package = models.BooleanField(default=False)
     project_page = models.URLField()

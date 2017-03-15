@@ -34,6 +34,7 @@ class ExperimentDetailView(DetailView):
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
         context['git_list'] = list_files_in_repo(experiment.title, self.request.user.username)
         context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
+        context['steps'] = ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
         return context
 
 
@@ -117,7 +118,7 @@ class ChooseExperimentSteps(View):
                 chosen_experiment_step.save()
                 counter += 1
             return HttpResponseRedirect(redirect_to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
-        
+
 
 @login_required
 def view_file_in_git_repository(request, pk):

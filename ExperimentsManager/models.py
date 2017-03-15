@@ -58,9 +58,11 @@ class ExperimentStep(models.Model):
         return self.step_name
 
 class ChosenExperimentSteps(models.Model):
-    experiment_step = models.ForeignKey(to=ExperimentStep)
+    step = models.ForeignKey(to=ExperimentStep)
     experiment = models.ForeignKey(to=Experiment)
     step_nr = models.IntegerField()
+    active = models.BooleanField(default=False)
+    completed = models.BooleanField(default=False)
 
 def delete_existing_chosen_steps(experiment):
     ChosenExperimentSteps.objects.filter(experiment=experiment).delete()

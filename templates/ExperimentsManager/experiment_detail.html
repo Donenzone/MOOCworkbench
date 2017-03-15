@@ -1,89 +1,121 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ object.title }}</h1>
-    <table class="table table-striped">
-    <tr>
-        <td>
-            Description
-        </td>
-        <td>
-            {{ object.description }}
-        </td>
-    </tr>
-    <tr>
-        <td>Git repository</td>
-        <td>{{ object.git_repo }}</td>
-    </tr>
-    <tr>
-        <td>Created on</td>
-        <td>{{ object.added }}</td>
-    </tr>
-    <tr>
-        <td>Owner of project</td>
-        <td>{{ object.owner }}</td>
-    </tr>
-    </table>
+    <h2>{{ object.title }}</h2>
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
+      <li><a data-toggle="tab" href="#issues">Issues</a></li>
+      <li><a data-toggle="tab" href="#wiki">Wiki</a></li>
+      <li><a data-toggle="tab" href="#metrics">Metrics</a></li>
+    </ul>
 
-    <a href="/experiment/run/{{ experiment.id }}">Run experiment on first available worker</a>
+<div class="tab-content">
+  <div id="index" class="tab-pane fade in active">
 
-    <h3>Files in Git repository</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>
-                    File/Folder name
-                </th>
-                <th>
-                    Git commit
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in git_list %}
-            <tr>
-                <td>
-                    {% if not item.isdir %}
-                        <a href="/experiment/file/{{ object.id }}?file_name={{ item.file }}">{{ item.file }}</a>
-                    {% else %}
-                        <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.file }}">{{ item.file }}</a>
-                    {% endif %}
-                </td>
-                <td>
-                    {{ item.hash }}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h3>General information</h3>
+      <table class="table table-striped">
+        <tr>
+            <td>
+                Description
+            </td>
+            <td>
+                {{ object.description }}
+            </td>
+        </tr>
+        <tr>
+            <td>Git repository</td>
+            <td><a href="#">View on GitHub</a></td>
+        </tr>
+        <tr>
+            <td>Created on</td>
+            <td>{{ object.added }}</td>
+        </tr>
+        <tr>
+            <td>Owner of project</td>
+            <td>{{ object.owner }}</td>
+        </tr>
+      </table>
 
-    <h3>Recent commits</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>
-                    Message
-                </th>
-                <th>
-                    Hash
-                </th>
-                <th>
-                    Date
-                </th>
-                <th>
-                    Author
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for commit in commit_list %}
-            <tr>
-                <td><b>{{ commit.message }}</b></td>
-                <td>{{ commit.hash }}</td>
-                <td>{{ commit.date }}</td>
-                <td>{{ commit.author }}</td>
-            </tr>
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        {% for step in steps %}
+        <div class="panel {% if step.active %}panel-success{% else %}panel-default{% endif %}">
+          <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" {% if step.active %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="collapse{{ forloopcounter }}">
+                {{ step.step }}
+              </a>
+            </h4>
+          </div>
+          <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse {% if step.active %}in{% endif %}" role="tabpanel" aria-labelledby="heading{{ forloop.counter }}">
+            <div class="panel-body">
+            {% if step.active %}
+              <table class="table table-striped">
+                  <thead>
+                    <tr>
+                        <th>
+                            File/Folder name
+                        </th>
+                        <th>
+                            Git commit
+                        </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in git_list %}
+                    <tr>
+                        <td>
+                            {% if not item.isdir %}
+                                <a href="/experiment/file/{{ object.id }}?file_name={{ item.file }}">{{ item.file }}</a>
+                            {% else %}
+                                <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.file }}">{{ item.file }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ item.hash|truncatechars:11}}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+              </table>
+
+              <div class="row">
+                <div class="col-sm-6">
+                  <h4>Recommended packages in this step</h4>
+                    <ul>
+                      <li><a href="#">Package X</a></li>
+                      <li><a href="#">Package Y</a></li>
+                      <li><a href="#">Package Z</a></li>
+                      <li><a href="#">Package A</a></li>
+                    </ul>
+                    <a href="#" class="btn btn-default">View more on the MOOC Marketplace</a>
+                  </div>
+                  <div class="col-sm-6">
+                    <h4>How am I doing?</h4>
+                      <ul>
+                        <li>You haven't defined any requirements yet. Defining requirements is important... <a href="#">Learn more</a></li>
+                        <li>Testing: Good</li>
+                        <li>You haven't written any documentation yet! Writing documentation frequently is important, as now your knowledge is still fresh  <a href="#">Learn more</a></li>
+                      </ul>
+                  </div>
+                </div>
+              {% endif %}
+              <p></p>
+              <p><a href="#" class="btn btn-primary">Complete and go to next step</a></p>
+            </div>
+          </div>
+        </div>
         {% endfor %}
-        </tbody>
-    </table>
+      </div>
+
+  </div>
+  <div id="issues" class="tab-pane fade">
+</div>
+  </div>
+  <div id="wiki" class="tab-pane fade">Wiki
+  </div>
+  <div id="metrics" class="tab-pane fade">Metrics
+  </div>
+</div>
+
+
 {% endblock %}

@@ -6,6 +6,7 @@ from UserManager.models import get_workbench_user
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from markdownx.utils import markdownify
 
 class MarketplaceIndex(View):
     def get(self, request):
@@ -27,10 +28,12 @@ class PackageDetailView(DetailView):
     model = Package
 
     def get_context_data(self, **kwargs):
-        update_all_versions()
         context = super(PackageDetailView, self).get_context_data(**kwargs)
         context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        context['resources'] = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        for resource in resources:
+            resource.markdown = markdownify(resource.resource)
+        context['resources'] = resources
         return context
 
 class PackageVersionCreateView(CreateView):

@@ -16,7 +16,6 @@ class Package(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
 
-
     def __str__(self):
         return self.package_name
 
@@ -55,12 +54,14 @@ def update_all_versions():
 def get_latest_version(package):
     if not package.internal_package:
         pypi = xmlrpc.client.ServerProxy(PYPI_URL)
-        release = pypi.package_releases(package.package_name)[0]
-        newest_release = package.get_latest_package_version()
-        if newest_release is None or newest_release.check_if_version_is_newer(release):
-            url = '{0}/{1}/{2}'.format(PYPI_URL, package.package_name, release)
-            newer_release = PackageVersion(package=package, version_nr=release, changelog="Unknown", url=url)
-            newer_release.save()
+        release = pypi.package_releases(package.package_name)
+        if len(release) != 0:
+            release = release[0]
+            newest_release = package.get_latest_package_version()
+            if newest_release is None or newest_release.check_if_version_is_newer(release):
+                url = '{0}/{1}/{2}'.format(PYPI_URL, package.package_name, release)
+                newer_release = PackageVersion(package=package, version_nr=release, changelog="Auto-added", url=url)
+                newer_release.save()
 
 class PackageResource(models.Model):
     package = models.ForeignKey(to=Package)

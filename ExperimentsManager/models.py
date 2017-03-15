@@ -48,3 +48,19 @@ class ExperimentRun(AbstractExperimentRun):
 
 class ExperimentWorkerRun(AbstractExperimentRun):
     pass
+
+class ExperimentStep(models.Model):
+    step_name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(null=True)
+    default_order = models.IntegerField()
+
+    def __str__(self):
+        return self.step_name
+
+class ChosenExperimentSteps(models.Model):
+    experiment_step = models.ForeignKey(to=ExperimentStep)
+    experiment = models.ForeignKey(to=Experiment)
+    step_nr = models.IntegerField()
+
+def delete_existing_chosen_steps(experiment):
+    ChosenExperimentSteps.objects.filter(experiment=experiment).delete()

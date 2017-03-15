@@ -8,6 +8,10 @@ from GitManager.views import *
 from django.views import View
 from WorkerManager.views import run_experiment
 from .serializer import serializer_experiment_run_factory
+from UserManager.models import get_workbench_user
+import json
+from django.shortcuts import HttpResponse, render, redirect, reverse
+from django.http import HttpResponseRedirect
 # Create your views here.
 
 
@@ -90,6 +94,30 @@ class CreateExperimentView(View):
             repository_list = get_user_repositories(request.user)
             return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
 
+class ChooseExperimentSteps(View):
+    def get(self, request, experiment_id):
+        # check if request.user is owner of experiment pls
+        context = {}
+        context['steps'] = ExperimentStep.objects.all()
+        context['experiment_id'] = experiment_id
+        return render(request, "ExperimentsManager/choose_experiment_steps.html", context)
+
+    def post(self, request, experiment_id):
+        experiment = Experiment.objects.get(id=experiment_id)
+        workbench_user =  get_workbench_user(request.user)
+        if experiment.owner == workbench_user:
+            step_list = []
+            step_json_list = json.loads(request.POST['steplist'])
+            counter = 1
+            delete_existing_chosen_steps(experiment)
+            for step in step_json_list:
+                step = int(step)
+                step = ExperimentStep.objects.get(id=step)
+                chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, experiment_step=step, step_nr=counter)
+                chosen_experiment_step.save()
+                counter += 1
+            return HttpResponseRedirect(redirect_to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
+        
 
 @login_required
 def view_file_in_git_repository(request, pk):

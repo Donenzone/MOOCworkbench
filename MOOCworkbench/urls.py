@@ -17,7 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
 import ExperimentsManager.views
-from ExperimentsManager.views import CreateExperimentView
+from ExperimentsManager.views import CreateExperimentView, ChooseExperimentSteps
 from GitManager.views import GitRepositoryViewSet
 import UserManager.views
 import GitManager.views
@@ -47,6 +47,7 @@ urlpatterns = [
 
     url(r'^experiments/$', ExperimentsManager.views.index, name="experiments_index"),
     url(r'^experiments/new$', CreateExperimentView.as_view(), name="new_experiment"),
+    url(r'^experiments/steps/(?P<experiment_id>\d+)$$', ChooseExperimentSteps.as_view(), name="choose_experiment_steps"),
     url(r'^experiments/edit/(?P<experiment_id>\d+)$', CreateExperimentView.as_view(), name="edit_experiment"),
     url(r'^experiment/(?P<pk>[-\w]+)/$', ExperimentsManager.views.ExperimentDetailView.as_view(), name='experiment_detail'),
     url(r'^experiment/run/(?P<pk>[-\w]+)/$', ExperimentsManager.views.run_experiment_view, name='run_experiment'),

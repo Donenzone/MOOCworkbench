@@ -1,0 +1,71 @@
+{% extends "ExperimentsManager/experiments_table.html" %}
+{% load bootstrap %}
+
+{% block content %}
+
+<h2>Choose your experiment steps</h2>
+<p>Don't worry, you'll be able to change these later. We recommend the following order, but feel free to rearrange or delete steps.</p>
+
+<div class="row">
+  <div class="col-md-9">
+    <select class="form-control" id="step-selector">
+      {% for step in steps %}
+        <option id="{{ step.id }}">{{ step }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <a href="#" id="add-step-button" class="btn btn-primary">Add New Step</a>
+  </div>
+</div>
+
+<p></p>
+
+<ul class="list-group" id="step-list">
+  {% for step in steps %}
+    <li class="list-group-item" id="{{ step.id }}">
+      <label class="checkbox-inline"><input type="checkbox" class="step-checkbox" checked value="">{{ step }}</label>
+    </li>
+  {% endfor %}
+</ul>
+
+<a href="#" class="btn btn-primary" id="save-steps">Save steps and continue</a>
+
+<script>
+  $(function() {
+    const Item = ({ step_id, step_name }) => `
+      <li class="list-group-item" id="${step_id}">
+        <label class="checkbox-inline"><input type="checkbox" class="step-checkbox" checked value="">${step_name}</label>
+      </li>
+      `;
+
+    $('#add-step-button').click(function(){
+      var selected_element = $("#step-selector :selected").text();
+      var step_id = $("#step-selector :selected").attr('id');
+      $('#step-list').append(Item({step_id: step_id, step_name: selected_element}));
+    });
+    $('.step-checkbox:checkbox').change(
+      function(){
+        if(!$(this).is(':checked')) {
+            $target = $(this).closest('li');
+            $target.hide('slow', function(){ $target.remove(); });
+        }
+    });
+    $(".list-group").sortable();
+    $(".list-group").disableSelection();
+
+    $('#save-steps').click(function() {
+        var sortedIDs = {'csrfmiddlewaretoken': '{{ csrf_token }}', 'steplist': JSON.stringify($("#step-list").sortable("toArray"))};
+        $.ajax({
+            type: "POST",
+            url: '{% url 'choose_experiment_steps' experiment_id %}',
+            data: sortedIDs,
+            success: function(data) {
+              alert(data);
+            },
+            dataType: 'json',
+          });
+        });
+  });
+  </script>
+{% endblock %}

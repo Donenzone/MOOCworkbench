@@ -1,19 +1,17 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
-from .models import GitRepository, GitHubAuth
+from .models import GitRepository
 from UserManager.models import WorkbenchUser
 from GitManager.serializer import GitRepositorySerializer
 from django.shortcuts import render, redirect, HttpResponse
 from .modules.Gitolite import Gitolite
 from .modules.Git import GitRepo
+from UserManager.models import get_workbench_user
 import requests
 from django.utils.crypto import get_random_string
 from github import Github
-
-CLIENT_ID = '1697609f631820ff6ad3'
-CLIENT_SECRET = 'd466715a419f4f5511b2ad0575b3f9466c88176e'
-
+from allauth.socialaccount.models import SocialToken
 
 # Create your views here.
 class GitRepositoryViewSet(viewsets.ModelViewSet):
@@ -25,76 +23,29 @@ class GitRepositoryViewSet(viewsets.ModelViewSet):
 def index(request):
     return render(request, 'index.html')
 
-@login_required
-def authorize_github(request):
-    workbench_user = WorkbenchUser.objects.get(user=request.user)
-    nr_of_github = GitHubAuth.objects.filter(workbench_user=workbench_user).count()
 
-    github_auth = GitHubAuth(state=get_random_string(length=32), workbench_user=workbench_user)
-    github_auth.save()
-    return redirect(
-        to='https://github.com/login/oauth/authorize?client_id=' + CLIENT_ID + '&state=' +
-           github_auth.state + '&scope=repo read:repo_hook' + '&redirect_uri=https://mooc.jochem.xyz/github-callback/')
+def get_github_object(user):
+    workbench_user = get_workbench_user(user)
+    socialtoken = SocialToken.objects.filter(account__user=user, account__provider='github')
+    if socialtoken.count() != 0:
+        return Github(login_or_token=socialtoken[0].token)
+    else: return None
 
 
 def get_user_repositories(user):
-    workbench_user = WorkbenchUser.objects.get(user=user)
-    git_auth = GitHubAuth.objects.filter(workbench_user=workbench_user)
-    if git_auth.count() is not 0:
-        git_auth = git_auth[0]
-        g = Github(git_auth.auth_token)
+    github_api = get_github_object(user)
+    if github_api:
         repo_list = []
-        for repo in g.get_user().get_repos(type='owner'):
+        for repo in github_api.get_user().get_repos(type='owner'):
             repo_list.append((repo.name, repo.clone_url))
         return repo_list
     return []
 
-
-@login_required
-@csrf_exempt
-def callback_authorization_github(request):
-    if request.method == 'GET':
-        workbench_user = WorkbenchUser.objects.get(user=request.user)
-        code = request.GET['code']
-        state = request.GET['state']
-        github_auth = GitHubAuth.objects.filter(state=state, workbench_user=workbench_user)
-
-        if github_auth.count() != 0 and state == github_auth[0].state:
-            github_auth = github_auth[0]
-            github_auth.code = code
-            github_auth.save()
-            data = {'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET, 'code': github_auth.code,
-                    'redirect_uri': 'https://mooc.jochem.xyz/github-callback/', 'state': github_auth.state}
-            response = requests.post('https://github.com/login/oauth/access_token', data=data)
-            print(response.content.decode("utf-8"))
-            splitted_response = response.content.decode("utf-8").split('=')
-            access_token = splitted_response[1].split('&scope')[0]
-
-            github_auth.auth_token = access_token
-            github_auth.save()
-            return redirect(to='/')
-
-
-def create_new_repository(repository_name, user, type, experiment):
-    if repository_name and user:
-        print("Creating git repo")
-        gitolite = Gitolite()
-        gitolite_repo = gitolite.add_repo(repository_name, user.username)
-        gitolite.push_config_changes()
-
-        git_repo = GitRepo(repository_name, user.username, gitolite_repo.get_path())
-        git_repo.clone_bare_repo()
-
-        owner = WorkbenchUser.objects.get(user=user)
-        git_db = GitRepository(git_url=gitolite_repo.get_path(), owner=owner, title=repository_name)
-        git_db.save()
-
-        experiment.git_repo = git_db
-        experiment.save()
-        return git_repo
-    else:
-        return Exception("Repository name and/or username is empty!")
-
+def create_new_github_repository(title, user, type, experiment):
+    github_api = get_github_object(user)
+    user = github_api.get_user()
+    repo = user.create_repo(title)
+    print(repo)
 
 def list_files_in_repo(repository_name, user):
     if repository_name and user:

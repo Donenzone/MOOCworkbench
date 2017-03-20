@@ -1,26 +1,39 @@
-{% extends "base.html" %}
-{% load bootstrap %}
-
-{% block content %}
+{% extends "base.html" %} {% load bootstrap %} {% load socialaccount %} {% block content %}
+<div class="row">
     <h1>{{ workbench_user.user.username }}</h1>
-    <table class="table">
-
+    <table class="table table-bordered">
         <tr>
             <td>Email address</td>
             <td>{{ workbench_user.user.email }}</td>
         </tr>
-
         <tr>
             <td>Net ID</td>
             <td>{{ workbench_user.netid }}</td>
         </tr>
-
-        <tr>
-            <td>SSH-key</td>
-            <td>{{ workbench_user.ssh_key }}</td>
-        </tr>
-
     </table>
 
-    <a href="{% url "edit_profile" %}">Edit profile</a>
+    <p><a href="{% url "edit_profile" %}" class="btn btn-primary">Edit profile</a></p>
+</div>
+<div class="row">
+
+    <h3>Connected accounts</h3>
+
+    <p><a href="/accounts/social/connections/" class="btn btn-primary">Manage social connections</a></p>
+    <div class="col-md-6">
+        {% for account in user.socialaccount_set.all %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">Account provider: GitHub</div>
+            <div class="panel-body">
+                <p style="float:left;margin:10px;"><img width="50" height="50" src="{{ account.get_avatar_url }}" /></p>
+                <p>UID: <a href="{{ account.extra_data.link }}">{{ account.uid }}</a></p>
+                <p>Username: {{ account.extra_data.login }}</p>
+                <p>GitHub Profile:
+                    <a href="{{ account.extra_data.html_url }}">{{ account.extra_data.html_url }}</a></p>
+                {% empty %}
+                <a href="{% provider_login_url "github" process="connect" %}" class="btn btn-primary">Connect with GitHub</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

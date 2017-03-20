@@ -41,8 +41,8 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^accounts/login/$', UserManager.views.sign_in, name="sign_in"),
     url(r'^accounts/logout/$', UserManager.views.sign_out, name="sign_out"),
-    url(r'^my-account/$', UserManager.views.view_my_profile, name="view_my_profile"),
-    url(r'^accounts/edit/$', UserManager.views.edit_profile, name="edit_profile"),
+    url(r'^my-account/$', UserManager.views.DetailProfileView.as_view(), name="view_my_profile"),
+    url(r'^accounts/edit/$', login_required(UserManager.views.EditProfileView.as_view()), name="edit_profile"),
     url(r'^accounts/register/$', UserManager.views.register, name="register"),
 
     url(r'^experiments/$', ExperimentsManager.views.index, name="experiments_index"),
@@ -57,15 +57,13 @@ urlpatterns = [
     url(r'^$', UserManager.views.index, name="index"),
 
     url(r'^git/$', GitManager.views.index, name="git_index"),
-    url(r'^github/$', GitManager.views.authorize_github, name="authorize_github"),
-    url(r'^github-callback/$', GitManager.views.callback_authorization_github, name="callback_github"),
 
     url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
 
     url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
 
-
+    # Marketplace URLs
     url(r'^marketplace/$', login_required(MarketplaceIndex.as_view()), name="marketplace_index"),
     url(r'^marketplace/list$', login_required(PackageListView.as_view()), name="package_list"),
     url(r'^marketplace/new$', login_required(PackageCreateView.as_view(success_url='/marketplace')), name="package_new"),
@@ -78,4 +76,5 @@ urlpatterns = [
     url(r'^markdownx/', include('markdownx.urls')),
     url(r'^comments/', include('django_comments.urls')),
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
+    url(r'^accounts/', include('allauth.urls')),
 ]

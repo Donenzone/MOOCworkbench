@@ -2,14 +2,15 @@
 {% load bootstrap %}
 
 {% block content %}
-  <h2>Add a New Experiment</h2>
+  <h2>Add New Experiment</h2>
     <form action="{% url "edit_experiment" experiment_id %}" method="post">
         {% csrf_token %}
         {{ form|bootstrap }}
 
         <div class="form-group">
-          <label for="github">...or select an existing GitHub repository:</label>
+          <label for="github">Or select an existing GitHub repository:</label>
           <select class="form-control" id="github" name="github">
+              <option></option>
               {% for repo in repository_list %}
                 <option value="{{ repo.1 }}">{{ repo.0 }}</option>
               {% endfor %}
@@ -17,7 +18,7 @@
         </div>
 
         <div class="form-group">
-            <input type="submit" name="submit" class="btn btn-primary" value="Save" />
+            <input type="submit" name="submit" class="btn btn-primary" value="Create New Experiment" />
         </div>
 
         <a href="/experiments">Cancel</a>

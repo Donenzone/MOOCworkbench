@@ -8,7 +8,8 @@ from .forms import *
 from django.views.generic.detail import DetailView
 from django.utils import timezone
 from ExperimentsManager.models import Experiment
-
+from .models import get_workbench_user
+from django.views.generic import View
 
 class WorkbenchUserViewset(viewsets.ModelViewSet):
     queryset = WorkbenchUser.objects.all()
@@ -44,26 +45,26 @@ def sign_in(request):
             return render(request, 'login.html', {'form': form})
 
 
-@login_required
-def view_my_profile(request):
-    workbench_user = WorkbenchUser.objects.get(user=request.user)
-    return render(request, "UserManager/workbenchuser_detail.html", {'workbench_user': workbench_user})
+class DetailProfileView(View):
+    def get(self, request):
+        workbench_user = get_workbench_user(request.user)
+        return render(request, "UserManager/workbenchuser_detail.html", {'workbench_user': workbench_user})
 
 
-@login_required
-def edit_profile(request):
-    workbench_user = WorkbenchUser.objects.get(user=request.user)
-    if request.method == 'GET':
+class EditProfileView(View):
+    def get(self, request):
+        workbench_user = get_workbench_user(request.user)
         form = WorkbenchUserForm(instance=workbench_user)
         return render(request, "UserManager/workbenchuser_edit.html", {'form': form})
-    if request.method == 'POST':
+
+    def post(self, request):
+        workbench_user = get_workbench_user(request.user)
         form = WorkbenchUserForm(request.POST, instance=workbench_user)
         if form.is_valid():
             form.save()
             return redirect(to='/')
         else:
             return render(request, "UserManager/workbenchuser_edit.html", {'form': form})
-
 
 def sign_out(request):
     logout(request)

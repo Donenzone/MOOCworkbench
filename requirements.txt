@@ -13,3 +13,4 @@ asgi_redis
 django-markdownx
 django-contrib-comments
 django-notifications-hq
+django-allauth

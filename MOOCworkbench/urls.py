@@ -57,9 +57,7 @@ urlpatterns = [
     url(r'^$', UserManager.views.index, name="index"),
 
     url(r'^git/$', GitManager.views.index, name="git_index"),
-
     url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
-
     url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),
     url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
 
@@ -72,7 +70,7 @@ urlpatterns = [
     url(r'^marketplace/(?P<package_id>[-\w]+)/resource/new/$', login_required(PackageResourceCreateView.as_view()), name="packageresource_new"),
     url(r'^marketplace/subscribe/(?P<package_id>[-\w]+)/$', login_required(PackageSubscriptionView.as_view()), name="package_subscribe"),
 
-
+    # Installed apps URLs
     url(r'^markdownx/', include('markdownx.urls')),
     url(r'^comments/', include('django_comments.urls')),
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),

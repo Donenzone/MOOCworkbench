@@ -64,10 +64,12 @@
                     {% for item in git_list %}
                     <tr>
                         <td>
-                            {% if not item.isdir %}
-                                <a href="/experiment/file/{{ object.id }}?file_name={{ item.file }}">{{ item.file }}</a>
+                            {% if item.type == 'dir' %}
+                              <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}">{{ item.path }}</a>
+
                             {% else %}
-                                <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.file }}">{{ item.file }}</a>
+                              <a href="/experiment/file/{{ object.id }}?file_name={{ item.path }}">{{ item.path }}</a>
+
                             {% endif %}
                         </td>
                         <td>

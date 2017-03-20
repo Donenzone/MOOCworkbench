@@ -11,7 +11,7 @@ from .serializer import serializer_experiment_run_factory
 from UserManager.models import get_workbench_user
 import json
 from django.shortcuts import HttpResponse, render, redirect, reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 # Create your views here.
 
 
@@ -32,7 +32,7 @@ class ExperimentDetailView(DetailView):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         context['now'] = timezone.now()
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
-        context['git_list'] = list_files_in_repo(experiment.title, self.request.user.username)
+        context['git_list'] = list_files_in_repo(self.request.user, experiment.git_repo.name)
         context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
         context['steps'] = ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
         return context
@@ -79,7 +79,9 @@ class CreateExperimentView(View):
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
             experiment.save()
             if form.cleaned_data['new_git_repo']:
-                create_new_github_repository(experiment.title, request.user, 'python', experiment)
+                git_repo = create_new_github_repository(experiment.title, request.user, 'python', experiment)
+                experiment.git_repo = git_repo
+                experiment.save()
             elif request.POST['github'] is not '':
                 git_repo = GitRepository()
                 git_repo.title = experiment.title
@@ -87,7 +89,7 @@ class CreateExperimentView(View):
                 git_repo.owner = experiment.owner
                 git_repo.save()
                 experiment.git_repo = git_repo
-            return redirect(to=index)
+            return redirect(to=reverse('choose_experiment_steps', kwargs={'experiment_id': experiment.id}))
         else:
             repository_list = get_user_repositories(request.user)
             return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
@@ -111,10 +113,11 @@ class ChooseExperimentSteps(View):
             for step in step_json_list:
                 step = int(step)
                 step = ExperimentStep.objects.get(id=step)
-                chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, experiment_step=step, step_nr=counter)
+                chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, step=step, step_nr=counter)
                 chosen_experiment_step.save()
                 counter += 1
-            return HttpResponseRedirect(redirect_to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
+            url = reverse('experiment_detail', kwargs={'pk': experiment_id})
+            return JsonResponse({'url': url})
 
 
 @login_required

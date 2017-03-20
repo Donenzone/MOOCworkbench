@@ -3,8 +3,8 @@
 
 {% block content %}
 
-<h2>Choose your experiment steps</h2>
-<p>Don't worry, you'll be able to change these later. We recommend the following order, but feel free to rearrange or delete steps.</p>
+<h2>Add New Experiment: Step 2 of 2</h2>
+<p>We recommend the following order, but feel free to rearrange or delete steps.</p>
 
 <div class="row">
   <div class="col-md-9">
@@ -61,7 +61,7 @@
             url: '{% url 'choose_experiment_steps' experiment_id %}',
             data: sortedIDs,
             success: function(data) {
-              alert(data);
+              alert(data.url);
             },
             dataType: 'json',
           });

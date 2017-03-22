@@ -62,12 +62,15 @@ INSTALLED_APPS = [
     'channels',
     'bootstrap3',
     'rest_framework',
+
     'ExperimentsManager',
     'GitManager',
     'UserManager',
     'WorkerManager',
     'Worker',
     'Marketplace',
+    'RequirementsManager',
+    
     'bootstrapform',
     'django_tables2',
     'markdownx',

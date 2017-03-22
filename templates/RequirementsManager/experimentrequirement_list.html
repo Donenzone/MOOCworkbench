@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Requirements</h2>
+  <ul>
+    {% for requirement in object_list %}
+      <li>{{ requirement.package_name }} {{ requirement.version }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

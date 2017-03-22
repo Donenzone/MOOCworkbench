@@ -38,11 +38,11 @@
 
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         {% for step in steps %}
-        <div class="panel {% if step.active %}panel-success{% else %}panel-default{% endif %}">
+        <div class="panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
           <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
             <h4 class="panel-title">
               <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" {% if step.active %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="collapse{{ forloopcounter }}">
-                {{ step.step }}
+                {{ step.step }} {% if step.completed %}(completed){% endif %}
               </a>
             </h4>
           </div>
@@ -56,7 +56,7 @@
                             File/Folder name
                         </th>
                         <th>
-                            Git commit
+                            Type
                         </th>
                     </tr>
                   </thead>
@@ -65,15 +65,15 @@
                     <tr>
                         <td>
                             {% if item.type == 'dir' %}
-                              <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}">{{ item.path }}</a>
+                              <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}">{{ item.name }}</a>
 
                             {% else %}
-                              <a href="/experiment/file/{{ object.id }}?file_name={{ item.path }}">{{ item.path }}</a>
+                              <a href="/experiment/file/{{ object.id }}?file_name={{ item.path }}">{{ item.name }}</a>
 
                             {% endif %}
                         </td>
                         <td>
-                            {{ item.hash|truncatechars:11}}
+                            {{ item.type }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -100,9 +100,23 @@
                       </ul>
                   </div>
                 </div>
+                <div class='row'>
+                    <div class="col-sm-6">
+                      <h4>Your installed packages</h4>
+                        <ul>
+                          <li><a href="#">Package X</a></li>
+                          <li><a href="#">Package Y</a></li>
+                          <li><a href="#">Package Z</a></li>
+                          <li><a href="#">Package A</a></li>
+                        </ul>
+                        <a href="#" class="btn btn-default">Manage Dependencies</a>
+                      </div>
+                </div>
               {% endif %}
               <p></p>
-              <p><a href="#" class="btn btn-primary">Complete and go to next step</a></p>
+              {% if step.active %}
+                <p><a href="{% url 'complete_step_and_go_to_next' object.id %}" class="btn btn-primary">Complete and go to next step</a></p>
+              {% endif %}
             </div>
           </div>
         </div>

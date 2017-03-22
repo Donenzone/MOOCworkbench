@@ -12,7 +12,7 @@ from UserManager.models import get_workbench_user
 import json
 from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
-from .tasks import create_step_folders
+from .tasks import initialize_repository
 from django.template.defaultfilters import slugify
 # Create your views here.
 
@@ -42,6 +42,24 @@ class ExperimentDetailView(DetailView):
         context['steps'] = steps
         return context
 
+
+@login_required
+def complete_step_and_go_to_next(request, experiment_id):
+    experiment = Experiment.objects.get(id=experiment_id)
+    if experiment.owner.user == request.user:
+        active_step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
+        active_step.active = False
+        active_step.completed = True
+        active_step.save()
+        next_step_nr = active_step.step_nr + 1
+        next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)
+        if next_step.count() != 0:
+            next_step = next_step[0]
+            next_step.active = True
+            next_step.save()
+            return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
+        else:
+            return JsonResponse({'completed': True})
 
 @login_required
 def index(request):
@@ -121,7 +139,7 @@ class ChooseExperimentSteps(View):
                 chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, step=step, step_nr=counter)
                 chosen_experiment_step.save()
                 counter += 1
-            create_step_folders.delay(self.kwargs['pk'])
+            initialize_repository.delay(self.kwargs['pk'])
             url = reverse('experiment_detail', kwargs={'pk': experiment_id})
             return JsonResponse({'url': url})
 

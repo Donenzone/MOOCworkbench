@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load bootstrap %}
 
 {% block content %}
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-      <li><a data-toggle="tab" href="#issues">Issues</a></li>
+      <li><a data-toggle="tab" href="#requirements" id='requirements-btn'>Manage Your Requirements</a></li>
       <li><a data-toggle="tab" href="#wiki">Wiki</a></li>
       <li><a data-toggle="tab" href="#metrics">Metrics</a></li>
     </ul>
@@ -38,7 +39,7 @@
 
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         {% for step in steps %}
-        <div class="panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
+        <div id="{{ step.id }}" class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
           <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
             <h4 class="panel-title">
               <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" {% if step.active %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="collapse{{ forloopcounter }}">
@@ -48,7 +49,6 @@
           </div>
           <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse {% if step.active %}in{% endif %}" role="tabpanel" aria-labelledby="heading{{ forloop.counter }}">
             <div class="panel-body">
-            {% if step.active %}
               <table class="table table-striped">
                   <thead>
                     <tr>
@@ -60,7 +60,8 @@
                         </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tbody-{{ step.id }}">
+                    {% if step.active %}
                     {% for item in git_list %}
                     <tr>
                         <td>
@@ -77,6 +78,8 @@
                         </td>
                     </tr>
                     {% endfor %}
+
+                    {% endif %}
                   </tbody>
               </table>
 
@@ -89,7 +92,7 @@
                       <li><a href="#">Package Z</a></li>
                       <li><a href="#">Package A</a></li>
                     </ul>
-                    <a href="#" class="btn btn-default">View more on the MOOC Marketplace</a>
+                    <p><a href="#" class="btn btn-default">View more on the MOOC Marketplace</a></p>
                   </div>
                   <div class="col-sm-6">
                     <h4>How am I doing?</h4>
@@ -100,19 +103,6 @@
                       </ul>
                   </div>
                 </div>
-                <div class='row'>
-                    <div class="col-sm-6">
-                      <h4>Your installed packages</h4>
-                        <ul>
-                          <li><a href="#">Package X</a></li>
-                          <li><a href="#">Package Y</a></li>
-                          <li><a href="#">Package Z</a></li>
-                          <li><a href="#">Package A</a></li>
-                        </ul>
-                        <a href="#" class="btn btn-default">Manage Dependencies</a>
-                      </div>
-                </div>
-              {% endif %}
               <p></p>
               {% if step.active %}
                 <p><a href="{% url 'complete_step_and_go_to_next' object.id %}" class="btn btn-primary">Complete and go to next step</a></p>
@@ -124,8 +114,28 @@
       </div>
 
   </div>
-  <div id="issues" class="tab-pane fade">
-</div>
+  <div id="requirements" class="tab-pane fade">
+    <h4>Add New Requirement</h4>
+    <form class="form-inline" id="add-new-requirement">
+        {% csrf_token %}
+        {{ requirements_form|bootstrap_inline }}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+            <button type="submit" class="btn btn-primary">Add New Requirement</button>
+          </div>
+        </div>
+    </form>
+    <h4>Requirements In Your Project</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Package name</th>
+          <th>Version</th>
+        </tr>
+      </thead>
+      <tbody id="requirements-tbody">
+      </tbody>
+    </table>
   </div>
   <div id="wiki" class="tab-pane fade">Wiki
   </div>
@@ -133,5 +143,62 @@
   </div>
 </div>
 
+<script type='text/javascript'>
+  $(document).ready(function() {
+    $('#requirements-btn').click(function() {
+      $('#requirements-tbody').append('<tr><td>Loading...</td><td></td></tr>');
 
+      $.ajax({
+        url: '{% url 'experiment_requirements_list' experiment.id %}',
+        success: function(data) {
+            $('#requirements-tbody').empty();
+            var req_list = $.parseJSON(data.requirements)
+            for (var req in req_list) {
+              package_name = req_list[req].fields.package_name;
+              version = req_list[req].fields.version;
+              $('#requirements-tbody').append('<tr><td>' + package_name + '</td><td>'+ version +'</td></tr>');
+            }
+          },
+        });
+      });
+
+      $('#add-new-requirement').submit(function(event) {
+        event.preventDefault();
+        send_data = {'csrfmiddlewaretoken': '{{ csrf_token }}'}
+        send_data['package_name'] = $('#id_package_name').val();
+        send_data['version'] = $('#id_version').val();
+        $.post({
+          url: '{% url 'add_experiment_requirement' experiment.id %}',
+          data: send_data,
+          dataType: 'json',
+          success: function(data){
+            if (data.added) {
+              $('#requirements-tbody').append('<tr><td>' + send_data['package_name'] + '</td><td>'+ send_data['version'] +'</td></tr>');
+              $('#add-new-requirement')[0].reset();
+            }
+          }
+        })
+      });
+
+      $('.step-panel').click(function (event) {
+        var step_id = $(this).attr('id');
+        var identifier = '#tbody-' + step_id
+        $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
+
+        $.ajax({
+          url: '{% url "get_git_list_for_step" %}',
+          data: {
+            experiment_id: {{ experiment.id }},
+            step_id: step_id,
+          },
+          success: function(data) {
+            $(identifier).empty();
+            for (value in data.files) {
+              $(identifier).append('<tr><td>'+ data.files[value][0] + '</td><td>'+ data.files[value][1] +'</td></tr>')
+            }
+          }
+        })
+      });
+    });
+</script>
 {% endblock %}

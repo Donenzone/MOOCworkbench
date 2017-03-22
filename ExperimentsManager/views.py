@@ -14,6 +14,7 @@ from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from .tasks import initialize_repository
 from django.template.defaultfilters import slugify
+from RequirementsManager.forms import ExperimentRequirementForm
 # Create your views here.
 
 
@@ -34,14 +35,38 @@ class ExperimentDetailView(DetailView):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         context['now'] = timezone.now()
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
-        steps = ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
-        active_step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
-        name = slugify(active_step.step.step_name)
-        context['git_list'] = list_files_in_repo(self.request.user, experiment.git_repo.name, name)
+        context['steps'] = get_steps(experiment)
+        context['git_list'] = get_git_list(self.request.user, experiment)
         context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
-        context['steps'] = steps
+        context['requirements_form'] = ExperimentRequirementForm()
         return context
 
+def get_git_list(user, experiment, step=None):
+    if not step:
+        step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
+    name = slugify(step.step.step_name)
+    return list_files_in_repo(user, experiment.git_repo.name, name)
+
+def get_steps(experiment):
+    return ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
+
+
+@login_required
+def get_git_list_for_step(request):
+    assert 'experiment_id' in request.GET
+    assert 'step_id' in request.GET
+
+    step_id = request.GET['step_id']
+    experiment_id = request.GET['experiment_id']
+    experiment = Experiment.objects.get(id=experiment_id)
+    assert experiment.owner.user == request.user
+    
+    step = ChosenExperimentSteps.objects.get(id=step_id)
+    file_list = get_git_list(request.user, experiment, step)
+    return_dict = []
+    for content_file in file_list:
+        return_dict.append((content_file.name, content_file.type))
+    return JsonResponse({'files': return_dict})
 
 @login_required
 def complete_step_and_go_to_next(request, experiment_id):

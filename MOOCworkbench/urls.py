@@ -17,9 +17,9 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
 import ExperimentsManager.views
-from ExperimentsManager.views import CreateExperimentView, ChooseExperimentSteps, complete_step_and_go_to_next
+from ExperimentsManager.views import *
 from GitManager.views import GitRepositoryViewSet
-from RequirementsManager.views import ExperimentRequirementsListView
+from RequirementsManager.views import experiment_list_view, add_experiment_requirement
 import UserManager.views
 import GitManager.views
 from WorkerManager.views import *
@@ -49,6 +49,9 @@ urlpatterns = [
     url(r'^experiments/$', ExperimentsManager.views.index, name="experiments_index"),
     url(r'^experiments/new$', CreateExperimentView.as_view(), name="new_experiment"),
     url(r'^experiments/steps/(?P<experiment_id>\d+)$', ChooseExperimentSteps.as_view(), name="choose_experiment_steps"),
+
+    url(r'^experiment/step/files$', get_git_list_for_step, name="get_git_list_for_step"),
+
     url(r'^experiments/next-step/(?P<experiment_id>\d+)$', complete_step_and_go_to_next, name="complete_step_and_go_to_next"),
     url(r'^experiments/edit/(?P<experiment_id>\d+)$', CreateExperimentView.as_view(), name="edit_experiment"),
     url(r'^experiment/(?P<pk>[-\w]+)/$', ExperimentsManager.views.ExperimentDetailView.as_view(), name='experiment_detail'),
@@ -56,7 +59,8 @@ urlpatterns = [
     url(r'^experiment/file/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_file_in_git_repository, name='file_detail'),
     url(r'^experiment/folder/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
 
-    url(r'^experiment/requirements/(?P<experiment_id>\d+)/$', login_required(ExperimentRequirementsListView.as_view()), name="experiment_requirements_list"),
+    url(r'^experiment/requirements/(?P<experiment_id>\d+)/$', experiment_list_view, name="experiment_requirements_list"),
+    url(r'^experiment/add-requirement/(?P<experiment_id>\d+)/$', add_experiment_requirement, name="add_experiment_requirement"),
 
     url(r'^$', UserManager.views.index, name="index"),
 

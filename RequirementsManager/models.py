@@ -9,5 +9,5 @@ class ExperimentRequirement(models.Model):
 
     def __str__(self):
         if self.version is not None:
-            return '{0}=={1}'.format(package_name, version)
-        return '{0}'.format(package_name)
+            return '{0}=={1}'.format(self.package_name, self.version)
+        return '{0}'.format(self.package_name)

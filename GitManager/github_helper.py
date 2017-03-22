@@ -3,7 +3,8 @@ from allauth.socialaccount.models import SocialToken
 from UserManager.models import get_workbench_user, WorkbenchUser
 
 def get_github_object(user):
-    workbench_user = get_workbench_user(user)
+    if isinstance(user, WorkbenchUser):
+        user = user.user
     socialtoken = SocialToken.objects.filter(account__user=user, account__provider='github')
     if socialtoken.count() != 0:
         return Github(login_or_token=socialtoken[0].token)
@@ -19,10 +20,10 @@ def get_repository(user, repository_name):
     repo = github_user.get_repo(repository_name)
     return repo
 
-def list_files_in_repo(user, repository_name):
+def list_files_in_repo(user, repository_name, folder=''):
     try:
         repo = get_repository(user, repository_name)
-        return repo.get_contents('/')
+        return repo.get_contents('/{0}'.format(folder))
     except GithubException as e:
         return [e.data['message']]
 

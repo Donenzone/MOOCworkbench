@@ -12,6 +12,8 @@ from UserManager.models import get_workbench_user
 import json
 from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
+from .tasks import create_step_folders
+from django.template.defaultfilters import slugify
 # Create your views here.
 
 
@@ -32,9 +34,12 @@ class ExperimentDetailView(DetailView):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         context['now'] = timezone.now()
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
-        context['git_list'] = list_files_in_repo(self.request.user, experiment.git_repo.name)
+        steps = ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
+        active_step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
+        name = slugify(active_step.step.step_name)
+        context['git_list'] = list_files_in_repo(self.request.user, experiment.git_repo.name, name)
         context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
-        context['steps'] = ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
+        context['steps'] = steps
         return context
 
 
@@ -116,6 +121,7 @@ class ChooseExperimentSteps(View):
                 chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, step=step, step_nr=counter)
                 chosen_experiment_step.save()
                 counter += 1
+            create_step_folders.delay(self.kwargs['pk'])
             url = reverse('experiment_detail', kwargs={'pk': experiment_id})
             return JsonResponse({'url': url})
 

@@ -2,18 +2,21 @@ from django.db import models
 from ExperimentsManager.models import Experiment
 # Create your models here.
 
-class ExperimentQualityMeasure(models.Model):
-    MEASUREMENT_TYPES = (
-        ('MTZ', 'More than zero'),
-        ('')
-    )
-
+class ExperimentMeasure(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    type = models.CharField(max_length=3, choices=MEASUREMENT_TYPES)
 
+HIGH = 'H'
+MEDIUM = 'M'
+LOW = 'L'
 
-class ExperimentQualityResult(models.Model):
+class ExperimentMeasureResult(models.Model):
+    SCALE = (
+        (HIGH, 'High'),
+        (MEDIUM, 'Medium'),
+        (LOW, 'Low'),
+    )
     experiment = models.ForeignKey(to=Experiment)
-    measurement = models.ForeignKey(to=ExperimentQualityMeasure)
-    result = models.FloatField(default=0)
+    measurement = models.ForeignKey(to=ExperimentMeasure)
+    result = models.CharField(max_length=1, choices=SCALE)
+    performed_at = models.DateTimeField(auto_now_add=True)

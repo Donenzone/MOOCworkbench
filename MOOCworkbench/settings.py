@@ -70,7 +70,8 @@ INSTALLED_APPS = [
     'Worker',
     'Marketplace',
     'RequirementsManager',
-    
+    'QualityManager',
+
     'bootstrapform',
     'django_tables2',
     'markdownx',

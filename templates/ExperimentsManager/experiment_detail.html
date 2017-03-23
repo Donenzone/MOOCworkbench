@@ -5,14 +5,13 @@
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-      <li><a data-toggle="tab" href="#requirements" id='requirements-btn'>Manage Your Requirements</a></li>
-      <li><a data-toggle="tab" href="#wiki">Wiki</a></li>
-      <li><a data-toggle="tab" href="#metrics">Metrics</a></li>
+      <li><a data-toggle="tab" href="#requirements" id='requirements-click'>Manage Your Requirements</a></li>
+      <li><a data-toggle="tab" id="wiki-click" href="#wiki">Wiki</a></li>
+      <li><a data-toggle="tab"href="/metrics">Metrics</a></li>
     </ul>
 
 <div class="tab-content">
   <div id="index" class="tab-pane fade in active">
-
     <h3>General information</h3>
       <table class="table table-striped">
         <tr>
@@ -115,27 +114,7 @@
 
   </div>
   <div id="requirements" class="tab-pane fade">
-    <h4>Add New Requirement</h4>
-    <form class="form-inline" id="add-new-requirement">
-        {% csrf_token %}
-        {{ requirements_form|bootstrap_inline }}
-        <div class="form-group">
-          <div class="col-sm-10 col-sm-offset-2">
-            <button type="submit" class="btn btn-primary">Add New Requirement</button>
-          </div>
-        </div>
-    </form>
-    <h4>Requirements In Your Project</h4>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Package name</th>
-          <th>Version</th>
-        </tr>
-      </thead>
-      <tbody id="requirements-tbody">
-      </tbody>
-    </table>
+    Loading...
   </div>
   <div id="wiki" class="tab-pane fade">Wiki
   </div>
@@ -145,40 +124,9 @@
 
 <script type='text/javascript'>
   $(document).ready(function() {
-    $('#requirements-btn').click(function() {
-      $('#requirements-tbody').append('<tr><td>Loading...</td><td></td></tr>');
-
-      $.ajax({
-        url: '{% url 'experiment_requirements_list' experiment.id %}',
-        success: function(data) {
-            $('#requirements-tbody').empty();
-            var req_list = $.parseJSON(data.requirements)
-            for (var req in req_list) {
-              package_name = req_list[req].fields.package_name;
-              version = req_list[req].fields.version;
-              $('#requirements-tbody').append('<tr><td>' + package_name + '</td><td>'+ version +'</td></tr>');
-            }
-          },
-        });
-      });
-
-      $('#add-new-requirement').submit(function(event) {
-        event.preventDefault();
-        send_data = {'csrfmiddlewaretoken': '{{ csrf_token }}'}
-        send_data['package_name'] = $('#id_package_name').val();
-        send_data['version'] = $('#id_version').val();
-        $.post({
-          url: '{% url 'add_experiment_requirement' experiment.id %}',
-          data: send_data,
-          dataType: 'json',
-          success: function(data){
-            if (data.added) {
-              $('#requirements-tbody').append('<tr><td>' + send_data['package_name'] + '</td><td>'+ send_data['version'] +'</td></tr>');
-              $('#add-new-requirement')[0].reset();
-            }
-          }
-        })
-      });
+    $('#requirements-click').click(function() {
+      $("#requirements").load("{% url 'experimentrequirements_list' object.id %}");
+    });
 
       $('.step-panel').click(function (event) {
         var step_id = $(this).attr('id');

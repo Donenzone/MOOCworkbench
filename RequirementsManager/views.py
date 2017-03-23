@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 import requirements
 from .models import ExperimentRequirement
 from ExperimentsManager.models import Experiment
 from django.views.generic.list import ListView
+from django.views.generic import CreateView
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core import serializers
+from .forms import ExperimentRequirementForm
 # Create your views here.
 
 def parse_requirements_file(requirements_file):
@@ -13,28 +15,33 @@ def parse_requirements_file(requirements_file):
         print(req.name, req.specs, req.extras)
 
 
-@login_required
-def experiment_list_view(request, experiment_id):
-    experiment = Experiment.objects.get(id=experiment_id)
-    assert experiment.owner.user == request.user
-    data = serializers.serialize('json', ExperimentRequirement.objects.filter(experiment=experiment))
-    return JsonResponse({'requirements': data})
+class ExperimentRequirementListView(ListView):
+    model = ExperimentRequirement
+
+    def get_queryset(self):
+        experiment = Experiment.objects.get(id=self.kwargs['pk'])
+        assert experiment.owner.user == self.request.user
+        return ExperimentRequirement.objects.filter(experiment=experiment)
+
+    def get_context_data(self, **kwargs):
+        context = super(ExperimentRequirementListView, self).get_context_data(**kwargs)
+        context['requirements_form'] = ExperimentRequirementForm()
+        context['experiment_id'] = self.kwargs['pk']
+        return context
 
 
-@login_required
-def add_experiment_requirement(request, experiment_id):
-    assert request.POST
-    assert request.POST['package_name']
-    assert request.POST['version']
-    package_name = request.POST['package_name']
-    version = request.POST['version']
+class ExperimentRequirementCreateView(CreateView):
+    model = ExperimentRequirement
+    fields = ['package_name', 'version']
 
-    experiment = Experiment.objects.get(id=experiment_id)
-    assert experiment.owner.user == request.user
+    def form_valid(self, form):
+        experiment = Experiment.objects.get(id=self.kwargs['experiment_id'])
+        assert experiment.owner.user == self.request.user
+        form.instance.experiment = experiment
+        return super(ExperimentRequirementCreateView, self).form_valid(form)
 
-    requirement = ExperimentRequirement(package_name=package_name, experiment=experiment, version=version)
-    requirement.save()
-    return JsonResponse({'added': True})
+    def get_success_url(self):
+        return reverse('experiment_detail', kwargs={'pk': self.kwargs['experiment_id']})
 
 
 @login_required

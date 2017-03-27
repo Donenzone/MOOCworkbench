@@ -61,7 +61,7 @@
             url: '{% url 'choose_experiment_steps' experiment_id %}',
             data: sortedIDs,
             success: function(data) {
-              alert(data.url);
+              window.location.replace(data.url);
             },
             dataType: 'json',
           });

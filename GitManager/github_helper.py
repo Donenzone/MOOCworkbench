@@ -1,4 +1,5 @@
-from github import Github, GithubException
+from github import Github
+from github.GithubException import GithubException
 from allauth.socialaccount.models import SocialToken
 from UserManager.models import get_workbench_user, WorkbenchUser
 
@@ -37,15 +38,18 @@ def commits_in_repository(user, repository_name):
     pass
 
 def add_file_to_repository(user, repository_name, file_name, commit_message, folder='', contents=''):
-    repo = get_repository(user, repository_name)
-    if folder:
-        repo_file_name = '/{0}/{1}'.format(folder, file_name)
-    else:
-        repo_file_name = '/{0}'.format(file_name)
-    repo.create_file(repo_file_name, commit_message, contents)
+    try:
+        repo = get_repository(user, repository_name)
+        if folder:
+            repo_file_name = '/{0}/{1}'.format(folder, file_name)
+        else:
+            repo_file_name = '/{0}'.format(file_name)
+        repo.create_file(repo_file_name, commit_message, contents)
+    except GithubException as e:
+        print(e)
 
 def create_new_github_repository(name, user):
     github_api = get_github_object(user)
     github_user = github_api.get_user()
-    repo = user.create_repo(name, auto_init=True)
+    repo = github_user.create_repo(name, auto_init=True)
     return repo

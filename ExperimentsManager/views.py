@@ -125,7 +125,7 @@ class CreateExperimentView(View):
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
             experiment.save()
             if form.cleaned_data['new_git_repo']:
-                git_repo = create_new_github_repository(experiment.title, request.user, 'python', experiment)
+                git_repo = create_new_github_repository_local(experiment.title, request.user, 'python', experiment)
                 experiment.git_repo = git_repo
                 experiment.save()
             elif request.POST['github'] is not '':
@@ -142,7 +142,8 @@ class CreateExperimentView(View):
 
 class ChooseExperimentSteps(View):
     def get(self, request, experiment_id):
-        # check if request.user is owner of experiment pls
+        experiment = Experiment.objects.get(id=experiment_id)
+        assert request.user == experiment.owner.user
         context = {}
         context['steps'] = ExperimentStep.objects.all()
         context['experiment_id'] = experiment_id
@@ -160,9 +161,11 @@ class ChooseExperimentSteps(View):
                 step = int(step)
                 step = ExperimentStep.objects.get(id=step)
                 chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, step=step, step_nr=counter)
+                if counter == 1:
+                    chosen_experiment_step.active = True
                 chosen_experiment_step.save()
                 counter += 1
-            initialize_repository.delay(self.kwargs['pk'])
+            initialize_repository.delay(experiment_id)
             url = reverse('experiment_detail', kwargs={'pk': experiment_id})
             return JsonResponse({'url': url})
 

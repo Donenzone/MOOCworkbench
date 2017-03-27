@@ -37,13 +37,18 @@ def list_files_in_repo_folder(user, repository_name, folder):
 def commits_in_repository(user, repository_name):
     pass
 
+def get_repo_file_name(repository, file_name, folder=''):
+    if folder:
+        repo_file_name = '/{0}/{1}'.format(folder, file_name)
+    else:
+        repo_file_name = '/{0}'.format(file_name)
+    return repo_file_name
+
+
 def add_file_to_repository(user, repository_name, file_name, commit_message, folder='', contents=''):
     try:
         repo = get_repository(user, repository_name)
-        if folder:
-            repo_file_name = '/{0}/{1}'.format(folder, file_name)
-        else:
-            repo_file_name = '/{0}'.format(file_name)
+        repo_file_name = get_repo_file_name(repo, file_name, folder)
         repo.create_file(repo_file_name, commit_message, contents)
     except GithubException as e:
         print(e)
@@ -53,3 +58,9 @@ def create_new_github_repository(name, user):
     github_user = github_api.get_user()
     repo = github_user.create_repo(name, auto_init=True)
     return repo
+
+def update_file_in_repository(user, repository_name, file_name, commit_message, contents, folder=''):
+    repo = get_repository(user, repository_name)
+    repo_file_name = get_repo_file_name(repo, file_name, folder)
+    current_file = repo.get_file_contents(repo_file_name)
+    repo.update_file(repo_file_name, commit_message, contents, current_file.sha)

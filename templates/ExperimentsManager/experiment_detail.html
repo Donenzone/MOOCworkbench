@@ -38,9 +38,9 @@
 
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         {% for step in steps %}
-        <div id="{{ step.id }}" class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
+        <div class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
           <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
-            <h4 class="panel-title">
+            <h4 id="{{ step.id }}" class="panel-title">
               <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" {% if step.active %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="collapse{{ forloopcounter }}">
                 {{ step.step }} {% if step.completed %}(completed){% endif %}
               </a>
@@ -128,7 +128,7 @@
       $("#requirements").load("{% url 'experimentrequirements_list' object.id %}");
     });
 
-      $('.step-panel').click(function (event) {
+      $('.step-panel .panel-title').click(function (event) {
         var step_id = $(this).attr('id');
         var identifier = '#tbody-' + step_id
         $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')

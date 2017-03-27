@@ -19,6 +19,7 @@ from rest_framework import routers
 import ExperimentsManager.views
 from ExperimentsManager.views import *
 from GitManager.views import GitRepositoryViewSet
+from RequirementsManager.views import *
 from RequirementsManager.views import ExperimentRequirementListView, ExperimentRequirementCreateView
 import UserManager.views
 import GitManager.views
@@ -60,6 +61,7 @@ urlpatterns = [
     url(r'^experiment/folder/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
 
     url(r'^experiment/requirements/(?P<pk>\d+)/$', login_required(ExperimentRequirementListView.as_view()), name="experimentrequirements_list"),
+    url(r'^experiment/requirements/(?P<experiment_id>\d+)/write$', write_requirements_file, name="write_requirements_file"),
     url(r'^experiment/add-requirement/(?P<experiment_id>\d+)/$', login_required(ExperimentRequirementCreateView.as_view()), name="add_experiment_requirement"),
 
     url(r'^$', UserManager.views.index, name="index"),

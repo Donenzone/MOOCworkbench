@@ -15,3 +15,5 @@ django-contrib-comments
 django-notifications-hq
 django-allauth
 requirements-parser
+django-model-utils
+waliki[all]

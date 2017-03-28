@@ -85,4 +85,6 @@ urlpatterns = [
     url(r'^comments/', include('django_comments.urls')),
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
     url(r'^accounts/', include('allauth.urls')),
+
+    url(r'^wiki/', include('waliki.urls')),
 ]

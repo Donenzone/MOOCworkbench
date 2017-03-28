@@ -14,6 +14,7 @@ from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from .tasks import initialize_repository
 from django.template.defaultfilters import slugify
+from QualityManager.utils import get_measurement_messages_for_experiment
 # Create your views here.
 
 
@@ -37,6 +38,7 @@ class ExperimentDetailView(DetailView):
         context['steps'] = get_steps(experiment)
         context['git_list'] = get_git_list(self.request.user, experiment)
         context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
+        context['measurements'] = get_measurement_messages_for_experiment(experiment)
         return context
 
 def get_git_list(user, experiment, step=None):

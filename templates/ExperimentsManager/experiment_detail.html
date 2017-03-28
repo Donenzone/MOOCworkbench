@@ -77,7 +77,6 @@
                         </td>
                     </tr>
                     {% endfor %}
-
                     {% endif %}
                   </tbody>
               </table>
@@ -96,9 +95,9 @@
                   <div class="col-sm-6">
                     <h4>How am I doing?</h4>
                       <ul>
-                        <li>You haven't defined any requirements yet. Defining requirements is important... <a href="#">Learn more</a></li>
-                        <li>Testing: Good</li>
-                        <li>You haven't written any documentation yet! Writing documentation frequently is important, as now your knowledge is still fresh  <a href="#">Learn more</a></li>
+                        {% for message in measurements %}
+                          <li>{{ message }}</li>
+                        {% endfor %}
                       </ul>
                   </div>
                 </div>

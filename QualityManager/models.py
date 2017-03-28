@@ -1,5 +1,6 @@
 from django.db import models
 from ExperimentsManager.models import Experiment
+from model_utils.models import TimeStampedModel
 # Create your models here.
 
 class ExperimentMeasure(models.Model):
@@ -13,7 +14,7 @@ class ExperimentMeasure(models.Model):
     def __str__(self):
         return 'Measurement of {0}'.format(self.name)
 
-class ExperimentMeasureResult(models.Model):
+class ExperimentMeasureResult(TimeStampedModel):
     HIGH = 'H'
     MEDIUM = 'M'
     LOW = 'L'
@@ -26,7 +27,6 @@ class ExperimentMeasureResult(models.Model):
     experiment = models.ForeignKey(to=Experiment)
     measurement = models.ForeignKey(to=ExperimentMeasure)
     result = models.CharField(max_length=1, choices=SCALE)
-    performed_at = models.DateTimeField(auto_now_add=True)
 
     def get_message(self):
         message_dict = {ExperimentMeasureResult.LOW: self.measurement.low_message,

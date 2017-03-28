@@ -34,7 +34,6 @@ class RequirementsMeasurement(MeasurementAbstraction):
             self.result.result = ExperimentMeasureResult.HIGH
 
     def save_and_get_result(self):
-        self.result.performed_at = datetime.now()
         self.result.measurement = self.measurement
         self.result.save()
         return self.result
@@ -91,7 +90,6 @@ class VersionControlUseMeasurement(MeasurementAbstraction):
         return 0
 
     def save_and_get_result(self):
-        self.result.performed_at = datetime.now()
         self.result.measurement = self.measurement
         self.result.save()
         return self.result

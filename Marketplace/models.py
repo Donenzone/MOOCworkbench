@@ -5,15 +5,15 @@ import xmlrpc.client
 from notifications.signals import notify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from model_utils.models import TimeStampedModel
 
 PYPI_URL = 'https://pypi.python.org/pypi'
 
-class Package(models.Model):
+class Package(TimeStampedModel):
     package_name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     internal_package = models.BooleanField(default=False)
     project_page = models.URLField()
-    created = models.DateTimeField(auto_now_add=True)
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
 
     def __str__(self):
@@ -25,10 +25,9 @@ class Package(models.Model):
             return package_version[0]
         return None
 
-class PackageVersion(models.Model):
+class PackageVersion(TimeStampedModel):
     package = models.ForeignKey(to=Package)
     version_nr = models.CharField(max_length=50)
-    created = models.DateTimeField(auto_now_add=True)
     changelog = models.TextField()
     added_by = models.ForeignKey(to=WorkbenchUser, null=True)
     url = models.URLField()
@@ -63,9 +62,8 @@ def get_latest_version(package):
                 newer_release = PackageVersion(package=package, version_nr=release, changelog="Auto-added", url=url)
                 newer_release.save()
 
-class PackageResource(models.Model):
+class PackageResource(TimeStampedModel):
     package = models.ForeignKey(to=Package)
     resource = MarkdownxField()
     url = models.URLField(null=True)
     added_by = models.ForeignKey(to=WorkbenchUser)
-    created = models.DateTimeField(auto_now_add=True)

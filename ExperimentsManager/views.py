@@ -15,9 +15,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from .tasks import initialize_repository
 from django.template.defaultfilters import slugify
 from QualityManager.utils import get_measurement_messages_for_experiment
-from QualityManager.tasks import version_control_quality_check
 # Create your views here.
-
 
 class ExperimentRunViewSet(viewsets.ModelViewSet):
     queryset = ExperimentRun.objects.all()
@@ -34,7 +32,6 @@ class ExperimentDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
-        version_control_quality_check(self.kwargs['pk'])
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
         github_helper = GitHubHelper(self.request.user, experiment.git_repo.name)
         context['steps'] = get_steps(experiment)

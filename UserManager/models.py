@@ -19,7 +19,7 @@ def get_workbench_user(user):
     return WorkbenchUser.objects.get(user=user)
 
 @receiver(post_save, sender=User)
-def creat_workbench_user(sender, instance, created, **kwargs):
+def create_workbench_user(sender, instance, created, **kwargs):
     if created:
         workbench_user = WorkbenchUser.objects.filter(user=instance)
         if workbench_user.count() == 0:

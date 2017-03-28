@@ -15,6 +15,6 @@ def get_recent_measurements_for_all_types(experiment):
     return measurement_list
 
 def get_most_recent_measurement(experiment, experiment_measure):
-    result = ExperimentMeasureResult.objects.filter(experiment=experiment, measurement=experiment_measure).order_by('-performed_at')
+    result = ExperimentMeasureResult.objects.filter(experiment=experiment, measurement=experiment_measure).order_by('-created')
     if result.count() != 0:
         return result[0]

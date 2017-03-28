@@ -1,8 +1,9 @@
 from django.db import models
 from ExperimentsManager.models import Experiment
+from model_utils.models import TimeStampedModel
 
 
-class ExperimentRequirement(models.Model):
+class ExperimentRequirement(TimeStampedModel):
     package_name = models.CharField(max_length=255)
     experiment = models.ForeignKey(to=Experiment)
     version = models.CharField(max_length=255, null=True)

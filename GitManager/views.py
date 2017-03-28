@@ -42,5 +42,5 @@ def create_new_github_repository_local(title, user, type, experiment):
     git_repo.owner = get_workbench_user(user)
     git_repo.github_url = repo.url
     git_repo.save()
-    
+
     return git_repo

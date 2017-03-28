@@ -7,15 +7,15 @@ from rest_framework.renderers import JSONRenderer
 from ExperimentsManager.serializer import serializer_experiment_run_factory
 import requests
 from helpers.url_helper import build_url
+from model_utils.models import TimeStampedModel
 
 
-class AbstractExperiment(models.Model):
+class AbstractExperiment(TimeStampedModel):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     version = models.CharField(max_length=200)
     added = models.DateField(auto_now_add=True)
     owner = models.ForeignKey(to=WorkbenchUser)
-    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True

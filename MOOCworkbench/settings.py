@@ -93,6 +93,8 @@ INSTALLED_APPS = [
     'waliki.pdf',           # optional
     'waliki.slides',        # optional
     'waliki.togetherjs',    # optional
+
+    'django_bootstrap_breadcrumbs',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -132,7 +134,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'UserManager.context_processor.workbench_user'
+                'UserManager.context_processor.workbench_user',
+                'django.template.context_processors.request'
             ],
         },
     },

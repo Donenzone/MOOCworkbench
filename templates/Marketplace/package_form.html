@@ -1,5 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'Marketplace/marketplace_index.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Create New Package" "package_new" %}
+{% endblock %}
+
 {% block content %}
 
 <h2>Create New Package</h2>

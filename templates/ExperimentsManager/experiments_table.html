@@ -1,5 +1,13 @@
 {% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
 {% load render_table from django_tables2 %}
+
+{% block experiments_active %}active{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Experiments" "experiments_index" %}
+{% endblock %}
 
 {% block content %}
         {% render_table table %}

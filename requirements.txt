@@ -17,3 +17,4 @@ django-allauth
 requirements-parser
 django-model-utils
 waliki[all]
+django-bootstrap-breadcrumbs

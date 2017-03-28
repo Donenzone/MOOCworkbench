@@ -1,4 +1,14 @@
 {% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block marketplace_active %}active{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "MOOC Marketplace" "marketplace_index" %}
+{% endblock %}
+
+
 {% block content %}
   <h2>MOOC Marketplace</h2>
   <ul class="nav nav-tabs">

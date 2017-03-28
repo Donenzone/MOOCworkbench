@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core import serializers
 from .forms import ExperimentRequirementForm
-from GitManager.github_helper import update_file_in_repository
+from GitManager.github_helper import GitHubHelper
 from django.contrib import messages
 # Create your views here.
 
@@ -61,6 +61,7 @@ def write_requirements_file(request, experiment_id):
     requirements_txt = ''
     for requirement in ExperimentRequirement.objects.filter(experiment=experiment):
         requirements_txt += '{0}\n'.format(str(requirement))
-    update_file_in_repository(request.user, experiment.git_repo.name, 'requirements.txt', 'Updated requirements.txt file by MOOC workbench', requirements_txt)
+    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+    github_helper.update_file_in_repository('requirements.txt', 'Updated requirements.txt file by MOOC workbench', requirements_txt)
     messages.add_message(request, messages.INFO, 'Successfully updated requirements in your repository')
     return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id}))

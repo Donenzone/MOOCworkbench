@@ -10,7 +10,8 @@ def get_recent_measurements_for_all_types(experiment):
     measurement_list = []
     for measure in measures:
         recent_result = get_most_recent_measurement(experiment, measure)
-        measurement_list.append(recent_result)
+        if recent_result:
+            measurement_list.append(recent_result)
     return measurement_list
 
 def get_most_recent_measurement(experiment, experiment_measure):

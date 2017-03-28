@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from .tasks import initialize_repository
 from django.template.defaultfilters import slugify
 from QualityManager.utils import get_measurement_messages_for_experiment
+from QualityManager.tasks import version_control_quality_check
 # Create your views here.
 
 
@@ -33,19 +34,20 @@ class ExperimentDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
-        context['now'] = timezone.now()
+        version_control_quality_check(self.kwargs['pk'])
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
+        github_helper = GitHubHelper(self.request.user, experiment.git_repo.name)
         context['steps'] = get_steps(experiment)
-        context['git_list'] = get_git_list(self.request.user, experiment)
-        context['commit_list'] = commits_in_repository(experiment.title, self.request.user.username)
+        context['git_list'] = get_git_list(self.request.user, experiment, github_helper)
+        #context['commit_list'] = github_helper.get_commits_in_repository()
         context['measurements'] = get_measurement_messages_for_experiment(experiment)
         return context
 
-def get_git_list(user, experiment, step=None):
+def get_git_list(user, experiment, github_helper, step=None):
     if not step:
         step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
     name = slugify(step.step.step_name)
-    return list_files_in_repo(user, experiment.git_repo.name, name)
+    return github_helper.list_files_in_repo(name)
 
 def get_steps(experiment):
     return ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
@@ -62,7 +64,8 @@ def get_git_list_for_step(request):
     assert experiment.owner.user == request.user
 
     step = ChosenExperimentSteps.objects.get(id=step_id)
-    file_list = get_git_list(request.user, experiment, step)
+    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+    file_list = get_git_list(request.user, experiment, github_helper, step)
     return_dict = []
     for content_file in file_list:
         return_dict.append((content_file.name, content_file.type))

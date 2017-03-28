@@ -23,7 +23,8 @@ def index(request):
     return render(request, 'index.html')
 
 def get_user_repositories(user):
-    github_api = get_github_object(user)
+    github_helper = GitHubHelper(user)
+    github_api = github_helper.github_object
     if github_api:
         repo_list = []
         for repo in github_api.get_user().get_repos(type='owner'):
@@ -33,10 +34,13 @@ def get_user_repositories(user):
 
 
 def create_new_github_repository_local(title, user, type, experiment):
-    repo = create_new_github_repository(title, user)
+    github_helper = GitHubHelper(user, title, create=True)
+    repo = github_helper.github_repository
+
     git_repo = GitRepository()
     git_repo.name = repo.name
     git_repo.owner = get_workbench_user(user)
     git_repo.github_url = repo.url
     git_repo.save()
+    
     return git_repo

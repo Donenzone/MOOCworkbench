@@ -4,15 +4,17 @@ from allauth.socialaccount.models import SocialToken
 from UserManager.models import get_workbench_user, WorkbenchUser
 
 class GitHubHelper(object):
-    def __init__(self, user, repo_name = None, create=False):
+    def __init__(self, user, repo_name=None, create=False):
         self.github_object = self.get_github_object(user)
         self.github_user = self.github_object.get_user()
-        
+
+        if repo_name:
+            self.repo_name = repo_name
+
         if create:
             self.github_repository = self.create_new_repository()
-        elif repo_name:
+        else:
             self.github_repository = self.github_user.get_repo(repo_name)
-            self.repo_name = repo_name
 
     def get_github_object(self, user):
         if isinstance(user, WorkbenchUser):
@@ -47,7 +49,7 @@ class GitHubHelper(object):
 
     def add_file_to_repository(self, file_name, commit_message, folder='', contents=''):
         try:
-            repo_file_name = self.get_repo_file_name(self.github_repository, file_name, folder)
+            repo_file_name = self.get_repo_file_name(file_name, folder)
             self.github_repository.create_file(repo_file_name, commit_message, contents)
         except GithubException as e:
             print(e)

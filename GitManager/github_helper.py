@@ -13,7 +13,7 @@ class GitHubHelper(object):
 
         if create:
             self.github_repository = self.create_new_repository()
-        else:
+        elif repo_name is not None:
             self.github_repository = self.github_user.get_repo(repo_name)
 
     def get_github_object(self, user):

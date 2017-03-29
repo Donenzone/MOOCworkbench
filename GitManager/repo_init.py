@@ -27,7 +27,7 @@ class GitRepoInit(object):
     def create_step_folders(self):
         chosen_experiment_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
         for step in chosen_experiment_steps:
-            name = slugify(step.step.step_name).replace('-', '')
+            name = slugify(step.step.step_name).replace('-', '_')
             commit_message = 'Create folder {0}'.format(name)
             self.github_helper.add_file_to_repository('__init__.py', commit_message, name)
             self.create_main_and_test_file(name)

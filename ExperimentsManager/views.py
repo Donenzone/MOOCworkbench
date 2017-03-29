@@ -13,8 +13,8 @@ import json
 from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from .tasks import initialize_repository
-from django.template.defaultfilters import slugify
 from QualityManager.utils import get_measurement_messages_for_experiment
+from BuildManager.utils import trigger_build_for_repo
 # Create your views here.
 
 class ExperimentRunViewSet(viewsets.ModelViewSet):
@@ -43,8 +43,7 @@ class ExperimentDetailView(DetailView):
 def get_git_list(user, experiment, github_helper, step=None):
     if not step:
         step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
-    name = slugify(step.step.step_name)
-    return github_helper.list_files_in_repo(name)
+    return github_helper.list_files_in_repo(step.folder_name())
 
 def get_steps(experiment):
     return ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')

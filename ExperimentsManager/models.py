@@ -8,6 +8,7 @@ from ExperimentsManager.serializer import serializer_experiment_run_factory
 import requests
 from helpers.url_helper import build_url
 from model_utils.models import TimeStampedModel
+from django.template.defaultfilters import slugify
 
 
 class AbstractExperiment(TimeStampedModel):
@@ -63,6 +64,9 @@ class ChosenExperimentSteps(models.Model):
     step_nr = models.IntegerField()
     active = models.BooleanField(default=False)
     completed = models.BooleanField(default=False)
+
+    def folder_name(self):
+        return slugify(self.step.step_name).replace('-', '_')
 
 def delete_existing_chosen_steps(experiment):
     ChosenExperimentSteps.objects.filter(experiment=experiment).delete()

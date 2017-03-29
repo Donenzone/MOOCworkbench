@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'Marketplace',
     'RequirementsManager',
     'QualityManager',
+    'BuildManager',
 
     'bootstrapform',
     'django_tables2',

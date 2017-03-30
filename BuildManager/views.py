@@ -14,11 +14,36 @@ from travispy import TravisPy
 # Create your views here.
 
 @login_required
-def create_new_ci_config(request):
+def enable_ci_builds(request):
     assert 'experiment_id' in request.POST
     experiment_id = request.POST['experiment_id']
     experiment = verify_and_get_experiment(request, experiment_id)
 
+    existing_config = TravisInstance.objects.filter(experiment=experiment)
+    if existing_config.count() is not 0:
+        existing_config = existing_config[0]
+        existing_config.enabled = True
+        existing_config.save()
+    else:
+        create_new_ci_config(experiment)
+
+    return JsonResponse({'enabled': True})
+
+
+@login_required
+def disable_ci_builds(request):
+    assert 'experiment_id' in request.POST
+    experiment_id = request.POST['experiment_id']
+    experiment = verify_and_get_experiment(request, experiment_id)
+
+    current_config = TravisInstance.objects.get(experiment=experiment)
+    current_config.enabled = False
+    current_config.save()
+
+    return  JsonResponse({'disabled': True})
+
+
+def create_new_ci_config(experiment):
     new_ci_config = TravisCiConfig()
     new_ci_config.save()
     new_ci = TravisInstance(experiment=experiment, config=new_ci_config)
@@ -27,7 +52,7 @@ def create_new_ci_config(request):
     github_helper = get_github_helper(request, experiment)
     enable_travis_for_repository(github_helper)
 
-    return JsonResponse({'enabled': True})
+    return new_ci
 
 
 @login_required
@@ -41,6 +66,7 @@ def build_experiment_now(request):
 
     return JsonResponse({'build_started': True})
 
+
 @login_required
 def build_status(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
@@ -49,7 +75,7 @@ def build_status(request, experiment_id):
     configured = False
     if current_config.count() is not 0:
         current_config = current_config[0]
-        configured = True
+        configured = current_config.enabled
         github_helper = get_github_helper(request, experiment)
         t = TravisPy.github_auth(github_helper.socialtoken)
         travis_user = t.user()

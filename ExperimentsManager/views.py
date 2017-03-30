@@ -13,7 +13,7 @@ from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from ExperimentsManager.tasks import initialize_repository
 from QualityManager.utils import get_measurement_messages_for_experiment
-from BuildManager.utils import trigger_build_for_repo
+from BuildManager.travis_ci_helper import TravisCiHelper
 from django.contrib.auth.decorators import login_required
 import json
 # Create your views here.

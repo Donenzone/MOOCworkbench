@@ -3,6 +3,8 @@ from .models import ExperimentMeasureResult, ExperimentMeasure
 def get_measurement_messages_for_experiment(experiment):
     results = get_recent_measurements_for_all_types(experiment)
     message_list = [i.get_message() for i in results]
+    if len(message_list) is 0:
+        message_list.append('We don\'t know how you are doing yet. Check back later!')
     return message_list
 
 def get_recent_measurements_for_all_types(experiment):

@@ -3,9 +3,7 @@ from django.views import View
 from ExperimentsManager.models import Experiment
 from ExperimentsManager.helper import verify_and_get_experiment
 from BuildManager.models import TravisInstance, TravisCiConfig
-from BuildManager.utils import trigger_build_for_repo
-from BuildManager.utils import enable_travis_for_repository
-from BuildManager.utils import get_repo_slug
+from BuildManager.travis_ci_helper import TravisCiHelper
 from GitManager.github_helper import GitHubHelper
 from GitManager.helper import get_github_helper
 from django.contrib.auth.decorators import login_required
@@ -24,6 +22,7 @@ def enable_ci_builds(request):
         existing_config = existing_config[0]
         existing_config.enabled = True
         existing_config.save()
+        enable_travis(request, experiment)
     else:
         create_new_ci_config(experiment)
 
@@ -40,7 +39,11 @@ def disable_ci_builds(request):
     current_config.enabled = False
     current_config.save()
 
-    return  JsonResponse({'disabled': True})
+    github_helper = get_github_helper(request, experiment)
+    travis_ci_helper = TravisCiHelper(github_helper)
+    travis_ci_helper.disable_travis_for_repository()
+
+    return JsonResponse({'disabled': True})
 
 
 def create_new_ci_config(experiment):
@@ -49,11 +52,14 @@ def create_new_ci_config(experiment):
     new_ci = TravisInstance(experiment=experiment, config=new_ci_config)
     new_ci.save()
 
-    github_helper = get_github_helper(request, experiment)
-    enable_travis_for_repository(github_helper)
+    enable_travis(request, experiment)
 
     return new_ci
 
+def enable_travis(request, experiment):
+    github_helper = get_github_helper(request, experiment)
+    travis_ci_helper = TravisCiHelper(github_helper)
+    travis_ci_helper.enable_travis_for_repository()
 
 @login_required
 def build_experiment_now(request):

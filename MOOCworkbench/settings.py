@@ -201,6 +201,5 @@ USE_TZ = True
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "mw_static"),
+    os.path.join(BASE_DIR, "static"),
 ]
-STATIC_ROOT = '/home/jochem/Development/MOOCworkbench/static/'

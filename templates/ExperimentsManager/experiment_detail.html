@@ -11,7 +11,9 @@
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
+      <li><a data-toggle="tab" href="#readme" id='readme-click'>Read Me</a></li>
       <li><a data-toggle="tab" href="#requirements" id='requirements-click'>Manage Your Requirements</a></li>
+      <li><a data-toggle="tab" href="#ci" id='ci-click'>Continuous Integration</a></li>
       <li><a data-toggle="tab" id="wiki-click" href="#wiki">Wiki</a></li>
       <li><a data-toggle="tab"href="/metrics">Metrics</a></li>
     </ul>
@@ -121,6 +123,9 @@
   <div id="requirements" class="tab-pane fade">
     Loading...
   </div>
+  <div id="ci" class="tab-pane fade">
+    Loading...
+  </div>
   <div id="wiki" class="tab-pane fade">Wiki
   </div>
   <div id="metrics" class="tab-pane fade">Metrics
@@ -133,25 +138,33 @@
       $("#requirements").load("{% url 'experimentrequirements_list' object.id %}");
     });
 
-      $('.step-panel .panel-title').click(function (event) {
-        var step_id = $(this).attr('id');
-        var identifier = '#tbody-' + step_id
-        $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
+    $('#readme-click').click(function() {
+      $("#requirements").load("{% url 'experimentrequirements_list' object.id %}");
+    });
 
-        $.ajax({
-          url: '{% url "get_git_list_for_step" %}',
-          data: {
-            experiment_id: {{ experiment.id }},
-            step_id: step_id,
-          },
-          success: function(data) {
-            $(identifier).empty();
-            for (value in data.files) {
-              $(identifier).append('<tr><td>'+ data.files[value][0] + '</td><td>'+ data.files[value][1] +'</td></tr>')
-            }
+    $('#ci-click').click(function() {
+      $("#ci").load("{% url 'build_status' object.id %}");
+    });
+
+    $('.step-panel .panel-title').click(function (event) {
+      var step_id = $(this).attr('id');
+      var identifier = '#tbody-' + step_id
+      $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
+
+      $.ajax({
+        url: '{% url "get_git_list_for_step" %}',
+        data: {
+          experiment_id: {{ experiment.id }},
+          step_id: step_id,
+        },
+        success: function(data) {
+          $(identifier).empty();
+          for (value in data.files) {
+            $(identifier).append('<tr><td>'+ data.files[value][0] + '</td><td>'+ data.files[value][1] +'</td></tr>')
           }
-        })
-      });
+        }
+      })
+    });
     });
 </script>
 {% endblock %}

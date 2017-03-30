@@ -1,20 +1,21 @@
 from ExperimentsManager.serializer import *
-from .tables import ExperimentTable
-from .forms import ExperimentForm
-from .models import *
+from ExperimentsManager.tables import ExperimentTable
+from ExperimentsManager.forms import ExperimentForm
+from ExperimentsManager.models import *
 from django.views.generic.detail import DetailView
 from django.utils import timezone
 from GitManager.views import *
 from django.views import View
 from WorkerManager.views import run_experiment
-from .serializer import serializer_experiment_run_factory
+from ExperimentsManager.serializer import serializer_experiment_run_factory
 from UserManager.models import get_workbench_user
-import json
 from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
-from .tasks import initialize_repository
+from ExperimentsManager.tasks import initialize_repository
 from QualityManager.utils import get_measurement_messages_for_experiment
 from BuildManager.utils import trigger_build_for_repo
+from django.contrib.auth.decorators import login_required
+import json
 # Create your views here.
 
 class ExperimentRunViewSet(viewsets.ModelViewSet):

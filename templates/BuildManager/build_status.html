@@ -1,0 +1,37 @@
+{% load bootstrap %}
+
+{% block content%}
+  <h3>Build status</h3>
+
+  {% if not configured %}
+    <p>You have not enabled automatic Travis CI builds.</p>
+
+    <p><a href="#" class="btn btn-primary" id='enable-builds'>Enable now</a></p>
+
+  {% else %}
+    <img src='https://travis-ci.org/{{ username }}/{{ reposlug }}.svg?branch=master' />
+    <p>Travis CI will automatically run tests and check if your experiment builds.</p>
+
+    <p>
+      <a href="#" class="btn btn-primary">Build My Experiment Now</a>
+      <a href="#" class="btn btn-default">Disable Builds</a>
+    </p>
+  {% endif %}
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('#enable-builds').click(function() {
+        alert('post')
+        $.post({
+          url: '{% url 'create_new_ci_config' %}',
+          data: {'experiment_id': {{ experiment_id }}, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          success: function(data) {
+            if (data.enabled) {
+              location.reload();
+            }
+          },
+        })
+      });
+    });
+  </script>
+{% endblock %}

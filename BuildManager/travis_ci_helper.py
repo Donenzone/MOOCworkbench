@@ -41,4 +41,4 @@ class TravisCiHelper(object):
     def get_log_for_last_build(self):
         build = self.travis.build(self.travis_repo.last_build_id)
         log = build.jobs[0].log.body
-        print(log)
+        return log

@@ -87,6 +87,6 @@ def build_status(request, experiment_id):
         travis_user = t.user()
         reposlug = github_helper.github_repository.name
         username = travis_user.login
-    context = {'configured': configured, 'current_config': current_config, 'experiment_id': experiment.id,
+        context = {'configured': configured, 'current_config': current_config, 'experiment_id': experiment.id,
                'reposlug': reposlug, 'username': username}
     return render(request, 'BuildManager/build_status.html', context)

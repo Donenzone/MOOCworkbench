@@ -15,3 +15,4 @@ def version_control_quality_check(experiment_id):
     vcs_measure = VersionControlUseMeasurement(experiment)
     vcs_measure.measure()
     result = vcs_measure.save_and_get_result()
+    

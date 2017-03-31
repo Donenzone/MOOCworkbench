@@ -16,11 +16,23 @@
       <a href="#" class="btn btn-default" id='disable-builds'>Disable Builds</a>
     </p>
 
-    <p id='build-status'></p>
+    <hr />
+    
+    <h4>Log from last build</h4>
+
+    <p id='build-log' style="white-space: pre-wrap;">Loading log...</p>
   {% endif %}
 
   <script type="text/javascript">
     $(document).ready(function () {
+
+      $.get({
+        url: '{% url 'last_build_log' experiment_id %}',
+        data: {},
+        success: function(data) {
+          $('#build-log').html(data.log);
+        },
+      })
 
       $('#enable-builds').click(function() {
         $.post({

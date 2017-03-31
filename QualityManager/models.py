@@ -14,6 +14,14 @@ class ExperimentMeasure(models.Model):
     def __str__(self):
         return 'Measurement of {0}'.format(self.name)
 
+    def get_low_message(self):
+        return '{0}: {1}'.format(self.name, self.low_message)
+
+    def get_medium_message(self):
+        return '{0}: {1}'.format(self.name, self.medium_message)
+
+    def get_high_message(self):
+        return '{0}: {1}'.format(self.name, self.high_message)
 
 class RawMeasureResult(models.Model):
     key = models.CharField(max_length=255)
@@ -39,7 +47,7 @@ class ExperimentMeasureResult(TimeStampedModel):
 
 
     def get_message(self):
-        message_dict = {ExperimentMeasureResult.LOW: self.measurement.low_message,
-                ExperimentMeasureResult.MEDIUM: self.measurement.medium_message,
-                ExperimentMeasureResult.HIGH: self.measurement.high_message}
+        message_dict = {ExperimentMeasureResult.LOW: self.measurement.get_low_message(),
+                ExperimentMeasureResult.MEDIUM: self.measurement.get_medium_message(),
+                ExperimentMeasureResult.HIGH: self.measurement.get_high_message()}
         return message_dict[self.result]

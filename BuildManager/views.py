@@ -9,6 +9,7 @@ from GitManager.helper import get_github_helper
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from travispy import TravisPy
+from BuildManager.tasks import get_last_log_for_build_task
 # Create your views here.
 
 @login_required
@@ -24,7 +25,7 @@ def enable_ci_builds(request):
         existing_config.save()
         enable_travis(request, experiment)
     else:
-        create_new_ci_config(experiment)
+        create_new_ci_config(request, experiment)
 
     return JsonResponse({'enabled': True})
 
@@ -46,7 +47,7 @@ def disable_ci_builds(request):
     return JsonResponse({'disabled': True})
 
 
-def create_new_ci_config(experiment):
+def create_new_ci_config(request, experiment):
     new_ci_config = TravisCiConfig()
     new_ci_config.save()
     new_ci = TravisInstance(experiment=experiment, config=new_ci_config)
@@ -78,15 +79,21 @@ def build_status(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     context = {}
     current_config = TravisInstance.objects.filter(experiment=experiment)
-    configured = False
+    context['experiment_id'] = experiment.id
+    context['configured'] = False
     if current_config.count() is not 0:
-        current_config = current_config[0]
-        configured = current_config.enabled
+        context['current_config'] = current_config[0]
+        context['configured'] = context['current_config'].enabled
         github_helper = get_github_helper(request, experiment)
-        t = TravisPy.github_auth(github_helper.socialtoken)
-        travis_user = t.user()
-        reposlug = github_helper.github_repository.name
-        username = travis_user.login
-        context = {'configured': configured, 'current_config': current_config, 'experiment_id': experiment.id,
-               'reposlug': reposlug, 'username': username}
+        travis_helper = TravisCiHelper(github_helper)
+        context['reposlug'] = github_helper.github_repository.name
+        context['username'] = travis_helper.travis_user.login
     return render(request, 'BuildManager/build_status.html', context)
+
+@login_required
+def get_log_from_last_build(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    github_helper = get_github_helper(request, experiment)
+    travis_helper = TravisCiHelper(github_helper)
+    log = travis_helper.get_log_for_last_build()
+    return JsonResponse({'log': log})

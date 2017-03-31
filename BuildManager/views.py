@@ -85,9 +85,8 @@ def build_status(request, experiment_id):
         context['current_config'] = current_config[0]
         context['configured'] = context['current_config'].enabled
         github_helper = get_github_helper(request, experiment)
-        travis_helper = TravisCiHelper(github_helper)
-        context['reposlug'] = github_helper.github_repository.name
-        context['username'] = travis_helper.travis_user.login
+        context['reposlug'] = experiment.git_repo.name
+        context['username'] = github_helper.github_repository.owner.login
     return render(request, 'BuildManager/build_status.html', context)
 
 @login_required

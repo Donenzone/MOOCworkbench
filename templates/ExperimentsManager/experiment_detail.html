@@ -75,7 +75,7 @@
                               <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}">{{ item.name }}</a>
 
                             {% else %}
-                              <a href="/experiment/file/{{ object.id }}?file_name={{ item.path }}">{{ item.name }}</a>
+                              <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}">{{ item.name }}</a>
 
                             {% endif %}
                         </td>

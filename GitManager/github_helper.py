@@ -2,6 +2,7 @@ from github import Github
 from github.GithubException import GithubException
 from allauth.socialaccount.models import SocialToken
 from UserManager.models import get_workbench_user, WorkbenchUser
+import base64
 
 class GitHubHelper(object):
     def __init__(self, user, repo_name=None, create=False):
@@ -29,16 +30,17 @@ class GitHubHelper(object):
 
     def list_files_in_repo(self, folder=''):
         try:
-            repo = self.github_repository
-            return repo.get_contents('/{0}'.format(folder))
+            return self.github_repository.get_contents('/{0}'.format(folder))
         except GithubException as e:
             return [e.data['message']]
 
     def view_file_in_repo(self, file_name):
-        pass
-
-    def list_files_in_repo_folder(self, folder):
-        pass
+        try:
+            encoded = self.github_repository.get_file_contents('{0}'.format(file_name))
+            decoded = base64.b64decode(encoded.content)
+            return decoded
+        except GithubException as e:
+            print([e.data['message']])
 
     def get_commits_in_repository(self, since):
         return self.github_repository.get_commits(since=since)

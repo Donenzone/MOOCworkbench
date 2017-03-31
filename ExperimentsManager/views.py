@@ -14,6 +14,7 @@ from ExperimentsManager.tasks import initialize_repository
 from QualityManager.utils import get_measurement_messages_for_experiment
 from django.contrib.auth.decorators import login_required
 import json
+from ExperimentsManager.helper import verify_and_get_experiment
 
 class ExperimentDetailView(DetailView):
     model = Experiment
@@ -22,6 +23,7 @@ class ExperimentDetailView(DetailView):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         experiment = Experiment.objects.get(id=self.kwargs['pk'])
         github_helper = GitHubHelper(self.request.user, experiment.git_repo.name)
+        print(github_helper.view_file_in_repo('settings.py'))
         context['steps'] = get_steps(experiment)
         context['git_list'] = get_git_list(self.request.user, experiment, github_helper)
         #context['commit_list'] = github_helper.get_commits_in_repository()
@@ -160,12 +162,13 @@ class ChooseExperimentSteps(View):
 
 
 @login_required
-def view_file_in_git_repository(request, pk):
+def view_file_in_git_repository(request, experiment_id):
     if request.method == 'GET':
         file_name = request.GET['file_name']
-        expirement = Experiment.objects.get(id=pk)
-        data = view_file_in_repo('gitrepository1', file_name, request.user.username)
-        return render(request, 'ExperimentsManager/file_detail.html', {'contents': data, 'name': file_name})
+        experiment = verify_and_get_experiment(request, experiment_id)
+        github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+        content_file = github_helper.view_file_in_repo(file_name)
+        return render(request, 'ExperimentsManager/file_detail.html', {'content_file': content_file, 'name': file_name})
 
 
 @login_required

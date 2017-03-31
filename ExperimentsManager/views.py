@@ -26,7 +26,6 @@ class ExperimentDetailView(DetailView):
         github_helper = GitHubHelper(self.request.user, experiment.git_repo.name)
         context['steps'] = get_steps(experiment)
         context['git_list'] = get_git_list(self.request.user, experiment, github_helper)
-        #context['commit_list'] = github_helper.get_commits_in_repository()
         context['measurements'] = get_measurement_messages_for_experiment(experiment)
         return context
 

@@ -34,10 +34,13 @@ class TestMeasurement(MeasurementAbstraction):
 
     def parse_travis_log(self, log_file):
         match = re.search('Ran [0-9] test[s]? in', log_file)
-        match = match.group(0)
-        nr_of_tests = re.findall(r'\d+', match)[0]
+        if match:
+            match = match.group(0)
+            nr_of_tests = re.findall(r'\d+', match)[0]
 
-        return int(nr_of_tests)
+            return int(nr_of_tests)
+        else:
+            return 0
 
     def get_last_month_measures(self):
         results = ExperimentMeasureResult.objects.filter(measurement=self.measurement, experiment=self.experiment)

@@ -14,7 +14,7 @@
       <li><a data-toggle="tab" href="#readme" id='readme-click'>Read Me</a></li>
       <li><a data-toggle="tab" href="#requirements" id='requirements-click'>Manage Your Requirements</a></li>
       <li><a data-toggle="tab" href="#ci" id='ci-click'>Continuous Integration</a></li>
-      <li><a data-toggle="tab"href="/metrics">Metrics</a></li>
+      <li><a data-toggle="tab" href="#metrics" id="metrics-click">Metrics</a></li>
     </ul>
 
 <div class="tab-content">
@@ -126,7 +126,8 @@
   </div>
   <div id="wiki" class="tab-pane fade">Wiki
   </div>
-  <div id="metrics" class="tab-pane fade">Metrics
+  <div id="metrics" class="tab-pane fade">
+    Loading...
   </div>
 </div>
 
@@ -142,6 +143,10 @@
 
     $('#ci-click').click(function() {
       $("#ci").load("{% url 'build_status' object.id %}");
+    });
+
+    $('#metrics-click').click(function() {
+      $("#metrics").load("{% url 'overview_metrics' object.id %}");
     });
 
     $('.step-panel .panel-title').click(function (event) {

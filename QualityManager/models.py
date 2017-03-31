@@ -45,7 +45,6 @@ class ExperimentMeasureResult(TimeStampedModel):
     result = models.CharField(max_length=1, choices=SCALE)
     raw_values = models.ManyToManyField(to=RawMeasureResult)
 
-
     def get_message(self):
         message_dict = {ExperimentMeasureResult.LOW: self.measurement.get_low_message(),
                 ExperimentMeasureResult.MEDIUM: self.measurement.get_medium_message(),

@@ -6,7 +6,6 @@ from django.views.generic.detail import DetailView
 from django.utils import timezone
 from GitManager.views import *
 from django.views import View
-from WorkerManager.views import run_experiment
 from ExperimentsManager.serializer import serializer_experiment_run_factory
 from UserManager.models import get_workbench_user
 from django.shortcuts import HttpResponse, render, redirect, reverse
@@ -15,17 +14,6 @@ from ExperimentsManager.tasks import initialize_repository
 from QualityManager.utils import get_measurement_messages_for_experiment
 from django.contrib.auth.decorators import login_required
 import json
-# Create your views here.
-
-class ExperimentRunViewSet(viewsets.ModelViewSet):
-    queryset = ExperimentRun.objects.all()
-    serializer_class = serializer_experiment_run_factory(ExperimentRun)
-
-
-class ExperimentWorkerRunViewSet(viewsets.ModelViewSet):
-    queryset = ExperimentWorkerRun.objects.all()
-    serializer_class = serializer_experiment_run_factory(ExperimentWorkerRun)
-
 
 class ExperimentDetailView(DetailView):
     model = Experiment

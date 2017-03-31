@@ -19,19 +19,13 @@ from rest_framework import routers
 from GitManager.views import GitRepositoryViewSet
 import UserManager.views
 import GitManager.views
-from WorkerManager.views import *
-from Worker.views import *
 from django.contrib.auth.decorators import login_required
-from WorkerManager import views
 import notifications.urls
 
 router = routers.DefaultRouter()
-#router.register(r'master/experiment-run', ExperimentsManager.views.ExperimentRunViewSet)
-#router.register(r'worker/experiment-run', ExperimentsManager.views.ExperimentWorkerRunViewSet)
 router.register(r'git-repository', GitRepositoryViewSet)
 router.register(r'user', UserManager.views.UserViewset)
 router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)
-router.register(r'master/workers', views.WorkerViewSet)
 
 urlpatterns = [
     url(r'^$', UserManager.views.index, name="index"),

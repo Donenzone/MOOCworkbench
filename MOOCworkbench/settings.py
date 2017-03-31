@@ -66,12 +66,11 @@ INSTALLED_APPS = [
     'ExperimentsManager',
     'GitManager',
     'UserManager',
-    'WorkerManager',
-    'Worker',
     'Marketplace',
     'RequirementsManager',
     'QualityManager',
     'BuildManager',
+    'Feedback',
 
     'bootstrapform',
     'django_tables2',

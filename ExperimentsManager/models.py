@@ -4,7 +4,6 @@ from GitManager.models import GitRepository
 from rest_framework.renderers import JSONRenderer
 from ExperimentsManager.serializer import serializer_experiment_run_factory
 import requests
-from helpers.url_helper import build_url
 from model_utils.models import TimeStampedModel
 from django.template.defaultfilters import slugify
 

@@ -10,6 +10,7 @@ pygithub
 Celery
 pycryptodome
 asgi_redis
+markdown
 django-markdownx
 django-contrib-comments
 django-notifications-hq

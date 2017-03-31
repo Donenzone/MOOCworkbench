@@ -124,7 +124,8 @@
   <div id="ci" class="tab-pane fade">
     Loading...
   </div>
-  <div id="wiki" class="tab-pane fade">Wiki
+  <div id="readme" class="tab-pane fade">
+    Loading...
   </div>
   <div id="metrics" class="tab-pane fade">
     Loading...
@@ -138,7 +139,7 @@
     });
 
     $('#readme-click').click(function() {
-      $("#requirements").load("{% url 'experimentrequirements_list' object.id %}");
+      $("#readme").load("{% url 'view_readme' object.id %}");
     });
 
     $('#ci-click').click(function() {

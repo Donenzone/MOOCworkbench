@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-  <h2>Workers</h2>
-  <ul>
-    {% for worker in object_list %}
-      <li><b>{{ worker.name }}</b> current status <b>{{ worker.status }}</b> last ping <b>{{ worker.last_ping }}</b></li>
-    {% endfor %}
-  </ul>
-{% endblock %}

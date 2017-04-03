@@ -2,6 +2,7 @@ from django.db import models
 from UserManager.models import WorkbenchUser
 from model_utils.models import TimeStampedModel
 
+
 class Task(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -14,12 +15,14 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
+
 class Feedback(models.Model):
-    like = models.BooleanField()
-    feedback_like = models.TextField(null=True)
-    feedback_dislike = models.TextField(null=True)
-    other_comments = models.TextField(null=True)
+    like = models.BooleanField(verbose_name="Overall, was your experience positive?")
+    feedback_like = models.TextField(null=True, verbose_name="What did you like about your experience?")
+    feedback_dislike = models.TextField(null=True, verbose_name="What didn't you like about your experience?")
+    other_comments = models.TextField(null=True, verbose_name="Do you have any other comments?")
     for_task = models.ForeignKey(to=Task, null=True)
+
 
 class UserTask(TimeStampedModel):
     for_task = models.ForeignKey(to=Task)

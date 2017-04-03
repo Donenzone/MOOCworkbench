@@ -17,19 +17,17 @@ class TravisCiHelper(object):
         self.travis_repo.disable()
 
     def trigger_build_for_repo(self):
-        repo_slug_2f = self.get_repo_slug(github_helper, travis_user, two_f=True)
+        repo_slug_2f = self.get_repo_slug(two_f=True)
         url = 'https://api.travis-ci.org/repo/{0}/requests'.format(repo_slug_2f)
         body='{"request": {"branch":"master"} }'
-        access_token = get_access_token(self.github_helper.socialtoken)
+        access_token = self.get_access_token()
         auth_token = 'token {0}'.format(access_token)
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Travis-API-Version': '3', 'Authorization': auth_token}
         requests.post(url, data=body, headers=headers)
 
     def get_access_token(self):
-        headers = {'User-Agent': 'TravisMOOCworkbench', 'Accept': 'application/vnd.travis-ci.2+json'}
-        response = requests.post('https://api.travis-ci.org/auth/github', headers=headers, params={
-                "github_token": self.github_token,
-            })
+        headers = {'Content-Type': 'application/json', 'User-Agent': 'TravisMOOCworkbench', 'Accept': 'application/vnd.travis-ci.2+json'}
+        response = requests.post('https://api.travis-ci.org/auth/github', headers=headers, params={"github_token": self.github_helper.socialtoken})
         contents = response.json()
         return contents['access_token']
 

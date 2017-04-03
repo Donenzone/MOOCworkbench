@@ -69,7 +69,8 @@ def build_experiment_now(request):
     experiment = verify_and_get_experiment(request, experiment_id)
 
     github_helper = get_github_helper(request, experiment)
-    trigger_build_for_repo(github_helper)
+    travis_ci_helper = TravisCiHelper(github_helper)
+    travis_ci_helper.trigger_build_for_repo()
 
     return JsonResponse({'build_started': True})
 

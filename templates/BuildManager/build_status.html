@@ -17,7 +17,7 @@
     </p>
 
     <hr />
-    
+
     <h4>Log from last build</h4>
 
     <p id='build-log' style="white-space: pre-wrap;">Loading log...</p>
@@ -53,7 +53,11 @@
           success: function(data) {
             if (data.build_started) {
                 $('#build-status').html('Build started... please wait')
+                location.reload();
             }
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+              $('#build-status').html('Something might have went wrong... please try again')
           },
         });
       });

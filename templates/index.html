@@ -6,9 +6,9 @@
     <div class="col-md-12">
         <h2>Welcome to the MOOC workbench</h2>
         <p>Thanks for helping test this workbench. In order to get you started, we've created some tasks for testing important functionality in this version</p>
-
+        <hr />
         {% if active_task %}
-          <h2>Active Task</h2>
+          <h3>Active Task</h3>
           <div class="col-md-4">
             <div class="panel panel-primary">
               <div class="panel-heading">{{ active_task.name }}</div>
@@ -17,7 +17,7 @@
             </div>
           </div>
         {% else %}
-          <h2>Current Available Tasks</h2>
+          <h3>Current Available Tasks</h3>
             {% for task in tasks %}
             <div class="col-md-4">
               <div class="panel panel-default">
@@ -28,8 +28,10 @@
             </div>
             {% endfor %}
           {% endif %}
+          <p class="col-md-12"><a href="{% url 'user_task_list' %}" class="btn btn-primary">Go to my task overview</a></p>
     </div>
   </div>
+          <hr />
     <div class="row">
         <div class="col-md-12">
             <h2>Recent Experiments</h2>
@@ -38,7 +40,9 @@
                 <li><a href="{% url "experiment_detail" experiment.id %}">{{ experiment.title }}</a></li>
             {% endfor %}
             </ul>
-            <a href="{% url "new_experiment" %}">Create new experiment</a>
+            <p>
+              <a href="{% url "new_experiment" %}" class="btn btn-primary">Create new experiment</a>
+            </p>
         </div>
     </div>
 {% endblock %}

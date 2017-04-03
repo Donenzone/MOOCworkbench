@@ -107,7 +107,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -116,6 +116,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Feedback.middleware.MiddlewareTaskCompleted',
 ]
 
 ROOT_URLCONF = 'MOOCworkbench.urls'
@@ -136,7 +137,6 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'UserManager.context_processor.workbench_user',
                 'Feedback.context_processor.active_task',
-                'Feedback.context_processor.check_if_active_task_complete',
                 'django.template.context_processors.request'
             ],
         },

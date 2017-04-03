@@ -1,0 +1,57 @@
+{% extends 'index.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "My Tasks" "task_list" %}
+{% endblock %}
+
+
+{% block content %}
+  <div class="row">
+    <h2>Active Tasks</h2>
+    {% for user_task in object_list %}
+      {% if user_task.active %}
+        <div class="col-md-4">
+          <div class="panel panel-primary">
+            <div class="panel-heading">{{ user_task.for_task.name }}</div>
+            <div class="panel-body">{{ user_task.for_task.description|linebreaks }}</div>
+            <div class="panel-footer"><a href="{% url 'set_task_active' user_task.for_task.id %}">Start this task now</a></div>
+          </div>
+        </div>
+      {% endif %}
+    {% empty %}
+      <p>You do not have any active tasks right now.</p>
+    {% endfor %}
+  </div>
+
+  <div class="row">
+    <h2>Available Tasks</h2>
+    {% for task in available_tasks %}
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">{{ task.name }}</div>
+          <div class="panel-body">{{ task.description|linebreaks }}</div>
+          <div class="panel-footer"><a href="{% url 'set_task_active' task.id %}">Start this task now</a></div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+
+  <div class="row">
+    <h2>Completed Tasks</h2>
+    {% for user_task in object_list %}
+      {% if user_task.completed %}
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">{{ user_task.for_task.name }}</div>
+            <div class="panel-body">{{ user_task.for_task.description|linebreaks }}</div>
+            {% if not user_task.left_feedback %}
+                <div class="panel-footer"><a href="{% url 'create_feedback' user_task.for_task.id %}">Leave feedback for this task</a></div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

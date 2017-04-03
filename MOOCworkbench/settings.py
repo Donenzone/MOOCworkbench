@@ -135,6 +135,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'UserManager.context_processor.workbench_user',
+                'Feedback.context_processor.active_task',
+                'Feedback.context_processor.check_if_active_task_complete',
                 'django.template.context_processors.request'
             ],
         },

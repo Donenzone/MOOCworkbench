@@ -9,11 +9,8 @@ urlpatterns = [
     url(r'^step/files$', ExperimentsManager.views.get_git_list_for_step, name="get_git_list_for_step"),
     url(r'^next-step/(?P<experiment_id>\d+)$', ExperimentsManager.views.complete_step_and_go_to_next, name="complete_step_and_go_to_next"),
     url(r'^edit/(?P<experiment_id>\d+)$', login_required(ExperimentsManager.views.CreateExperimentView.as_view()), name="edit_experiment"),
-    url(r'^(?P<pk>[-\w]+)/$', login_required(ExperimentsManager.views.ExperimentDetailView.as_view()), name='experiment_detail'),
-    url(r'^run/(?P<pk>[-\w]+)/$', ExperimentsManager.views.run_experiment_view, name='run_experiment'),
+    url(r'^(?P<pk>\d+)/$', login_required(ExperimentsManager.views.ExperimentDetailView.as_view()), name='experiment_detail'),
     url(r'^file/(?P<experiment_id>[-\w]+)/$', ExperimentsManager.views.view_file_in_git_repository, name='file_detail'),
     url(r'^readme/(?P<experiment_id>[-\w]+)/$', ExperimentsManager.views.readme_of_experiment, name='view_readme'),
     url(r'^folder/(?P<pk>[-\w]+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
-
-
 ]

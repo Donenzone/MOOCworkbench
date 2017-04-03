@@ -2,8 +2,36 @@
 
 
 {% block content %}
+  <div class="row">
+    <div class="col-md-12">
+        <h2>Welcome to the MOOC workbench</h2>
+        <p>Thanks for helping test this workbench. In order to get you started, we've created some tasks for testing important functionality in this version</p>
+
+        {% if active_task %}
+          <h2>Active Task</h2>
+          <div class="col-md-4">
+            <div class="panel panel-primary">
+              <div class="panel-heading">{{ active_task.name }}</div>
+              <div class="panel-body">{{ active_task.description|linebreaks }}</div>
+              <div class="panel-footer"><a href="{% url 'set_task_active' active_task.id %}">Complete this task</a></div>
+            </div>
+          </div>
+        {% else %}
+          <h2>Current Available Tasks</h2>
+            {% for task in tasks %}
+            <div class="col-md-4">
+              <div class="panel panel-default">
+                <div class="panel-heading">{{ task.name }}</div>
+                <div class="panel-body">{{ task.description|linebreaks }}</div>
+                <div class="panel-footer"><a href="{% url 'set_task_active' task.id %}">Start this task now</a></div>
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+    </div>
+  </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-12">
             <h2>Recent Experiments</h2>
             <ul>
             {% for experiment in experiments %}
@@ -12,23 +40,5 @@
             </ul>
             <a href="{% url "new_experiment" %}">Create new experiment</a>
         </div>
-        <div class="col-md-4">
-
-            <h2>Recent Commits</h2>
-            <ul>
-
-            </ul>
-            <a href="#">Manage</a>
-        </div>
-
-        <div class="col-md-4">
-
-            <h2>Invites</h2>
-            <ul>
-
-            </ul>
-            <a href="#">View all invites</a>
-        </div>
     </div>
 {% endblock %}
-

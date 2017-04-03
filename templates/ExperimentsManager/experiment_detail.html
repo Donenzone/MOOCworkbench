@@ -42,7 +42,15 @@
             <td>{{ object.owner }}</td>
         </tr>
       </table>
+      <h3>What to do now?</h3>
+      <ul>
+        <li>Check out this repository using git clone <github-url></li>
+        {% for what_now in what_now_list %}
+          <li>{{ what_now }}</li>
+        {% endfor %}
+      </ul>
 
+      <h3>Progress</h3>
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         {% for step in steps %}
         <div class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
@@ -92,9 +100,7 @@
                 <div class="col-sm-6">
                   <h4>Recommended packages in this step</h4>
                     <ul>
-                      <li><a href="#">Package X</a></li>
-                      <li><a href="#">Package Y</a></li>
-                      <li><a href="#">Package Z</a></li>
+                      <li>There aren't any recommended packages yet. Check back later!</li>
                     </ul>
                     <p><a href="#" class="btn btn-default">View more on the MOOC Marketplace</a></p>
                   </div>

@@ -16,6 +16,9 @@ from django.contrib.auth.decorators import login_required
 import json
 from ExperimentsManager.helper import verify_and_get_experiment
 import markdown
+from django.contrib import messages
+from BuildManager.models import TravisInstance
+from RequirementsManager.models import ExperimentRequirement
 
 class ExperimentDetailView(DetailView):
     model = Experiment
@@ -27,6 +30,7 @@ class ExperimentDetailView(DetailView):
         context['steps'] = get_steps(experiment)
         context['git_list'] = get_git_list(self.request.user, experiment, github_helper)
         context['measurements'] = get_measurement_messages_for_experiment(experiment)
+        context['what_now_list'] = what_to_do_now(experiment)
         return context
 
 def get_git_list(user, experiment, github_helper, step=None):
@@ -37,6 +41,34 @@ def get_git_list(user, experiment, github_helper, step=None):
 def get_steps(experiment):
     return ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
 
+def what_to_do_now(experiment):
+    message_list = []
+    
+    message_list.append(what_to_do_now_ci(experiment))
+
+    message_list.append(what_to_do_now_req(experiment))
+
+    vcs_message = "Make sure to commit and push daily and in small pieces"
+    message_list.append(vcs_message)
+    return message_list
+
+def what_to_do_now_ci(experiment):
+    ci_message = "Enable Travis Builds on the Continuous Integration tab"
+    ci_enabled = False
+    ci_enabled_check = TravisInstance.objects.filter(experiment=experiment)
+    if ci_enabled_check.count() is not 0:
+        ci_enabled = ci_enabled_check[0].enabled
+    if not ci_enabled:
+        return ci_message
+
+def what_to_do_now_req(experiment):
+    req_message = "Add some packages you wish to use on the Manage Your Requirements tab"
+    reqs_defined = False
+    reqs_list = ExperimentRequirement.objects.filter(experiment=experiment)
+    if reqs_list.count() is not 0:
+        reqs_defined = True
+    if not reqs_defined:
+        return req_message
 
 @login_required
 def get_git_list_for_step(request):
@@ -83,29 +115,16 @@ def index(request):
     return render(request, 'ExperimentsManager/experiments_table.html', {'table': table})
 
 
-@login_required
-def run_experiment_view(request, pk):
-    owner = WorkbenchUser.objects.get(user=request.user)
-    experiment = Experiment.objects.get(pk=pk)
-    experiment_run = ExperimentRun(experiment=experiment, owner=owner)
-    experiment_run.save()
-    run_experiment(experiment_run)
-    return render(request, 'ExperimentsManager/experiment_run.html', {'status': 'Started'})
-
-
-@login_required
-def cancel_experiment_run(request, pk):
-    experiment_run = ExperimentRun.objects.get(pk=pk)
-    experiment_run.status = ExperimentRun.CANCELLED
-    experiment_run.save()
-
-
 class CreateExperimentView(View):
     def get(self, request, experiment_id=0):
-        form = ExperimentForm()
-        repository_list = get_user_repositories(request.user)
-        return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id,
-                                                            'repository_list': repository_list})
+        try:
+            form = ExperimentForm()
+            repository_list = get_user_repositories(request.user)
+            return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id,
+                                                                'repository_list': repository_list})
+        except ValueError as a:
+            messages.add_message(request, messages.INFO, 'Before creating an experiment, please sign in with GitHub')
+            return redirect(to=reverse('view_my_profile'))
 
     def post(self, request, experiment_id=0):
         experiment = Experiment()

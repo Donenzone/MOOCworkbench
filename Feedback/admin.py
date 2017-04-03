@@ -1,3 +1,6 @@
 from django.contrib import admin
+from Feedback.models import Feedback, Task
 
-# Register your models here.
+
+admin.site.register(Feedback)
+admin.site.register(Task)

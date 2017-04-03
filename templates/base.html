@@ -48,12 +48,6 @@
             <li class="{% block wiki_active %}{% endblock %}"><a href="/wiki">Wiki</a></li>
             <li class="{% block my_account_active %}{% endblock %}"><a href="/my-account/">My Account</a></li>
             <li><a href="/accounts/logout">Sign out</a></li>
-          <form class="navbar-form navbar-left" role="search">
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="Search query...">
-            </div>
-            <button type="submit" class="btn btn-success">Search</button>
-          </form>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/inbox/notifications/">Notifications <span class="badge">{% notifications_unread %}</span></a></li>
@@ -72,6 +66,12 @@
       {% for message in messages %}
           <div class="alert alert-{{ message.tags }}">{{ message }}</div>
       {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if completed_task %}
+    <div class="container">
+          <div class="alert alert-success">Great! You've completed the task <b>{{ completed_task.for_task.name }}</b>! Please, leave your feedback now</div>
     </div>
   {% endif %}
 

@@ -10,6 +10,7 @@ from django.utils import timezone
 from ExperimentsManager.models import Experiment
 from .models import get_workbench_user
 from django.views.generic import View
+from Feedback.models import Task, UserTask
 
 class WorkbenchUserViewset(viewsets.ModelViewSet):
     queryset = WorkbenchUser.objects.all()
@@ -25,8 +26,20 @@ class UserViewset(viewsets.ModelViewSet):
 def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user)[:5]
-    return render(request, 'index.html', {'experiments': experiments})
 
+    return render(request, 'index.html', {'experiments': experiments, 'tasks': get_tasks(workbench_user)})
+
+def get_tasks(w_user):
+    completed_tasks = [i.for_task for i in UserTask.objects.filter(completed=True, user=w_user)]
+    tasks = Task.objects.all()
+    final_tasks = []
+    for task in tasks:
+        if not task in completed_tasks:
+            dependency = task.dependent_on
+            dependency_satisfied = UserTask.objects.filter(for_task=dependency, completed=True).count()
+            if dependency_satisfied is not 0 or dependency.id is task.id:
+                final_tasks.append(task)
+    return final_tasks
 
 def sign_in(request):
     if request.method == 'GET':

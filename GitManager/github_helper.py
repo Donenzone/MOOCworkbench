@@ -27,6 +27,7 @@ class GitHubHelper(object):
         socialtoken = SocialToken.objects.filter(account__user=user, account__provider='github')
         if socialtoken.count() != 0:
             return socialtoken[0].token
+        raise ValueError('SocialToken is missing')
 
     def list_files_in_repo(self, folder=''):
         try:

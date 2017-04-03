@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^marketplace/', include('Marketplace.urls')),
     url(r'^builds/', include('BuildManager.urls')),
     url(r'^metrics/', include('QualityManager.urls')),
+    url(r'^feedback/', include('Feedback.urls')),
     url(r'^git/$', GitManager.views.index, name="git_index"),
 
     #url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),

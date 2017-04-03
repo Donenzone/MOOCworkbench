@@ -1,5 +1,6 @@
 waliki_data/
 dump.rdb
+moocv
 .idea/workspace.xml
 # Byte-compiled / optimized / DLL files
 __pycache__/

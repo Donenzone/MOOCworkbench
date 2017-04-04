@@ -162,7 +162,7 @@
       $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
 
       $.ajax({
-        url: '{% url "get_git_list_for_step" %}',
+        url: '{% url "get_file_list_for_step" %}',
         data: {
           experiment_id: {{ experiment.id }},
           step_id: step_id,

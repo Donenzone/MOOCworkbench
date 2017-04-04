@@ -22,6 +22,7 @@ class GitRepositoryViewSet(viewsets.ModelViewSet):
 def index(request):
     return render(request, 'index.html')
 
+
 def get_user_repositories(user):
     github_helper = GitHubHelper(user)
     github_api = github_helper.github_object
@@ -40,7 +41,7 @@ def create_new_github_repository_local(title, user, type, experiment):
     git_repo = GitRepository()
     git_repo.name = repo.name
     git_repo.owner = get_workbench_user(user)
-    git_repo.github_url = repo.url
+    git_repo.github_url = repo.html_url
     git_repo.save()
 
     return git_repo

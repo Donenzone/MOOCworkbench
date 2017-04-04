@@ -29,6 +29,11 @@ class GitHubHelper(object):
             return socialtoken[0].token
         raise ValueError('SocialToken is missing')
 
+    def get_clone_url(self):
+        clone_url = self.github_repository.clone_url
+        remaining_clone_url = clone_url.split('https://')[1]
+        return 'https://{0}@{1}'.format(self.socialtoken, remaining_clone_url)
+
     def list_files_in_repo(self, folder=''):
         try:
             return self.github_repository.get_contents('/{0}'.format(folder))

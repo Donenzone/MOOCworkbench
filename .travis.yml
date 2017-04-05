@@ -5,4 +5,8 @@ services:
   - redis-server
 install:
   - pip install -r requirements.txt
-script: python3 manage.py test
+script:
+  - coverage run --source=BuildManager,DocsManager,ExperimentsManager,Feedback,GitManager,Marketplace,MOOCworkbench,QualityManager,RequirementsManager,UserManager,ExperimentHelper,helpers manage.py test
+
+after_success:
+  coveralls

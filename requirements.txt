@@ -21,3 +21,4 @@ waliki[all]
 django-bootstrap-breadcrumbs
 travispy
 GitPython
+coveralls

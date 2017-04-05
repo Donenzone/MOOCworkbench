@@ -8,7 +8,7 @@
       You've already enabled automatic documentation generation. You can now write reStructredText directly into your source files and it will appear in the documentation.
     </p>
 
-    <a href="{% url 'view_doc_of_experiment' experiment.id %}" class="btn btn-primary">Read the Docs</a>
+    <a href="{% url 'generate_docs' experiment.id %}" class="btn btn-success">Generate documentation</a>
     <a href="{% url 'toggle_docs_status' experiment.id %}" class="btn btn-default">Disable automatic document generation</a>
   {% else %}
   <p>

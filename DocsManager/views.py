@@ -6,6 +6,8 @@ from ExperimentsManager.helper import get_steps
 from django.contrib.auth.decorators import login_required
 from GitManager.github_helper import GitHubHelper
 from DocsManager.models import Docs
+from GitManager.clone_module import pull_git_repository, clone_git_repository
+
 
 @login_required
 def view_doc_of_experiment(request, experiment_id, page_slug=None):
@@ -38,4 +40,15 @@ def toggle_docs_status(request, experiment_id):
     docs = Docs.objects.get(experiment=experiment)
     docs.enabled = not docs.enabled
     docs.save()
-    return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
+    return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+
+
+@login_required
+def generate_docs(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    steps = get_steps(experiment)
+    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+    sphinx_helper = SphinxHelper(experiment, steps, github_helper.github_repository.owner.login)
+    sphinx_helper.add_sphinx_to_repo()
+    sphinx_helper.build_and_sync_docs()
+    return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))

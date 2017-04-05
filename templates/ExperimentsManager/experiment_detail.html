@@ -14,7 +14,7 @@
       <li><a data-toggle="tab" href="#readme" id='readme-click'>Read Me</a></li>
       <li><a data-toggle="tab" href="#requirements" id='requirements-click'>Manage Your Requirements</a></li>
       <li><a data-toggle="tab" href="#ci" id='ci-click'>Continuous Integration</a></li>
-      <li><a data-toggle="tab" href="#metrics" id="metrics-click">Metrics</a></li>
+      <li><a data-toggle="tab" href="#docs" id="docs-click">Docs</a></li>
     </ul>
 
 <div class="tab-content">
@@ -133,8 +133,9 @@
   <div id="readme" class="tab-pane fade">
     Loading...
   </div>
-  <div id="metrics" class="tab-pane fade">
-    Loading...
+  <div id="docs" class="tab-pane fade">
+    <iframe id="frame" src="" width="100%" height="700">
+     </iframe>
   </div>
 </div>
 
@@ -152,8 +153,8 @@
       $("#ci").load("{% url 'build_status' object.id %}");
     });
 
-    $('#metrics-click').click(function() {
-      $("#metrics").load("{% url 'overview_metrics' object.id %}");
+    $('#docs-click').click(function() {
+      $("#frame").attr("src", "{{ STATIC_URL }}{{ docs_dir }}");
     });
 
     $('.step-panel .panel-title').click(function (event) {

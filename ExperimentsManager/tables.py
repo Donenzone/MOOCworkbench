@@ -4,7 +4,7 @@ from django_tables2.utils import A
 
 
 class ExperimentTable(tables.Table):
-    title = tables.LinkColumn('experiment_detail', text=lambda record: record.title, args=[A('pk')])
+    title = tables.LinkColumn('experiment_detail', text=lambda record: record.title, args=[A('pk'), A('slug')])
 
     class Meta:
         model = Experiment

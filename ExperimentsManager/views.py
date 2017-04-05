@@ -112,7 +112,7 @@ def complete_step_and_go_to_next(request, experiment_id):
         next_step = next_step[0]
         next_step.active = True
         next_step.save()
-        return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
+        return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
     else:
         return JsonResponse({'completed': True})
 
@@ -142,7 +142,7 @@ class ChooseExperimentSteps(View):
                 chosen_experiment_step.save()
                 counter += 1
             initialize_repository.delay(experiment_id)
-            url = reverse('experiment_detail', kwargs={'pk': experiment_id})
+            url = reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()})
             return JsonResponse({'url': url})
         else:
             return JsonResponse({'message': 'Choose at least one step'})

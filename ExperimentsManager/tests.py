@@ -151,19 +151,19 @@ class ExperimentTestCase(TestCase):
         self.test_choose_experiment_steps_post()
         mock_github_helper.return_value = None
         mock_github_helper_file_list = ['file']
-        response = self.client.get(reverse('experiment_detail', kwargs={'pk': 1}))
+        response = self.client.get(reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'}))
         chosen_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment).count()
         self.assertEqual(response.context['steps'].count(), chosen_steps)
 
     def test_experiment_detail_view_wrong_user(self):
         c = Client()
         c.login(username='test2', password='test2')
-        args = [reverse('experiment_detail', kwargs={'pk': 1})]
+        args = [reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'})]
         self.assertRaises(AssertionError, c.get, *args)
 
     def test_experiment_detail_view_anon_user(self):
         c = Client()
-        response = c.get(reverse('experiment_detail', kwargs={'pk': 1}))
+        response = c.get(reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'}))
         self.assertEqual(response.status_code, 302)
 
     @patch('ExperimentsManager.views.GitHubHelper')

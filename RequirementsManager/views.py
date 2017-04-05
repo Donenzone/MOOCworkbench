@@ -10,19 +10,24 @@ from django.core import serializers
 from .forms import ExperimentRequirementForm
 from GitManager.github_helper import GitHubHelper
 from django.contrib import messages
+from ExperimentsManager.helper import verify_and_get_experiment
 # Create your views here.
 
-def parse_requirements_file(requirements_file):
+def parse_requirements_file(experiment, requirements_file):
     for req in requirements.parse(requirements_file):
-        print(req.name, req.specs, req.extras)
+        requirement = ExperimentRequirement()
+        requirement.package_name = req.name
+        if len(req.specs) is not 0:
+            requirement.version = req.specs[0][1]
+        requirement.experiment = experiment
+        requirement.save()
 
 
 class ExperimentRequirementListView(ListView):
     model = ExperimentRequirement
 
     def get_queryset(self):
-        experiment = Experiment.objects.get(id=self.kwargs['pk'])
-        assert experiment.owner.user == self.request.user
+        experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         return ExperimentRequirement.objects.filter(experiment=experiment)
 
     def get_context_data(self, **kwargs):
@@ -37,8 +42,7 @@ class ExperimentRequirementCreateView(CreateView):
     fields = ['package_name', 'version']
 
     def form_valid(self, form):
-        experiment = Experiment.objects.get(id=self.kwargs['experiment_id'])
-        assert experiment.owner.user == self.request.user
+        experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         form.instance.experiment = experiment
         return super(ExperimentRequirementCreateView, self).form_valid(form)
 
@@ -48,16 +52,14 @@ class ExperimentRequirementCreateView(CreateView):
 
 @login_required
 def remove_experiment_requirement(request, experiment_id, requirement_id):
-    experiment = Experiment.objects.get(id=experiment_id)
-    assert experiment.owner.user == request.user
+    experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
     requirement = ExperimentRequirement.objects.get(id=requirement_id)
     requirement.delete()
 
 
 @login_required
 def write_requirements_file(request, experiment_id):
-    experiment = Experiment.objects.get(id=experiment_id)
-    assert experiment.owner.user == request.user
+    experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
     requirements_txt = ''
     for requirement in ExperimentRequirement.objects.filter(experiment=experiment):
         requirements_txt += '{0}\n'.format(str(requirement))

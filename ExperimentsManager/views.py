@@ -18,10 +18,11 @@ from ExperimentsManager.helper import verify_and_get_experiment
 from ExperimentsManager.helper import what_to_do_now
 from ExperimentsManager.helper import get_files_in_repository
 from ExperimentsManager.helper import get_steps
-import markdown
+from markdown2 import Markdown
 from django.contrib import messages
 from GitManager.github_helper import GitHubHelper
 from django.shortcuts import get_object_or_404
+from DocsManager.models import Docs
 
 
 @login_required
@@ -44,7 +45,13 @@ class ExperimentDetailView(DetailView):
         context['git_list'] = get_files_in_repository(self.request.user, experiment, github_helper)
         context['measurements'] = get_measurement_messages_for_experiment(experiment)
         context['what_now_list'] = what_to_do_now(experiment)
+        context['docs'] = self.get_docs(experiment)
         return context
+
+    def get_docs(self, experiment):
+        docs = Docs.objects.filter(experiment=experiment)
+        if docs.count() is not 0:
+            return docs[0]
 
 
 class ExperimentCreateView(View):
@@ -156,7 +163,8 @@ def readme_of_experiment(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
     content_file = github_helper.view_file_in_repo('README.md')
-    content_file = markdown.markdown(content_file)
+    md = Markdown()
+    content_file = md.convert(content_file)
     return render(request, 'ExperimentsManager/experiment_readme.html', {'readme': content_file})
 
 
@@ -164,7 +172,6 @@ def readme_of_experiment(request, experiment_id):
 def view_list_files_in_repo_folder(request, pk):
     if request.method == 'GET':
         folder_name = request.GET['folder_name']
-        expirement = Experiment.objects.get(id=pk)
+        expirement = verify_and_get_experiment(request, experiment_id)
         data = list_files_in_repo_folder('gitrepository1', request.user.username, folder_name)
-        print(data)
         return render(request, 'ExperimentsManager/folder_detail.html', {'contents': data, 'pk': pk})

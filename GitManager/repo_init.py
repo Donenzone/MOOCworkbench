@@ -5,6 +5,9 @@ import os
 
 class GitRepoInit(object):
     TEMPLATE_FOLDER = 'codetemplates/'
+    PROJECTNAME_VAR = '{PROJECTNAME}'
+    STEPFOLDER_VAR = '{STEPFOLDER}'
+    AUTHOR_VAR = '{AUTHOR}'
 
     def __init__(self, experiment, type='python'):
         self.github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
@@ -32,7 +35,12 @@ class GitRepoInit(object):
             self.create_main_and_test_file(name)
 
     def create_main_and_test_file(self, folder):
-        self.create_new_file_in_repo('main.py', commit_message='Added main.py file', folder=folder, contents=self.get_file_contents('main.py', part_of_step=True, folder=folder))
+        main_contents = self.get_file_contents('main.py', part_of_step=True, folder=folder)
+        project_name = self.github_helper.github_repository.name
+        main_contents = replace_variable_in_file(main_contents, PROJECTNAME_VAR, project_name)
+        main_contents = replace_variable_in_file(main_contents, STEPFOLDER_VAR, folder)
+        main_contents = replace_variable_in_file(main_contents, AUTHOR_VAR, str(experiment.owner))
+        self.create_new_file_in_repo('main.py', commit_message='Added main.py file', folder=folder, contents=main_contents)
         self.create_new_file_in_repo('tests.py', commit_message='Added test.py file', folder=folder, contents=self.get_file_contents('tests.py', part_of_step=True, folder=folder))
 
     def create_travis_file(self):
@@ -67,6 +75,10 @@ class GitRepoInit(object):
 
     def replace_folder_in_file(self, contents, folder):
         return contents.replace('{0}', folder)
+
+    def replace_variable_in_file(self, contents, variable, value):
+        variable_name = '{{0}}'.format(variable)
+        return contents.replace(variable_name, value)
 
     def get_script_path(self):
         return '{0}/'.format(os.path.dirname(os.path.realpath(__file__)))

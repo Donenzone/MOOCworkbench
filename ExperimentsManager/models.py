@@ -15,6 +15,9 @@ class AbstractExperiment(TimeStampedModel):
     added = models.DateField(auto_now_add=True)
     owner = models.ForeignKey(to=WorkbenchUser)
 
+    def slug(self):
+        return slugify(self.title)
+
     class Meta:
         abstract = True
 

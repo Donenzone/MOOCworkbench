@@ -12,3 +12,6 @@ class ExperimentRequirement(TimeStampedModel):
         if self.version is not None:
             return '{0}=={1}'.format(self.package_name, self.version)
         return '{0}'.format(self.package_name)
+
+    class Meta:
+        unique_together = ('package_name', 'experiment')

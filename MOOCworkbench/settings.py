@@ -26,18 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# 0 for MASTER, 1 for WORKER
-MASTER_OR_WORKER = 0
-WORKER = 1
-MASTER = 0
-
-
-WORKER_URL = 'http://127.0.0.1:8000/' # set here the host name if the current server is a Worker
-if DEBUG:
-    MASTER_URL = 'http://127.0.0.1:8000/'
-else:
-    MASTER_URL = 'https://mooc.jochem.xyz/'
-
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
@@ -71,6 +59,7 @@ INSTALLED_APPS = [
     'QualityManager',
     'BuildManager',
     'Feedback',
+    'DocsManager',
 
     'bootstrapform',
     'django_tables2',

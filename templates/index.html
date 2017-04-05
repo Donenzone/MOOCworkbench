@@ -37,7 +37,7 @@
             <h2>Recent Experiments</h2>
             <ul>
             {% for experiment in experiments %}
-                <li><a href="{% url "experiment_detail" experiment.id %}">{{ experiment.title }}</a></li>
+                <li><a href="{% url "experiment_detail" experiment.id experiment.slug %}">{{ experiment.title }}</a></li>
             {% endfor %}
             </ul>
             <p>

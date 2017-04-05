@@ -22,7 +22,6 @@ import markdown
 from django.contrib import messages
 from GitManager.github_helper import GitHubHelper
 from django.shortcuts import get_object_or_404
-from DocsManager.sphinx_init import SphinxHelper
 
 
 @login_required
@@ -41,13 +40,10 @@ class ExperimentDetailView(DetailView):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         github_helper = GitHubHelper(self.request.user, experiment.git_repo.name)
-        steps = ChosenExperimentSteps.objects.filter(experiment=experiment)
-        sphinx_helper = SphinxHelper(experiment, steps, github_helper.github_repository.owner.login)
         context['steps'] = get_steps(experiment)
         context['git_list'] = get_files_in_repository(self.request.user, experiment, github_helper)
         context['measurements'] = get_measurement_messages_for_experiment(experiment)
         context['what_now_list'] = what_to_do_now(experiment)
-        context['docs_dir'] = sphinx_helper.get_docs_dir()
         return context
 
 

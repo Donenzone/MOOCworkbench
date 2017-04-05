@@ -1,3 +1,8 @@
 from django.db import models
+from ExperimentsManager.models import Experiment
 
-# Create your models here.
+
+class Docs(models.Model):
+    experiment = models.ForeignKey(to=Experiment)
+    enabled = models.BooleanField(default=False)
+    

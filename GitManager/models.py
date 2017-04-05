@@ -2,7 +2,7 @@ from django.db import models
 from UserManager.models import WorkbenchUser
 from model_utils.models import TimeStampedModel
 
-# Create your models here.
+
 class GitRepository(TimeStampedModel):
     name = models.CharField(max_length=200)
     has_issues = models.BooleanField(default=True)

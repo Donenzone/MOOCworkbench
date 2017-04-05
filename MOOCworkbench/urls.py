@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^metrics/', include('QualityManager.urls')),
     url(r'^feedback/', include('Feedback.urls')),
     url(r'^git/$', GitManager.views.index, name="git_index"),
+    url(r'^docs/', include('DocsManager.urls')),
 
     #url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
     #url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),

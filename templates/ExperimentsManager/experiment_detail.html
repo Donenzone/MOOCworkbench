@@ -2,12 +2,14 @@
 {% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
 
+{% block content %}
+
+
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.title "experiment_detail" object.id %}
+    {% breadcrumb experiment.title "experiment_detail" experiment.id %}
 {% endblock %}
 
-{% block content %}
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
@@ -97,6 +99,10 @@
               </table>
 
               <div class="row">
+                <div class="col-md-12">
+                  <h4>Read the docs</h4>
+                  <a href="{% url "view_doc_of_experiment" experiment.id step.folder_name %}">Read the docs for this step</a>
+                </div>
                 <div class="col-sm-6">
                   <h4>Recommended packages in this step</h4>
                     <ul>
@@ -125,17 +131,16 @@
 
   </div>
   <div id="requirements" class="tab-pane fade">
-    Loading...
+    <p>Loading...</p>
   </div>
   <div id="ci" class="tab-pane fade">
-    Loading...
+    <p>Loading...</p>
   </div>
   <div id="readme" class="tab-pane fade">
-    Loading...
+    <p>Loading...</p>
   </div>
   <div id="docs" class="tab-pane fade">
-    <iframe id="frame" src="" width="100%" height="700">
-     </iframe>
+    <p>Loading...</p>
   </div>
 </div>
 
@@ -154,7 +159,7 @@
     });
 
     $('#docs-click').click(function() {
-      $("#frame").attr("src", "{{ STATIC_URL }}{{ docs_dir }}");
+      $("#docs").load("{% url 'docs_status' object.id %}");
     });
 
     $('.step-panel .panel-title').click(function (event) {

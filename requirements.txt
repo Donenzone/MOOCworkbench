@@ -22,3 +22,5 @@ django-bootstrap-breadcrumbs
 travispy
 GitPython
 coveralls
+sphinx
+sqlalchemy

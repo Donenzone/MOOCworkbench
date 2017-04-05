@@ -5,7 +5,14 @@
 
   {% if not configured %}
     <p>You have not enabled automatic Travis CI builds.</p>
-    <p><a href="#" class="btn btn-primary" id='enable-builds'>Enable now</a></p>
+
+    <h4>Step 1. Sign in</h4>
+      <p>Sign in at least once into Travis CI with your GitHub account in order to enable automatic builds of your experiment:</p>
+      <p><a href="https://travis-ci.org/" target="_blank">Travis CI</a></p>
+
+    <h4>Step 2. Enable builds</h4>
+      <p>Once you're signed in, enable builds now:</p>
+      <p><a href="#" class="btn btn-primary" id='enable-builds'>Enable now</a></p>
 
   {% else %}
     <img src='https://travis-ci.org/{{ username }}/{{ reposlug }}.svg?branch=master' />

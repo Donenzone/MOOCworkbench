@@ -10,7 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from travispy import TravisPy
 from BuildManager.tasks import get_last_log_for_build_task
-# Create your views here.
+from unittest.mock import patch
+
 
 @login_required
 def enable_ci_builds(request):
@@ -62,6 +63,7 @@ def enable_travis(request, experiment):
     travis_ci_helper = TravisCiHelper(github_helper)
     travis_ci_helper.enable_travis_for_repository()
 
+
 @login_required
 def build_experiment_now(request):
     assert 'experiment_id' in request.POST
@@ -89,6 +91,7 @@ def build_status(request, experiment_id):
         context['reposlug'] = experiment.git_repo.name
         context['username'] = github_helper.github_repository.owner.login
     return render(request, 'BuildManager/build_status.html', context)
+
 
 @login_required
 def get_log_from_last_build(request, experiment_id):

@@ -12,19 +12,13 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 from os.path import dirname, abspath, basename, normpath, join
+from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '*nbn)!xz%u27f5_urt^z8cr^-b#46rt!kauxt^8lgp1%!#me3)'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 CHANNEL_LAYERS = {
     "default": {

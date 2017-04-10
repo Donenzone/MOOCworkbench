@@ -1,6 +1,7 @@
 from celery.decorators import task
 from ExperimentsManager.models import Experiment
-from .measurements.measurement import RequirementsMeasurement, VersionControlUseMeasurement
+from QualityManager.measurements.requirements_measurement import RequirementsMeasurement
+from QualityManager.measurements.vcs_measurement import VersionControlUseMeasurement
 
 @task
 def requirements_quality_check(experiment_id):
@@ -15,4 +16,3 @@ def version_control_quality_check(experiment_id):
     vcs_measure = VersionControlUseMeasurement(experiment)
     vcs_measure.measure()
     result = vcs_measure.save_and_get_result()
-    

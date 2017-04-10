@@ -1,7 +1,4 @@
 {% load bootstrap %}
-{% block content%}
-
-  <h3>Documentation</h3>
 
   {% if docs.enabled %}
     <p>
@@ -15,5 +12,3 @@
     <a href="{% url 'toggle_docs_status' experiment.id %}" class="btn btn-primary" id='enable-docs'>Enable automatic documentation generation</a>
   </p>
   {% endif %}
-
-{% endblock %}

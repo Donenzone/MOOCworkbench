@@ -1,6 +1,9 @@
 from QualityManager.measurements.measurement import MeasurementAbstraction
 from GitManager.github_helper import GitHubHelper
-from QualityManager.models import ExperimentMeasureResult, ExperimentMeasure
+from QualityManager.models import ExperimentMeasureResult, ExperimentMeasure, RawMeasureResult
+from datetime import datetime, timedelta
+from statistics import mean, median
+
 
 class VersionControlUseMeasurement(MeasurementAbstraction):
     THREE_WEEKS = 21
@@ -8,6 +11,7 @@ class VersionControlUseMeasurement(MeasurementAbstraction):
     def __init__(self, experiment):
         super().__init__(experiment)
         self.measurement = ExperimentMeasure.objects.get(name='Version control use')
+        self.raw = RawMeasureResult()
 
     def measure(self):
         github_helper = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)
@@ -33,6 +37,13 @@ class VersionControlUseMeasurement(MeasurementAbstraction):
         if median_nr_of_commits > 1.5:
             self.result.result = ExperimentMeasureResult.HIGH
 
+        self.commits_today(since, commits)
+
+    def commits_today(self, since, commits):
+        commits_today = self.get_commits_of_day(commits, since, 21)
+        self.raw.key = 'commits_today'
+        self.raw.value = len(commits_today)
+
     def get_commits_of_day(self, commits, since, day):
         date_day = since + timedelta(days=day)
         commit_list = []
@@ -51,5 +62,8 @@ class VersionControlUseMeasurement(MeasurementAbstraction):
 
     def save_and_get_result(self):
         self.result.measurement = self.measurement
+        self.result.save()
+        self.raw.save()
+        self.result.raw_values.add(self.raw)
         self.result.save()
         return self.result

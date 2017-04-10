@@ -6,10 +6,6 @@ class WhatNow(BuildWhatNowMixin, RequirementWhatNowMixin):
         self.messages = []
         self.experiment = experiment
 
-    def get_messages(self):
-        self.messages.append(self.what_to_do_now())
-        return self.messages
-
     def what_to_do_now(self):
         message_list = []
         message_list.append(self.what_to_do_now_ci())

@@ -25,6 +25,10 @@ class MeasurementMixin(object):
                 measurement_list.append(recent_result)
         return measurement_list
 
+    def get_recent_measurements_for_type(self, experiment, measure):
+        recent_results = ExperimentMeasureResult.objects.filter(experiment=experiment, measurement=measure).order_by('created')[:21]
+        return recent_results
+
     def _get_most_recent_measurement(self, experiment, experiment_measure):
         result = ExperimentMeasureResult.objects.filter(experiment=experiment, measurement=experiment_measure).order_by('-created')
         if result.count() != 0:

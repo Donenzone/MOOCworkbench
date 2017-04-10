@@ -15,8 +15,6 @@
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='readme'>Read Me</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='requirements'>Dependencies</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='ci'>Builds</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="docs">Docs</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="dashboard">Dashboard</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="settings">Settings</a></li>
     </ul>
@@ -158,8 +156,6 @@
       'dashboard': "{% url 'dashboard' object.id %}",
       'requirements': "{% url 'experimentrequirements_list' object.id %}",
       'readme': "{% url 'view_readme' object.id %}",
-      'ci': "{% url 'build_status' object.id %}",
-      'docs': "{% url 'docs_status' object.id %}",
     }
 
     $('.tab-btn').click(function() {
@@ -187,6 +183,6 @@
         }
       })
     });
-    });
+  });
 </script>
 {% endblock %}

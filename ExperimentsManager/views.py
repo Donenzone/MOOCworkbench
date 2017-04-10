@@ -44,7 +44,6 @@ class ExperimentDetailView(DetailView):
         context['steps'] = get_steps(experiment)
         context['git_list'] = get_files_in_repository(self.request.user, experiment, github_helper)
         context['measurements'] = get_measurement_messages_for_experiment(experiment)
-        context['what_now_list'] = what_to_do_now(experiment)
         context['docs'] = self.get_docs(experiment)
         return context
 
@@ -79,6 +78,13 @@ class ExperimentCreateView(View):
         else:
             repository_list = get_user_repositories(request.user)
             return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+
+
+@login_required
+def experiment_dashboard(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    what_now_list = what_to_do_now(experiment)
+    return render(request, 'ExperimentsManager/experiment_dashboard.html', {'what_now_list': what_now_list})
 
 
 @login_required

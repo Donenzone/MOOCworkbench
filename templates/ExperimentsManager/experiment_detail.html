@@ -13,10 +13,12 @@
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-      <li><a data-toggle="tab" href="#readme" id='readme-click'>Read Me</a></li>
-      <li><a data-toggle="tab" href="#requirements" id='requirements-click'>Manage Your Requirements</a></li>
-      <li><a data-toggle="tab" href="#ci" id='ci-click'>Builds</a></li>
-      <li><a data-toggle="tab" href="#docs" id="docs-click">Docs</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="dashboard">Dashboard</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='readme'>Read Me</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='requirements'>Manage Your Requirements</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='ci'>Builds</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="docs">Docs</a></li>
+      <li style="float:right;"><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="settings">Settings</a></li>
     </ul>
 
 <div class="tab-content">
@@ -33,7 +35,7 @@
         </tr>
         <tr>
             <td>Git repository</td>
-            <td><a href="#">View on GitHub</a></td>
+            <td><a href="{{ object.git_repo.github_url }}" target="_blank">View on GitHub</a></td>
         </tr>
         <tr>
             <td>Created on</td>
@@ -44,15 +46,6 @@
             <td>{{ object.owner }}</td>
         </tr>
       </table>
-      <h3>What to do now?</h3>
-      <ul>
-        <li>Check out this repository using git clone <github-url></li>
-        {% for what_now in what_now_list %}
-          {% if what_now %}
-          <li>{{ what_now }}</li>
-          {% endif %}
-        {% endfor %}
-      </ul>
 
       <h3>Progress</h3>
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -141,16 +134,7 @@
       </div>
 
   </div>
-  <div id="requirements" class="tab-pane fade">
-    <p>Loading...</p>
-  </div>
-  <div id="ci" class="tab-pane fade">
-    <p>Loading...</p>
-  </div>
-  <div id="readme" class="tab-pane fade">
-    <p>Loading...</p>
-  </div>
-  <div id="docs" class="tab-pane fade">
+  <div id="tabdiv" class="tab-pane fade">
     <p>Loading...</p>
   </div>
 </div>
@@ -159,34 +143,29 @@
 
   $(document).ready(function() {
     var hash = window.location.hash;
-    hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+    hash && $('ul.nav ' + hash).tab('show');
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      var target = $(e.target).attr("href");
-      jQuery(target+'-click')[0].click();
+      var target = $(e.target).attr("id");
+      jQuery($('#'+target)).click();
     });
 
     $('.nav-tabs a').click(function (e) {
-      $(this).tab('show');
-      var scrollmem = $('body').scrollTop() || $('html').scrollTop();
-      window.location.hash = this.hash;
-      $('html,body').scrollTop(scrollmem);
+      window.location.hash = this.id;
     });
 
-    $('#requirements-click').click(function() {
-      $("#requirements").load("{% url 'experimentrequirements_list' object.id %}");
-    });
+    url_dict = {
+      'dashboard': "{% url 'experiment_dashboard' object.id %}",
+      'requirements': "{% url 'experimentrequirements_list' object.id %}",
+      'readme': "{% url 'view_readme' object.id %}",
+      'ci': "{% url 'build_status' object.id %}",
+      'docs': "{% url 'docs_status' object.id %}",
+    }
 
-    $('#readme-click').click(function() {
-      $("#readme").load("{% url 'view_readme' object.id %}");
-    });
-
-    $('#ci-click').click(function() {
-      $("#ci").load("{% url 'build_status' object.id %}");
-    });
-
-    $('#docs-click').click(function() {
-      $("#docs").load("{% url 'docs_status' object.id %}");
+    $('.tab-btn').click(function() {
+      key = $(this).attr('id');
+      $("#tabdiv").html('<p>Loading...</p>')
+      $("#tabdiv").load(url_dict[key]);
     });
 
     $('.step-panel .panel-title').click(function (event) {

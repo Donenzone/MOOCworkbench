@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^file/(?P<experiment_id>\d+)/$', ExperimentsManager.views.view_file_in_git_repository, name='file_detail'),
     url(r'^readme/(?P<experiment_id>\d+)/$', ExperimentsManager.views.readme_of_experiment, name='view_readme'),
     url(r'^folder/(?P<pk>\d+)/$', ExperimentsManager.views.view_list_files_in_repo_folder, name='folder_detail'),
+    url(r'^dashboard/(?P<experiment_id>\d+)/$', ExperimentsManager.views.experiment_dashboard, name="experiment_dashboard"),
 ]

@@ -1,0 +1,18 @@
+{% load bootstrap %}
+
+{% block content %}
+
+{{ readme|safe }}
+
+{% endblock %}
+<h3>What to do now?</h3>
+<ul>
+  <li>Check out this repository using git clone <github-url></li>
+  {% for what_now in what_now_list %}
+    {% if what_now %}
+    <li>{{ what_now }}</li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+<h3>How am I doing?</h3>

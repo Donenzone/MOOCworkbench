@@ -1,6 +1,6 @@
 from django.conf.urls import url
-from QualityManager.views import overview_metrics
+from QualityManager.views import dashboard
 
 urlpatterns = [
-    url(r'^overview/(?P<experiment_id>[-\w]+)/$', overview_metrics, name="overview_metrics"),
+    url(r'^dashboard/(?P<experiment_id>[-\w]+)/$', dashboard, name="dashboard"),
 ]

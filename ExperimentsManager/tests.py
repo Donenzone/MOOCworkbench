@@ -147,10 +147,13 @@ class ExperimentTestCase(TestCase):
 
     @patch('ExperimentsManager.views.GitHubHelper')
     @patch('ExperimentsManager.views.GitHubHelper.list_files_in_repo')
-    def test_experiment_detail_view(self, mock_github_helper, mock_github_helper_file_list):
+    @patch('ExperimentsManager.views.RepoFileListMixin._get_files_in_repository')
+    def test_experiment_detail_view(self, mock_github_helper, mock_github_helper_file_list, mock_get_files_in_repository):
         self.test_choose_experiment_steps_post()
         mock_github_helper.return_value = None
         mock_github_helper_file_list = ['file']
+        mock_get_files_in_repository.return_value = self.get_mock_files()
+
         response = self.client.get(reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'}))
         chosen_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment).count()
         self.assertEqual(response.context['steps'].count(), chosen_steps)
@@ -167,20 +170,22 @@ class ExperimentTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     @patch('ExperimentsManager.views.GitHubHelper')
-    @patch('ExperimentsManager.views.get_files_in_repository')
+    @patch('ExperimentsManager.views.RepoFileListMixin._get_files_in_repository')
     def test_get_file_list_for_exp_step(self, mock_get_files_in_repository, mock_github_helper):
         self.test_choose_experiment_steps_post()
         mock_github_helper.return_value = None
+        mock_get_files_in_repository.return_value = self.get_mock_files()
 
-        Foo = namedtuple('Foo', ['name', 'type'])
-        main = Foo(name='main.py', type='file')
-        test = Foo(name='tests.py', type='file')
-        mock_get_files_in_repository.return_value = [main, test]
-
-        response = self.client.get(reverse('get_file_list_for_step'), {'experiment_id': 1, 'step_id': 2})
+        response = self.client.get(reverse('file_list_for_step'), {'experiment_id': 1, 'step_id': 2})
         response_json = json.loads(str(response.content, encoding='utf8'))
         self.assertEqual(response_json['files'], [['main.py', 'file'], ['tests.py', 'file']])
 
     def test_get_file_list_for_exp_non_exist_step(self):
-        response = self.client.get(reverse('get_file_list_for_step'), {'experiment_id': 1, 'step_id': 1})
+        response = self.client.get(reverse('file_list_for_step'), {'experiment_id': 1, 'step_id': 1})
         self.assertEqual(response.status_code, 404)
+
+    def get_mock_files(self):
+        Foo = namedtuple('Foo', ['name', 'type'])
+        main = Foo(name='main.py', type='file')
+        test = Foo(name='tests.py', type='file')
+        return [main, test]

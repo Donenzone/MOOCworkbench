@@ -5,6 +5,16 @@
   <p>The MOOC workbench scans the progress of your experiment regularly.
     It checks your results from CI, your requirements, your tests and more.</p>
 
+  <h4>What to do now?</h4>
+  <ul>
+    <li>Check out this repository using git clone <github-url></li>
+    {% for what_now in what_now_list %}
+      {% if what_now %}
+      <li>{{ what_now }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
   <h4>Version control</h4>
   {{ messages.VCS }}
 

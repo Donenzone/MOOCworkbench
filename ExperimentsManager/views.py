@@ -11,46 +11,30 @@ from UserManager.models import get_workbench_user
 from django.shortcuts import HttpResponse, render, redirect, reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from ExperimentsManager.tasks import initialize_repository
-from QualityManager.utils import get_measurement_messages_for_experiment
 from django.contrib.auth.decorators import login_required
 import json
 from ExperimentsManager.helper import verify_and_get_experiment
-from ExperimentsManager.helper import what_to_do_now
-from ExperimentsManager.helper import get_files_in_repository
 from ExperimentsManager.helper import get_steps
 from markdown2 import Markdown
 from django.contrib import messages
 from GitManager.github_helper import GitHubHelper
 from django.shortcuts import get_object_or_404
 from DocsManager.models import Docs
+from GitManager.mixins.repo_file_list import RepoFileListMixin
+from ExperimentsManager.mixins import ActiveStepMixin
+from ExperimentsManager.mixins import ExperimentContextMixin
+from QualityManager.mixins import MeasurementMixin
+from DocsManager.mixins import DocsMixin
 
 
-@login_required
-def index(request):
-    owner = WorkbenchUser.objects.get(user=request.user)
-    experiments = Experiment.objects.filter(owner=owner)
-    table = ExperimentTable(experiments)
-
-    return render(request, 'ExperimentsManager/experiments_table.html', {'table': table})
-
-
-class ExperimentDetailView(DetailView):
+class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, DetailView):
     model = Experiment
 
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
-        github_helper = GitHubHelper(self.request.user, experiment.git_repo.name)
         context['steps'] = get_steps(experiment)
-        context['git_list'] = get_files_in_repository(self.request.user, experiment, github_helper)
-        context['measurements'] = get_measurement_messages_for_experiment(experiment)
-        context['docs'] = self.get_docs(experiment)
         return context
-
-    def get_docs(self, experiment):
-        docs = Docs.objects.filter(experiment=experiment)
-        if docs.count() is not 0:
-            return docs[0]
 
 
 class ExperimentCreateView(View):
@@ -80,48 +64,21 @@ class ExperimentCreateView(View):
             return render(request, "ExperimentsManager/edit_new_experiment.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
 
 
-@login_required
-def experiment_dashboard(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
-    what_now_list = what_to_do_now(experiment)
-    return render(request, 'ExperimentsManager/experiment_dashboard.html', {'what_now_list': what_now_list})
+class FileListForStep(RepoFileListMixin, View):
+    def get(self, request):
+        assert 'experiment_id' in request.GET
+        assert 'step_id' in request.GET
 
+        step_id = request.GET['step_id']
+        experiment_id = request.GET['experiment_id']
+        experiment = verify_and_get_experiment(request, experiment_id)
 
-@login_required
-def get_file_list_for_step(request):
-    assert 'experiment_id' in request.GET
-    assert 'step_id' in request.GET
-
-    step_id = request.GET['step_id']
-    experiment_id = request.GET['experiment_id']
-    experiment = verify_and_get_experiment(request, experiment_id)
-
-    step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
-    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-    file_list = get_files_in_repository(request.user, experiment, github_helper, step)
-    return_dict = []
-    for content_file in file_list:
-        return_dict.append((content_file.name, content_file.type))
-    return JsonResponse({'files': return_dict})
-
-
-@login_required
-def complete_step_and_go_to_next(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
-    active_step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
-    active_step.active = False
-    active_step.completed = True
-    active_step.save()
-    next_step_nr = active_step.step_nr + 1
-    next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)
-    if next_step.count() != 0:
-        next_step = next_step[0]
-        next_step.active = True
-        next_step.save()
-        return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
-    else:
-        return JsonResponse({'completed': True})
-
+        step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
+        file_list = self._get_files_in_repository(request.user, experiment.git_repo.name, step.folder_name())
+        return_dict = []
+        for content_file in file_list:
+            return_dict.append((content_file.name, content_file.type))
+        return JsonResponse({'files': return_dict})
 
 
 class ChooseExperimentSteps(View):
@@ -154,14 +111,40 @@ class ChooseExperimentSteps(View):
             return JsonResponse({'message': 'Choose at least one step'})
 
 
-@login_required
-def view_file_in_git_repository(request, experiment_id):
-    if request.method == 'GET':
+class FileViewGitRepository(ExperimentContextMixin, View):
+    def get(self, request, experiment_id):
+        context = super(FileViewGitRepository, self).get(request, experiment_id)
         file_name = request.GET['file_name']
         experiment = verify_and_get_experiment(request, experiment_id)
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-        content_file = github_helper.view_file_in_repo(file_name)
-        return render(request, 'ExperimentsManager/file_detail.html', {'content_file': content_file, 'name': file_name})
+        context['content_file'] = github_helper.view_file_in_repo(file_name)
+        return render(request, 'ExperimentsManager/file_detail.html', context)
+
+
+@login_required
+def index(request):
+    owner = WorkbenchUser.objects.get(user=request.user)
+    experiments = Experiment.objects.filter(owner=owner)
+    table = ExperimentTable(experiments)
+    return render(request, 'ExperimentsManager/experiments_table.html', {'table': table})
+
+
+@login_required
+def complete_step_and_go_to_next(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    active_step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
+    active_step.active = False
+    active_step.completed = True
+    active_step.save()
+    next_step_nr = active_step.step_nr + 1
+    next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)
+    if next_step.count() != 0:
+        next_step = next_step[0]
+        next_step.active = True
+        next_step.save()
+        return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+    else:
+        return JsonResponse({'completed': True})
 
 
 @login_required

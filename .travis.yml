@@ -5,6 +5,7 @@ services:
   - redis-server
 install:
   - pip install -r requirements.txt
+  - sh travis/setup.sh
 script:
   - coverage run --source=BuildManager,DocsManager,ExperimentsManager,Feedback,GitManager,Marketplace,QualityManager,RequirementsManager,UserManager, manage.py test
 

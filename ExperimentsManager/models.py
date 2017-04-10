@@ -32,12 +32,12 @@ class Experiment(AbstractExperiment):
 
 
 class ExperimentStep(models.Model):
-    step_name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     description = models.TextField(null=True)
     default_order = models.IntegerField()
 
     def __str__(self):
-        return self.step_name
+        return self.name
 
 class ChosenExperimentSteps(models.Model):
     step = models.ForeignKey(to=ExperimentStep)
@@ -47,7 +47,7 @@ class ChosenExperimentSteps(models.Model):
     completed = models.BooleanField(default=False)
 
     def folder_name(self):
-        return slugify(self.step.step_name).replace('-', '_')
+        return slugify(self.step.name).replace('-', '_')
 
 def delete_existing_chosen_steps(experiment):
     ChosenExperimentSteps.objects.filter(experiment=experiment).delete()

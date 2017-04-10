@@ -7,18 +7,18 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb experiment.title "experiment_detail" experiment.id %}
+    {% breadcrumb experiment.title "experiment_detail" experiment.pk experiment.slug %}
 {% endblock %}
 
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="dashboard">Dashboard</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='readme'>Read Me</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='requirements'>Manage Your Requirements</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='requirements'>Dependencies</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='ci'>Builds</a></li>
       <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="docs">Docs</a></li>
-      <li style="float:right;"><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="settings">Settings</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="dashboard">Dashboard</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="settings">Settings</a></li>
     </ul>
 
 <div class="tab-content">
@@ -155,7 +155,7 @@
     });
 
     url_dict = {
-      'dashboard': "{% url 'experiment_dashboard' object.id %}",
+      'dashboard': "{% url 'dashboard' object.id %}",
       'requirements': "{% url 'experimentrequirements_list' object.id %}",
       'readme': "{% url 'view_readme' object.id %}",
       'ci': "{% url 'build_status' object.id %}",
@@ -174,7 +174,7 @@
       $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
 
       $.ajax({
-        url: '{% url "get_file_list_for_step" %}',
+        url: '{% url "file_list_for_step" %}',
         data: {
           experiment_id: {{ experiment.id }},
           step_id: step_id,

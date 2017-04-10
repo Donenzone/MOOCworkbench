@@ -3,11 +3,15 @@ from github.GithubException import GithubException
 from allauth.socialaccount.models import SocialToken
 from UserManager.models import get_workbench_user, WorkbenchUser
 import base64
+from django.contrib.auth.models import User
+
 
 class GitHubHelper(object):
     def __init__(self, user, repo_name=None, create=False):
-        self.socialtoken = self.get_social_token(user)
-        self.github_object = self.get_github_object(user)
+        self.user = self.get_user(user)
+
+        self.socialtoken = self.get_social_token()
+        self.github_object = self.get_github_object()
         self.github_user = self.github_object.get_user()
 
         if repo_name:
@@ -18,13 +22,16 @@ class GitHubHelper(object):
         elif repo_name is not None:
             self.github_repository = self.github_user.get_repo(repo_name)
 
-    def get_github_object(self, user):
-        if isinstance(user, WorkbenchUser):
-            user = user.user
+    def get_github_object(self):
         return Github(login_or_token=self.socialtoken)
 
-    def get_social_token(self, user):
-        socialtoken = SocialToken.objects.filter(account__user=user, account__provider='github')
+    def get_user(self, user):
+        if isinstance(user, WorkbenchUser):
+            return user.user
+        return user
+
+    def get_social_token(self):
+        socialtoken = SocialToken.objects.filter(account__user=self.user, account__provider='github')
         if socialtoken.count() != 0:
             return socialtoken[0].token
         raise ValueError('SocialToken is missing')

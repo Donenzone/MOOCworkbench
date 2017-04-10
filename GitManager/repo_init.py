@@ -5,9 +5,9 @@ import os
 
 class GitRepoInit(object):
     TEMPLATE_FOLDER = 'codetemplates/'
-    PROJECTNAME_VAR = '{PROJECTNAME}'
-    STEPFOLDER_VAR = '{STEPFOLDER}'
-    AUTHOR_VAR = '{AUTHOR}'
+    PROJECTNAME_VAR = 'PROJECTNAME'
+    STEPFOLDER_VAR = 'STEPFOLDER'
+    AUTHOR_VAR = 'AUTHOR'
 
     def __init__(self, experiment, type='python'):
         self.github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
@@ -30,16 +30,17 @@ class GitRepoInit(object):
     def create_step_folders(self):
         chosen_experiment_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
         for step in chosen_experiment_steps:
-            commit_message = 'Create folder {0}'.format(step.folder_name())
+            name = step.folder_name()
+            commit_message = 'Create folder {0}'.format(name)
             self.github_helper.add_file_to_repository('__init__.py', commit_message, name)
             self.create_main_and_test_file(name)
 
     def create_main_and_test_file(self, folder):
         main_contents = self.get_file_contents('main.py', part_of_step=True, folder=folder)
         project_name = self.github_helper.github_repository.name
-        main_contents = replace_variable_in_file(main_contents, PROJECTNAME_VAR, project_name)
-        main_contents = replace_variable_in_file(main_contents, STEPFOLDER_VAR, folder)
-        main_contents = replace_variable_in_file(main_contents, AUTHOR_VAR, str(experiment.owner))
+        main_contents = self.replace_variable_in_file(main_contents, self.PROJECTNAME_VAR, project_name)
+        main_contents = self.replace_variable_in_file(main_contents, self.STEPFOLDER_VAR, folder)
+        main_contents = self.replace_variable_in_file(main_contents, self.AUTHOR_VAR, str(self.experiment.owner))
         self.create_new_file_in_repo('main.py', commit_message='Added main.py file', folder=folder, contents=main_contents)
         self.create_new_file_in_repo('tests.py', commit_message='Added test.py file', folder=folder, contents=self.get_file_contents('tests.py', part_of_step=True, folder=folder))
 
@@ -77,7 +78,8 @@ class GitRepoInit(object):
         return contents.replace('{0}', folder)
 
     def replace_variable_in_file(self, contents, variable, value):
-        variable_name = '{{0}}'.format(variable)
+        variable_name = '{{{0}}}'.format(variable)
+        print(variable_name)
         return contents.replace(variable_name, value)
 
     def get_script_path(self):

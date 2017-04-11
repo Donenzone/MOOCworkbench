@@ -1,5 +1,5 @@
 from channels.routing import route
-from ExperimentsManager.consumers import *
+from experiments_manager.consumers import *
 from channels import include
 
 channel_routing = [

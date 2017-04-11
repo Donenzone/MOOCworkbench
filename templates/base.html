@@ -41,7 +41,7 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Experiments <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'experiments_index' %}">My Experiments</a></li>
-                <li><a href="{% url 'new_experiment' %}">Create new Experiment</a></li>
+                <li><a href="{% url 'experiment_new' %}">Create new Experiment</a></li>
               </ul>
             </li>
             <li class="{% block marketplace_active %}{% endblock %}"><a href="/marketplace/">MOOC marketplace</a></li>
@@ -50,7 +50,7 @@
                 <a  href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></a>
                 <ul class="dropdown-menu">
                   <li><a href="{% url 'view_my_profile' %}">My Account</a></li>
-                  <li><a href="{% url 'user_task_list' %}">My Tasks</a></li>
+                  <li><a href="{% url 'task_list' %}">My Tasks</a></li>
                   <li><a href="/accounts/social/connections/">Manage Social Connections</a></li>
                   <li><a href="/accounts/logout">Sign out</a></li>
                 </ul>
@@ -78,7 +78,7 @@
 
   {% if completed_task %}
     <div class="container">
-          <div class="alert alert-success">Great! You've completed the task <b>{{ completed_task.for_task.name }}</b>! <a href="{% url 'create_feedback' completed_task.for_task.id %}">Tell us about your experience</a></div>
+          <div class="alert alert-success">Great! You've completed the task <b>{{ completed_task.for_task.name }}</b>! <a href="{% url 'feedback_create' completed_task.for_task.id %}">Tell us about your experience</a></div>
     </div>
   {% endif %}
 
@@ -89,7 +89,7 @@
 
     <footer class="footer">
       <div class="container" style="margin:auto;padding: 0 15px;">
-        <p class="text-muted" style="margin:20px 0;"><a href="https://github.com/jlmdegoede/MOOCworkbench" target="_blank">MOOC Workbench</a> | <a href="https://github.com/Donenzone/MOOCworkbench/issues/new" target="_blank">Report a bug by opening an issue on GitHub</a> | <a href="{% url 'create_feedback' %}">Leave general feedback</a></p>
+        <p class="text-muted" style="margin:20px 0;"><a href="https://github.com/jlmdegoede/MOOCworkbench" target="_blank">MOOC Workbench</a> | <a href="https://github.com/Donenzone/MOOCworkbench/issues/new" target="_blank">Report a bug by opening an issue on GitHub</a> | <a href="{% url 'feedback_create' %}">Leave general feedback</a></p>
       </div>
     </footer>
 

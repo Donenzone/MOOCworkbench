@@ -16,35 +16,35 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
-from GitManager.views import GitRepositoryViewSet
-import UserManager.views
-import GitManager.views
+from git_manager.views import GitRepositoryViewSet
+import user_manager.views
+import git_manager.views
 from django.contrib.auth.decorators import login_required
 import notifications.urls
 
 router = routers.DefaultRouter()
 router.register(r'git-repository', GitRepositoryViewSet)
-router.register(r'user', UserManager.views.UserViewset)
-router.register(r'workbench-user', UserManager.views.WorkbenchUserViewset)
+router.register(r'user', user_manager.views.UserViewset)
+router.register(r'workbench-user', user_manager.views.WorkbenchUserViewset)
 
 urlpatterns = [
-    url(r'^$', UserManager.views.index, name="index"),
+    url(r'^$', user_manager.views.index, name="index"),
     url(r'^admin/', admin.site.urls),
     #url(r'^api/', include(router.urls)),
-    url(r'^accounts/login/$', UserManager.views.sign_in, name="sign_in"),
-    url(r'^accounts/logout/$', UserManager.views.sign_out, name="sign_out"),
-    url(r'^my-account/$', login_required(UserManager.views.DetailProfileView.as_view()), name="view_my_profile"),
-    url(r'^accounts/edit/$', login_required(UserManager.views.EditProfileView.as_view()), name="edit_profile"),
-    url(r'^accounts/register/$', UserManager.views.register, name="register"),
+    url(r'^accounts/login/$', user_manager.views.sign_in, name="sign_in"),
+    url(r'^accounts/logout/$', user_manager.views.sign_out, name="sign_out"),
+    url(r'^my-account/$', login_required(user_manager.views.DetailProfileView.as_view()), name="view_my_profile"),
+    url(r'^accounts/edit/$', login_required(user_manager.views.EditProfileView.as_view()), name="edit_profile"),
+    url(r'^accounts/register/$', user_manager.views.register, name="register"),
 
-    url(r'^experiments/', include('ExperimentsManager.urls')),
-    url(r'^experiments/requirements/', include('RequirementsManager.urls')),
-    url(r'^marketplace/', include('Marketplace.urls')),
-    url(r'^builds/', include('BuildManager.urls')),
-    url(r'^metrics/', include('QualityManager.urls')),
-    url(r'^feedback/', include('Feedback.urls')),
-    url(r'^git/$', GitManager.views.index, name="git_index"),
-    url(r'^docs/', include('DocsManager.urls')),
+    url(r'^experiments/', include('experiments_manager.urls')),
+    url(r'^experiments/requirements/', include('requirements_manager.urls')),
+    url(r'^marketplace/', include('marketplace.urls')),
+    url(r'^builds/', include('build_manager.urls')),
+    url(r'^metrics/', include('quality_manager.urls')),
+    url(r'^feedback/', include('feedback.urls')),
+    url(r'^git/$', git_manager.views.index, name="git_index"),
+    url(r'^docs/', include('docs_manager.urls')),
 
     #url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
     #url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),

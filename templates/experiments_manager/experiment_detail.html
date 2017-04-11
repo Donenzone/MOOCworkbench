@@ -1,0 +1,188 @@
+{% extends "experiments_manager/experiments_table.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+
+{% block content %}
+
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb experiment.title "experiment_detail" experiment.pk experiment.slug %}
+{% endblock %}
+
+    <h2>{{ object.title }}</h2>
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='readme'>Read Me</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='requirements'>Dependencies</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="dashboard">Dashboard</a></li>
+      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="settings">Settings</a></li>
+    </ul>
+
+<div class="tab-content">
+  <div id="index" class="tab-pane fade in active">
+    <h3>General information</h3>
+      <table class="table table-striped">
+        <tr>
+            <td>
+                Description
+            </td>
+            <td>
+                {{ object.description }}
+            </td>
+        </tr>
+        <tr>
+            <td>Git repository</td>
+            <td><a href="{{ object.git_repo.github_url }}" target="_blank">View on GitHub</a></td>
+        </tr>
+        <tr>
+            <td>Created on</td>
+            <td>{{ object.added }}</td>
+        </tr>
+        <tr>
+            <td>Owner of project</td>
+            <td>{{ object.owner }}</td>
+        </tr>
+      </table>
+
+      <h3>Progress</h3>
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        {% for step in steps %}
+        <div class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
+          <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
+            <h4 id="{{ step.id }}" class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" {% if step.active %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="collapse{{ forloopcounter }}">
+                {{ step.step }} {% if step.completed %}(completed){% endif %}
+              </a>
+            </h4>
+          </div>
+          <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse {% if step.active %}in{% endif %}" role="tabpanel" aria-labelledby="heading{{ forloop.counter }}">
+            <div class="panel-body">
+              {% if docs.enabled %}
+              <div class="row">
+                <div class="col-md-12">
+                  <h4>Read the docs</h4>
+                  <a href="{% url "docs_view" experiment.id step.folder_name %}">Read the docs for this step</a>
+                </div>
+              </div>
+              <hr />
+              {% endif %}
+              <table class="table table-striped">
+                  <thead>
+                    <tr>
+                        <th>
+                            File/Folder name
+                        </th>
+                        <th>
+                            Type
+                        </th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-{{ step.id }}">
+                    {% if step.active %}
+                    {% for item in git_list %}
+                    <tr>
+                        <td>
+                            {% if item.type == 'dir' %}
+                              <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}">{{ item.name }}</a>
+
+                            {% else %}
+                              <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}">{{ item.name }}</a>
+
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ item.type }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                  </tbody>
+              </table>
+
+              <hr />
+
+              <div class="row">
+                <div class="col-sm-6">
+                  <h4>Recommended packages in this step</h4>
+                    <ul>
+                      <li>There aren't any recommended packages yet. Check back later!</li>
+                    </ul>
+                    <p><a href="{% url 'marketplace_index' %}" class="btn btn-default">View more on the MOOC marketplace</a></p>
+                  </div>
+                  <div class="col-sm-6">
+                    <h4>How am I doing?</h4>
+                      <ul>
+                        {% for message in measurements %}
+                          <li>{{ message }}</li>
+                        {% endfor %}
+                      </ul>
+                  </div>
+                </div>
+              <p></p>
+            </div>
+            <div class="panel-footer">
+              {% if step.active %}
+                <p><a href="{% url 'complete_step_and_go_to_next' object.id %}" class="btn btn-success">Complete and go to next step</a></p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+  </div>
+  <div id="tabdiv" class="tab-pane fade">
+    <p>Loading...</p>
+  </div>
+</div>
+
+<script type='text/javascript'>
+
+  $(document).ready(function() {
+    var hash = window.location.hash;
+    hash && $('ul.nav ' + hash).tab('show');
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+      var target = $(e.target).attr("id");
+      jQuery($('#'+target)).click();
+    });
+
+    $('.nav-tabs a').click(function (e) {
+      window.location.hash = this.id;
+    });
+
+    url_dict = {
+      'dashboard': "{% url 'dashboard' object.id %}",
+      'requirements': "{% url 'requirements_list' object.id %}",
+      'readme': "{% url 'readme_view' object.id %}",
+    }
+
+    $('.tab-btn').click(function() {
+      key = $(this).attr('id');
+      $("#tabdiv").html('<p>Loading...</p>')
+      $("#tabdiv").load(url_dict[key]);
+    });
+
+    $('.step-panel .panel-title').click(function (event) {
+      var step_id = $(this).attr('id');
+      var identifier = '#tbody-' + step_id
+      $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
+
+      $.ajax({
+        url: '{% url "file_list_for_step" %}',
+        data: {
+          experiment_id: {{ experiment.id }},
+          step_id: step_id,
+        },
+        success: function(data) {
+          $(identifier).empty();
+          for (value in data.files) {
+            $(identifier).append('<tr><td>'+ data.files[value][0] + '</td><td>'+ data.files[value][1] +'</td></tr>')
+          }
+        }
+      })
+    });
+  });
+</script>
+{% endblock %}

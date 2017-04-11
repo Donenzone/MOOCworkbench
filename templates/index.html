@@ -13,7 +13,7 @@
             <div class="panel panel-primary">
               <div class="panel-heading">{{ active_task.name }}</div>
               <div class="panel-body">{{ active_task.description|linebreaks }}</div>
-              <div class="panel-footer"><a href="{% url 'set_task_active' active_task.id %}">Complete this task</a></div>
+              <div class="panel-footer"><a href="{% url 'task_active' active_task.id %}">Complete this task</a></div>
             </div>
           </div>
         {% else %}
@@ -23,12 +23,12 @@
               <div class="panel panel-default">
                 <div class="panel-heading">{{ task.name }}</div>
                 <div class="panel-body">{{ task.description|linebreaks }}</div>
-                <div class="panel-footer"><a href="{% url 'set_task_active' task.id %}">Start this task now</a></div>
+                <div class="panel-footer"><a href="{% url 'task_active' task.id %}">Start this task now</a></div>
               </div>
             </div>
             {% endfor %}
           {% endif %}
-          <p class="col-md-12"><a href="{% url 'user_task_list' %}" class="btn btn-primary">Go to my task overview</a></p>
+          <p class="col-md-12"><a href="{% url 'task_list' %}" class="btn btn-primary">Go to my task overview</a></p>
     </div>
   </div>
           <hr />
@@ -41,7 +41,7 @@
             {% endfor %}
             </ul>
             <p>
-              <a href="{% url "new_experiment" %}" class="btn btn-primary">Create new experiment</a>
+              <a href="{% url "experiment_new" %}" class="btn btn-primary">Create new experiment</a>
             </p>
         </div>
     </div>

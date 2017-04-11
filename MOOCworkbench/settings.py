@@ -45,15 +45,15 @@ INSTALLED_APPS = [
     'bootstrap3',
     'rest_framework',
 
-    'ExperimentsManager',
-    'GitManager',
-    'UserManager',
-    'Marketplace',
-    'RequirementsManager',
-    'QualityManager',
-    'BuildManager',
-    'Feedback',
-    'DocsManager',
+    'experiments_manager',
+    'git_manager',
+    'user_manager',
+    'marketplace',
+    'requirements_manager',
+    'quality_manager',
+    'build_manager',
+    'feedback',
+    'docs_manager',
 
     'bootstrapform',
     'django_tables2',
@@ -99,7 +99,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'Feedback.middleware.MiddlewareTaskCompleted',
+    'feedback.middleware.MiddlewareTaskCompleted',
 ]
 
 ROOT_URLCONF = 'MOOCworkbench.urls'
@@ -118,8 +118,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'UserManager.context_processor.workbench_user',
-                'Feedback.context_processor.active_task',
+                'user_manager.context_processor.workbench_user',
+                'feedback.context_processor.active_task',
                 'django.template.context_processors.request'
             ],
         },

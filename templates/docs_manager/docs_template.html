@@ -1,0 +1,18 @@
+{% extends "experiments_manager/experiment_detail.html" %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Documentation" "docs_view"  %}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-3">
+      {{ document.sidebar|safe }}
+    </div>
+    <div class="col-md-9">
+      {{ document.body|safe }}
+    </div>
+  </div>
+{% endblock %}

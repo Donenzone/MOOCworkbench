@@ -20,7 +20,7 @@ class build_managerTestCases(TestCase):
         self.experiment = Experiment.objects.create(title='Experiment', description='test', version='1.0', owner=self.workbench_user, git_repo=self.git_repo)
         self.client = Client()
         self.client.login(username='test', password='test')
-        call_command('loaddata', 'steps.json', verbosity=0)
+        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
 
     @patch('build_manager.views.enable_travis')
     def test_enable_ci_builds(self, mock_enable_travis):

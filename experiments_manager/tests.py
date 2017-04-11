@@ -22,7 +22,7 @@ class ExperimentTestCase(TestCase):
         self.experiment = Experiment.objects.create(title='Experiment', description='test', version='1.0', owner=self.workbench_user, git_repo=self.git_repo)
         self.client = Client()
         self.client.login(username='test', password='test')
-        call_command('loaddata', 'steps.json', verbosity=0)
+        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
 
     def test_index_not_signed_in(self):
         c = Client()

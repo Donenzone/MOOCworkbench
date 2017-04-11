@@ -107,7 +107,7 @@ class ExperimentTestCase(TestCase):
         response = self.client.get(reverse('experimentsteps_choose', kwargs={'experiment_id': 1}))
         self.assertIsNotNone(response.context['steps'])
         self.assertEqual(len(response.context['steps']), 6)
-        self.assertEqual(response.context['experiment_id'], '1')
+        self.assertEqual(response.context['experiment'].id, 1)
 
     def test_choose_experiment_steps_post(self):
         data = {'steplist': '["1","2","3","4","5","6"]'}

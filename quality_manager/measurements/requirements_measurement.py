@@ -9,7 +9,7 @@ from git_manager.github_helper import GitHubHelper
 class RequirementsMeasurement(MeasurementAbstraction):
     def __init__(self, experiment):
         super().__init__(experiment)
-        self.measurement = ExperimentMeasure.objects.get(name='Requirements')
+        self.measurement = ExperimentMeasure.objects.get(name='Dependencies defined')
         self.raw = RawMeasureResult()
 
     def measure(self):

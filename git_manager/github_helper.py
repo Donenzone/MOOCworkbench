@@ -22,6 +22,10 @@ class GitHubHelper(object):
         elif repo_name is not None:
             self.github_repository = self.github_user.get_repo(repo_name)
 
+    @property
+    def owner(self):
+        return self.github_repository.owner.login
+
     def get_github_object(self):
         return Github(login_or_token=self.socialtoken)
 

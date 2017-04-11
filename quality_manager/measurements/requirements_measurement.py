@@ -1,3 +1,5 @@
+import re
+
 from quality_manager.measurements.measurement import MeasurementAbstraction
 from requirements_manager.models import ExperimentRequirement
 from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
@@ -5,6 +7,7 @@ from quality_manager.models import RawMeasureResult
 from build_manager.models import TravisInstance
 from build_manager.travis_ci_helper import TravisCiHelper
 from git_manager.github_helper import GitHubHelper
+
 
 class RequirementsMeasurement(MeasurementAbstraction):
     def __init__(self, experiment):
@@ -17,7 +20,7 @@ class RequirementsMeasurement(MeasurementAbstraction):
         travis_ci_config = TravisInstance.objects.filter(experiment=self.experiment).first()
         if travis_ci_config:
             if travis_ci_config.enabled:
-                github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
+                github_helper = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)
                 travis_helper = TravisCiHelper(github_helper)
                 last_build_log = travis_helper.get_log_for_last_build()
                 complete_requirements_file = self.find_if_missing_dependency(last_build_log)

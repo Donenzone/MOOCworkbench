@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'build_manager',
     'feedback',
     'docs_manager',
+    'coverage_manager',
 
     'bootstrapform',
     'django_tables2',

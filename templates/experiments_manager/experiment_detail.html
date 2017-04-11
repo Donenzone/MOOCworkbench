@@ -13,13 +13,14 @@
     <h2>{{ object.title }}</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='readme'>Read Me</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id='requirements'>Dependencies</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="dashboard">Dashboard</a></li>
-      <li><a data-toggle="tab" href="#tabdiv" class="tab-btn" id="settings">Settings</a></li>
+      <li><a data-toggle="tab" href="#readme" class="tab-btn" id="readme-click">Read Me</a></li>
+      <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
+      <li><a data-toggle="tab" href="#dashboard" class="tab-btn" id="dashboard-click">Dashboard</a></li>
+      <li><a data-toggle="tab" href="#settings" class="tab-btn" id="settings-click">Settings</a></li>
     </ul>
 
 <div class="tab-content">
+
   <div id="index" class="tab-pane fade in active">
     <h3>General information</h3>
       <table class="table table-striped">
@@ -132,24 +133,37 @@
       </div>
 
   </div>
-  <div id="tabdiv" class="tab-pane fade">
+
+  <div id="dashboard" class="tab-pane fade">
     <p>Loading...</p>
   </div>
+
+  <div id="requirements" class="tab-pane fade">
+    <p>Loading...</p>
+  </div>
+
+  <div id="readme" class="tab-pane fade">
+    <p>Loading...</p>
+  </div>
+
 </div>
 
 <script type='text/javascript'>
 
   $(document).ready(function() {
     var hash = window.location.hash;
-    hash && $('ul.nav ' + hash).tab('show');
-
+    hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+    
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      var target = $(e.target).attr("id");
-      jQuery($('#'+target)).click();
+      var target = $(e.target).attr("href");
+      jQuery(target+'-click')[0].click();
     });
 
     $('.nav-tabs a').click(function (e) {
-      window.location.hash = this.id;
+      $(this).tab('show');
+      var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+      window.location.hash = this.hash;
+      $('html,body').scrollTop(scrollmem);
     });
 
     url_dict = {
@@ -158,10 +172,14 @@
       'readme': "{% url 'readme_view' object.id %}",
     }
 
-    $('.tab-btn').click(function() {
-      key = $(this).attr('id');
-      $("#tabdiv").html('<p>Loading...</p>')
-      $("#tabdiv").load(url_dict[key]);
+    $('#readme-click').click(function() {
+      $("#readme").load(url_dict['readme']);
+    });
+    $('#dashboard-click').click(function() {
+      $("#dashboard").load(url_dict['dashboard']);
+    });
+    $('#requirements-click').click(function() {
+      $("#requirements").load(url_dict['requirements']);
     });
 
     $('.step-panel .panel-title').click(function (event) {

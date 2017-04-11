@@ -1,0 +1,56 @@
+{% load bootstrap %}
+
+{% block content%}
+
+  {% if not travis %}
+    <p>Before you can enable code coverage measurements, you need to enable automatic builds with Travis CI.</p>
+    <p>Head over to the Builds section and get started with Travis.</p>
+  {% elif not configured %}
+    <p>You have not enabled code coverage measurements.</p>
+
+    <h4>Step 1. Sign in</h4>
+      <p>Sign in at least once into Coveralls and flip the switch for code coverage measurement:</p>
+      <p><a href="https://coveralls.io/" target="_blank">Coveralls.io</a></p>
+
+    <h4>Step 2. Enable coverage measurement</h4>
+      <p>Once you're signed in, enable builds now:</p>
+      <p><a href="#" class="btn btn-primary" id='enable-coverage'>Enable now</a></p>
+  {% else %}
+    <img src="{{ current_config.badge_url }}" />
+    <p class="lead">Coveralls will automatically receive results from Travis and measure code coverage.</p>
+
+    <p>
+      <a href="#" class="btn btn-default" id='disable-coverage'>Disable Code Coverage</a>
+    </p>
+
+  {% endif %}
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+      $('#enable-coverage').click(function() {
+        $.post({
+          url: '{% url 'coveralls_enable' %}',
+          data: {'experiment_id': {{ experiment_id }}, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          success: function(data) {
+            if (data.enabled) {
+              location.reload();
+            }
+          },
+        });
+      });
+
+      $('#disable-coverage').click(function() {
+        $.post({
+          url: '{% url 'coveralls_disable' %}',
+          data: {'experiment_id': {{ experiment_id }}, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          success: function(data) {
+            if (data.disabled) {
+              location.reload();
+            }
+          },
+        });
+      });
+    });
+  </script>
+{% endblock %}

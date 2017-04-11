@@ -1,6 +1,6 @@
 from quality_manager.measurements.measurement import MeasurementAbstraction
 from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
-from build_manager.models import
+from build_manager.models import TravisInstance
 
 class CiEnabledMeasurement(MeasurementAbstraction):
     def __init__(self, experiment):
@@ -8,7 +8,7 @@ class CiEnabledMeasurement(MeasurementAbstraction):
         self.measurement = ExperimentMeasure.objects.get(name='Use of CI')
 
     def measure(self):
-        travis_query_set = TravisInstance.objects.filter(experiment=experiment)
+        travis_query_set = TravisInstance.objects.filter(experiment=self.experiment)
         is_travis_enabled = travis_query_set.count() is not 0
         if is_travis_enabled:
             self.result.result = ExperimentMeasureResult.HIGH

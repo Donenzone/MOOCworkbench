@@ -1,17 +1,26 @@
 {% load bootstrap %}
 
 {% block content %}
+  <div class="row">
+    <div class="col-md-9">
+      <h2>Dashboard</h2>
+      <p class="lead">The MOOC workbench scans the progress of your experiment regularly.
+        It checks your results from CI, your requirements, your tests and more.</p>
+    </div>
 
-  <p class="lead">The MOOC workbench scans the progress of your experiment regularly.
-    It checks your results from CI, your requirements, your tests and more.</p>
-
+      <div class="col-md-3">
+        <h3>Refresh</h3>
+        <a href="#" id="refresh" class="btn btn-default">Refresh this data</a>
+        <span id="refresh-message"></span>
+      </div>
+    </div>
   <hr />
   <h3>What to do now?</h3>
   <ul>
-    <li>Check out this repository using git clone <github-url></li>
+    <p class="lead">Check out this repository using git clone <github-url></p>
     {% for what_now in what_now_list %}
       {% if what_now %}
-      <li>{{ what_now }}</li>
+      <p class="lead">{{ what_now }}</p>
       {% endif %}
     {% endfor %}
   </ul>
@@ -33,26 +42,47 @@
   {{ messages.Requirements }}
 
   <hr />
-  <h3>Testing</h3>
-  {{ messages.Testing }}
 
-  <hr />
-  <h3>CI</h3>
-  <div id="ci-dashboard">
-    <p>Loading...</p>
-  </div>
+  <div class="row">
+      <div class="col-md-6">
+        <h3>CI</h3>
+        <div id="ci-dashboard">
+          <p>Loading...</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <h3>Testing</h3>
+        <div id="coverage-dashboard">
+          <p>Loading...</p>
+        </div>
+      </div>
+    </div>
 
   <script type='text/javascript'>
     $(document).ready(function() {
       url_dict = {
         'ci': "{% url 'build_status' experiment.id %}",
         'docs': "{% url 'docs_status' experiment.id %}",
-        'vcs': "{% url 'vcs_overview' %}",
+        'vcs': "{% url 'vcs_overview' experiment.id %}",
+        'coverage': "{% url 'coveralls_status' experiment.id %}",
       }
 
       $("#docs-dashboard").load(url_dict['docs']);
       $("#ci-dashboard").load(url_dict['ci']);
       $("#vcs-dashboard").load(url_dict['vcs']);
+      $("#coverage-dashboard").load(url_dict['coverage']);
+
+      $('#refresh').click(function() {
+        $.get({
+          url: "{% url 'measurements_refresh' experiment.id %}",
+          success: function(data) {
+            if (data.refresh) {
+              $('#refresh-message').text("Refreshing data...")
+            }
+          }
+        })
+      })
 
   });
 </script>

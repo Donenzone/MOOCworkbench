@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^experiments/requirements/', include('requirements_manager.urls')),
     url(r'^marketplace/', include('marketplace.urls')),
     url(r'^builds/', include('build_manager.urls')),
+    url(r'^coverage/', include('coverage_manager.urls')),
     url(r'^metrics/', include('quality_manager.urls')),
     url(r'^feedback/', include('feedback.urls')),
     url(r'^git/$', git_manager.views.index, name="git_index"),

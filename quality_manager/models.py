@@ -49,4 +49,6 @@ class ExperimentMeasureResult(TimeStampedModel):
         message_dict = {ExperimentMeasureResult.LOW: self.measurement.get_low_message(),
                 ExperimentMeasureResult.MEDIUM: self.measurement.get_medium_message(),
                 ExperimentMeasureResult.HIGH: self.measurement.get_high_message()}
-        return message_dict[self.result]
+        if self.result:
+            return message_dict[self.result]
+        return 'Result missing'

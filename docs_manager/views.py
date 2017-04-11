@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.http import JsonResponse
 from docs_manager.sphinx_helper import SphinxHelper
-from experiments_manager.helper import get_steps
+from experiments_manager.helper import get_steps, verify_and_get_experiment
 from django.contrib.auth.decorators import login_required
 from git_manager.github_helper import GitHubHelper
 from docs_manager.models import Docs
@@ -12,7 +12,7 @@ from experiments_manager.mixins import ExperimentContextMixin
 class DocExperimentView(ExperimentContextMixin, View):
 
     def get(self, request, experiment_id, page_slug=None):
-        context = super(DocViewExperiment, self).get(request, experiment_id)
+        context = super(DocExperimentView, self).get(request, experiment_id)
         steps = get_steps(self.experiment)
         github_helper = GitHubHelper(request.user, self.experiment.git_repo.name)
         sphinx_helper = SphinxHelper(self.experiment, steps, github_helper.github_repository.owner.login)

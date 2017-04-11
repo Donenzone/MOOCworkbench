@@ -8,9 +8,6 @@ from git_manager.github_helper import GitHubHelper
 from git_manager.helper import get_github_helper
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from travispy import TravisPy
-from build_manager.tasks import get_last_log_for_build_task
-from unittest.mock import patch
 
 
 @login_required
@@ -47,21 +44,6 @@ def disable_ci_builds(request):
 
     return JsonResponse({'disabled': True})
 
-
-def create_new_ci_config(request, experiment):
-    new_ci_config = TravisCiConfig()
-    new_ci_config.save()
-    new_ci = TravisInstance(experiment=experiment, config=new_ci_config)
-    new_ci.save()
-
-    enable_travis(request, experiment)
-
-    return new_ci
-
-def enable_travis(request, experiment):
-    github_helper = get_github_helper(request, experiment)
-    travis_ci_helper = TravisCiHelper(github_helper)
-    travis_ci_helper.enable_travis_for_repository()
 
 
 @login_required
@@ -100,3 +82,20 @@ def get_log_from_last_build(request, experiment_id):
     travis_helper = TravisCiHelper(github_helper)
     log = travis_helper.get_log_for_last_build()
     return JsonResponse({'log': log})
+
+
+def create_new_ci_config(request, experiment):
+    new_ci_config = TravisCiConfig()
+    new_ci_config.save()
+    new_ci = TravisInstance(experiment=experiment, config=new_ci_config)
+    new_ci.save()
+
+    enable_travis(request, experiment)
+
+    return new_ci
+
+
+def enable_travis(request, experiment):
+    github_helper = get_github_helper(request, experiment)
+    travis_ci_helper = TravisCiHelper(github_helper)
+    travis_ci_helper.enable_travis_for_repository()

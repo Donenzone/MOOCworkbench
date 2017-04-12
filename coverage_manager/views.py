@@ -31,7 +31,7 @@ def coveralls_enable(request):
             existing_config.save()
             return JsonResponse({'enabled': True})
         else:
-            return JsonResponse({'enabled': False, 'message': 'Invalid response from Coverals. Are you sure you flipped the switch on Coveralls?'})
+            return JsonResponse({'enabled': False, 'message': 'Invalid response from Coveralls. Are you sure you flipped the switch on Coveralls?'})
     else:
         return JsonResponse({'enabled': False, 'message': 'First enable Travis CI builds!'})
 

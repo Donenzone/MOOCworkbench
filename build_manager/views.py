@@ -31,16 +31,18 @@ def disable_ci_builds(request):
     experiment_id = request.POST['experiment_id']
     experiment = verify_and_get_experiment(request, experiment_id)
 
-    current_config = TravisInstance.objects.get(experiment=experiment)
-    current_config.enabled = False
-    current_config.save()
+    try:
+        current_config = TravisInstance.objects.get(experiment=experiment)
+        current_config.enabled = False
+        current_config.save()
 
-    github_helper = get_github_helper(request, experiment)
-    travis_ci_helper = TravisCiHelper(github_helper)
-    travis_ci_helper.disable_travis_for_repository()
+        github_helper = get_github_helper(request, experiment)
+        travis_ci_helper = TravisCiHelper(github_helper)
+        travis_ci_helper.disable_travis_for_repository()
 
-    return JsonResponse({'disabled': True})
-
+        return JsonResponse({'disabled': True})
+    except TravisInstance.DoesNotExist as e:
+        return JsonResponse({'travis_does_not_exist': True})
 
 
 @login_required

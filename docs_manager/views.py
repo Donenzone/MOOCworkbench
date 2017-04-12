@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, reverse
-from django.http import JsonResponse
 from docs_manager.sphinx_helper import SphinxHelper
 from experiments_manager.helper import get_steps, verify_and_get_experiment
 from django.contrib.auth.decorators import login_required
@@ -8,6 +7,7 @@ from docs_manager.models import Docs
 from git_manager.clone_module import pull_git_repository, clone_git_repository
 from django.views import View
 from experiments_manager.mixins import ExperimentContextMixin
+
 
 class DocExperimentView(ExperimentContextMixin, View):
 

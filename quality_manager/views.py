@@ -1,18 +1,17 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from experiments_manager.helper import verify_and_get_experiment
-from quality_manager.models import ExperimentMeasure, ExperimentMeasureResult
-from quality_manager.models import RawMeasureResult
+from quality_manager.models import ExperimentMeasure
 from django.contrib.auth.decorators import login_required
 from quality_manager.mixins import MeasurementMixin
 from quality_manager.helpers.what_now_helper import WhatNow
 from django.views import View
 from experiments_manager.mixins import ExperimentContextMixin
-from quality_manager.models import RawMeasureResult
 from quality_manager.tasks import version_control_quality_check
 from quality_manager.tasks import requirements_quality_check
 from quality_manager.tasks import test_quality_check
 from quality_manager.tasks import ci_quality_check
+
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
@@ -52,7 +51,6 @@ class NrOfCommitsView(MeasurementMixin, View):
 
 @login_required
 def refresh_measurements(request, experiment_id):
-
     experiment = verify_and_get_experiment(request, experiment_id)
     version_control_quality_check.delay(experiment_id)
     requirements_quality_check.delay(experiment_id)

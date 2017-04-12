@@ -1,7 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from feedback.models import feedback, Task, UserTask
-from user_manager.models import get_workbench_user
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
 from user_manager.models import get_workbench_user

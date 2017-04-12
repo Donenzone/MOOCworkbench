@@ -1,18 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
 from .models import GitRepository
-from user_manager.models import WorkbenchUser
 from git_manager.serializer import GitRepositorySerializer
-from django.shortcuts import render, redirect, HttpResponse
-from user_manager.models import get_workbench_user
-import requests
-from django.utils.crypto import get_random_string
-from github import Github
-from allauth.socialaccount.models import SocialToken
+from django.shortcuts import render
 from .github_helper import *
 
-# Create your views here.
+
 class GitRepositoryViewSet(viewsets.ModelViewSet):
     queryset = GitRepository.objects.all().order_by('-created')
     serializer_class = GitRepositorySerializer

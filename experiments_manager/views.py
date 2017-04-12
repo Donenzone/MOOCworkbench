@@ -1,15 +1,11 @@
-from experiments_manager.serializer import *
 from experiments_manager.tables import ExperimentTable
 from experiments_manager.forms import ExperimentForm
 from experiments_manager.models import *
 from django.views.generic.detail import DetailView
-from django.utils import timezone
 from git_manager.views import get_user_repositories, create_new_github_repository_local
 from django.views import View
-from experiments_manager.serializer import serializer_experiment_run_factory
-from user_manager.models import get_workbench_user
-from django.shortcuts import HttpResponse, render, redirect, reverse
-from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, redirect, reverse
+from django.http import JsonResponse
 from experiments_manager.tasks import initialize_repository
 from django.contrib.auth.decorators import login_required
 import json
@@ -19,7 +15,6 @@ from markdown2 import Markdown
 from django.contrib import messages
 from git_manager.github_helper import GitHubHelper
 from django.shortcuts import get_object_or_404
-from docs_manager.models import Docs
 from git_manager.mixins.repo_file_list import RepoFileListMixin
 from experiments_manager.mixins import ActiveStepMixin
 from experiments_manager.mixins import ExperimentContextMixin

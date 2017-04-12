@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Package, PackageVersion, PackageResource, update_all_versions
+from .models import Package, PackageVersion, PackageResource
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, DetailView, View
 from user_manager.models import get_workbench_user
@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from markdownx.utils import markdownify
+
 
 class marketplaceIndex(View):
     def get(self, request):
@@ -17,12 +18,15 @@ class marketplaceIndex(View):
         context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:10]
         return render(request, 'marketplace/marketplace_index.html', context=context)
 
+
 class PackageListView(ListView):
     model = Package
+
 
 class PackageCreateView(CreateView):
     model = Package
     fields = ['package_name', 'description', 'internal_package', 'project_page']
+
 
 class PackageDetailView(DetailView):
     model = Package
@@ -36,6 +40,7 @@ class PackageDetailView(DetailView):
         context['resources'] = resources
         return context
 
+
 class PackageVersionCreateView(CreateView):
     model = PackageVersion
     fields = ['version_nr', 'changelog', 'url']
@@ -46,6 +51,7 @@ class PackageVersionCreateView(CreateView):
         form.instance.added_by = get_workbench_user(self.request.user)
         return super(PackageVersionCreateView, self).form_valid(form)
 
+
 class PackageResourceCreateView(CreateView):
     model = PackageResource
     fields = ['resource', 'url']
@@ -55,6 +61,7 @@ class PackageResourceCreateView(CreateView):
         form.instance.package = package
         form.instance.added_by = get_workbench_user(self.request.user)
         return super(PackageResourceCreateView, self).form_valid(form)
+
 
 class PackageSubscriptionView(View):
     def get(self, request, *args, **kwargs):

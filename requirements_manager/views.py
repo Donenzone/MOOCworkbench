@@ -1,17 +1,14 @@
-from django.shortcuts import render, reverse, redirect
+from django.shortcuts import reverse, redirect
 import requirements
 from .models import ExperimentRequirement
-from experiments_manager.models import Experiment
 from django.views.generic.list import ListView
 from django.views.generic import CreateView
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, JsonResponse
-from django.core import serializers
 from .forms import ExperimentRequirementForm
 from git_manager.github_helper import GitHubHelper
 from django.contrib import messages
 from experiments_manager.helper import verify_and_get_experiment
-# Create your views here.
+
 
 def parse_requirements_file(experiment, requirements_file):
     for req in requirements.parse(requirements_file):

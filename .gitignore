@@ -1,4 +1,5 @@
 MOOCworkbench/production_settings.py
+.idea/
 github_repositories/
 waliki_data/
 dump.rdb

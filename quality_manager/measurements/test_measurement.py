@@ -39,4 +39,5 @@ class TestMeasurement(MeasurementAbstraction):
         if self.raw.key:
             self.raw.save()
             self.result.raw_values.add(self.raw)
+            self.result.save()
         return self.result

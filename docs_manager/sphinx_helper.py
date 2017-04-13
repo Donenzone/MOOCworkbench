@@ -69,7 +69,7 @@ class SphinxHelper(object):
                 for module_info in coverage.items():
                     if 'funcs' in module_info[1]:
                         funcs = module_info[1]['funcs']
-                        total_undocumented_functions += funcs
+                        total_undocumented_functions += len(funcs)
                     if 'classes' in module_info[1]:
                         classes = module_info[1]['classes']
                         total_undocumented_classes += len(classes)

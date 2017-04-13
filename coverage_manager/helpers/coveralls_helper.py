@@ -22,5 +22,5 @@ class CoverallsHelper(object):
     def get_badge_url(self):
         response = requests.get(self.url)
         if response.status_code == 200:
-            json_dict = json.loads(response.content)
+            json_dict = json.loads(response.content.decode('utf-8'))
             return json_dict['badge_url']

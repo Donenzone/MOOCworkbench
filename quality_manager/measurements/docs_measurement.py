@@ -11,7 +11,8 @@ class DocsMeasurement(MeasurementAbstraction):
     def __init__(self, experiment):
         super().__init__(experiment)
         self.measurement = ExperimentMeasure.objects.get(name='Documentation')
-        self.raw = RawMeasureResult()
+        self.raw_funcs = RawMeasureResult()
+        self.raw_class = RawMeasureResult()
 
     def measure(self):
         docs = Docs.objects.filter(experiment=self.experiment)
@@ -34,17 +35,27 @@ class DocsMeasurement(MeasurementAbstraction):
                     self.result.result = ExperimentMeasureResult.MEDIUM
                 else:
                     self.result.result = ExperimentMeasureResult.LOW
+                self.add_raw_values(coverage)
         else:
             self.result.result = ExperimentMeasureResult.LOW
 
     def add_raw_values(self, coverage):
-        self.raw.key = 'docs_coverage_funcs'
-        self.raw.value = coverage[1]
+        self.raw_funcs.key = 'docs_coverage_funcs'
+        self.raw_funcs.value = coverage[1]
 
-        self.raw.key = 'docs_coverage_classes'
-        self.raw.value = coverage[2]
+        self.raw_class.key = 'docs_coverage_classes'
+        self.raw_class.value = coverage[2]
 
     def save_and_get_result(self):
         self.result.measurement = self.measurement
         self.result.save()
+
+        self.raw_funcs.save()
+        self.result.raw_values.add(self.raw_funcs)
+
+        self.raw_class.save()
+        self.result.raw_values.add(self.raw_class)
+
+        self.result.save()
+
         return self.result

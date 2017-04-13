@@ -11,6 +11,8 @@ from quality_manager.tasks import version_control_quality_check
 from quality_manager.tasks import requirements_quality_check
 from quality_manager.tasks import test_quality_check
 from quality_manager.tasks import ci_quality_check
+from quality_manager.tasks import docs_coverage_check
+from django.template.defaultfilters import slugify
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -22,7 +24,8 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
         messages = {}
         for measurement in self._get_recent_measurements_for_all_types(self.experiment):
-            messages[measurement.measurement.name] = measurement.get_message()
+            measurement_slug = slugify(measurement.measurement.name).replace('-', '_')
+            messages[measurement_slug] = measurement.get_message()
         context['messages'] = messages
         return render(request, 'quality_manager/dashboard.html', context)
 
@@ -56,5 +59,6 @@ def refresh_measurements(request, experiment_id):
     requirements_quality_check.delay(experiment_id)
     test_quality_check.delay(experiment_id)
     ci_quality_check.delay(experiment_id)
+    docs_coverage_check.delay(experiment_id)
 
     return JsonResponse({'refresh': True})

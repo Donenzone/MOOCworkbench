@@ -17,35 +17,38 @@
   <hr />
   <h3>What to do now?</h3>
   <ul>
-    <p class="lead">Check out this repository using git clone <github-url></p>
+    <p>Check out this repository using git clone <github-url></p>
     {% for what_now in what_now_list %}
       {% if what_now %}
-      <p class="lead">{{ what_now }}</p>
+      <p>{{ what_now }}</p>
       {% endif %}
     {% endfor %}
   </ul>
 
   <hr />
   <h3>Docs</h3>
+    {{ messages.documentation }}
     <div id="docs-dashboard">
       <p>Loading...</p>
     </div>
 
   <hr />
   <h3>Version control</h3>
+    {{ messages.version_control_use }}
   <div id="vcs-dashboard">
     <p>Loading...</p>
   </div>
 
   <hr />
   <h3>Requirements</h3>
-  {{ messages.Requirements }}
+  {{ messages.dependencies_defined }}
 
   <hr />
 
   <div class="row">
       <div class="col-md-6">
         <h3>CI</h3>
+        {{ messages.use_of_ci }}
         <div id="ci-dashboard">
           <p>Loading...</p>
         </div>
@@ -53,6 +56,7 @@
 
       <div class="col-md-6">
         <h3>Testing</h3>
+        {{ messages.testing }}
         <div id="coverage-dashboard">
           <p>Loading...</p>
         </div>

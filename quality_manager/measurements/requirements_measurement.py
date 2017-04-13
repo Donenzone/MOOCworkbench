@@ -31,7 +31,6 @@ class RequirementsMeasurement(MeasurementAbstraction):
             else:
                 self.result.result = ExperimentMeasureResult.LOW
 
-
     def find_if_missing_dependency(self, log_file):
         module_match = re.search('ModuleNotFoundError: No module named', log_file)
         import_match = re.search('ImportError: cannot import name', log_file)

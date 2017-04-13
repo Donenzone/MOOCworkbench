@@ -4,6 +4,7 @@ from quality_manager.measurements.requirements_measurement import RequirementsMe
 from quality_manager.measurements.vcs_measurement import VersionControlUseMeasurement
 from quality_manager.measurements.test_measurement import TestMeasurement
 from quality_manager.measurements.ci_measurement import CiEnabledMeasurement
+from quality_manager.measurements.docs_measurement import DocsMeasurement
 from git_manager.github_helper import GitHubHelper
 
 @task
@@ -34,3 +35,10 @@ def ci_quality_check(experiment_id):
     ci_measure = CiEnabledMeasurement(experiment)
     ci_measure.measure()
     result = ci_measure.save_and_get_result()
+
+@task
+def docs_coverage_check(experiment_id):
+    experiment = Experiment.objects.get(id=experiment_id)
+    docs_measure = DocsMeasurement(experiment)
+    docs_measure.measure()
+    result = docs_measure.save_and_get_result()

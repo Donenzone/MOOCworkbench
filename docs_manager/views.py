@@ -15,7 +15,7 @@ class DocExperimentView(ExperimentContextMixin, View):
         context = super(DocExperimentView, self).get(request, experiment_id)
         steps = get_steps(self.experiment)
         github_helper = GitHubHelper(request.user, self.experiment.git_repo.name)
-        sphinx_helper = SphinxHelper(self.experiment, steps, github_helper.github_repository.owner.login)
+        sphinx_helper = SphinxHelper(self.experiment, steps, github_helper.owner)
         if page_slug:
             context['document'] = sphinx_helper.get_document(page_slug)
         else:

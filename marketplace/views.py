@@ -28,6 +28,15 @@ class PackageCreateView(CreateView):
     fields = ['package_name', 'description', 'internal_package', 'project_page']
 
 
+class InternalPackageCreateView(CreateView):
+    model = Package
+    fields = ['package_name', 'description']
+
+    def get_context_data(self, **kwargs):
+        context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
+        return context
+
+
 class PackageDetailView(DetailView):
     model = Package
 

@@ -6,15 +6,28 @@ from notifications.signals import notify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
+from autoslug import AutoSlugField
 
 PYPI_URL = 'https://pypi.python.org/pypi'
+
+
+class PackageCategory(TimeStampedModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    slug = AutoSlugField(populate_from='name')
+    parent = models.ForeignKey(to='self', null=True, blank=True)
+
+
+class PackageLanguage(TimeStampedModel):
+    language = models.CharField(max_length=255)
+
 
 class Package(TimeStampedModel):
     package_name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
-    internal_package = models.BooleanField(default=False)
-    project_page = models.URLField()
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
+    category = models.ForeignKey(to=PackageCategory)
+    language = models.ForeignKey(to=PackageLanguage)
 
     def __str__(self):
         return self.package_name
@@ -24,6 +37,22 @@ class Package(TimeStampedModel):
         if package_version.count() is not 0:
             return package_version[0]
         return None
+
+
+class ExternalPackage(Package):
+    project_page = models.URLField()
+
+
+class InternalPackage(Package):
+    pass
+
+
+class PackageResource(TimeStampedModel):
+    package = models.ForeignKey(to=Package)
+    resource = MarkdownxField()
+    url = models.URLField(null=True)
+    added_by = models.ForeignKey(to=WorkbenchUser)
+
 
 class PackageVersion(TimeStampedModel):
     package = models.ForeignKey(to=Package)
@@ -38,6 +67,7 @@ class PackageVersion(TimeStampedModel):
     def __str__(self):
         return '{0}v{1} added at {2}'.format(self.package, self.version_nr, self.created)
 
+
 @receiver(post_save, sender=PackageVersion)
 def send_notification(sender, instance, created, **kwargs):
     if created:
@@ -46,9 +76,11 @@ def send_notification(sender, instance, created, **kwargs):
         for user in subscribed_users:
             notify.send(user, recipient=user.user, verb=message)
 
+
 def update_all_versions():
     for package in Package.objects.all():
         get_latest_version(package)
+
 
 def get_latest_version(package):
     if not package.internal_package:
@@ -62,8 +94,3 @@ def get_latest_version(package):
                 newer_release = PackageVersion(package=package, version_nr=release, changelog="Auto-added", url=url)
                 newer_release.save()
 
-class PackageResource(TimeStampedModel):
-    package = models.ForeignKey(to=Package)
-    resource = MarkdownxField()
-    url = models.URLField(null=True)
-    added_by = models.ForeignKey(to=WorkbenchUser)

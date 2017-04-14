@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Package, PackageVersion, PackageResource
+from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, DetailView, View
 from user_manager.models import get_workbench_user
@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from markdownx.utils import markdownify
 
 
-class marketplaceIndex(View):
+class MarketplaceIndex(View):
     def get(self, request):
         context = {}
         context['new_packages'] = Package.objects.all().order_by('-created')[:10]
@@ -23,18 +23,27 @@ class PackageListView(ListView):
     model = Package
 
 
-class PackageCreateView(CreateView):
-    model = Package
+class ExternalPackageCreateView(CreateView):
+    model = ExternalPackage
     fields = ['package_name', 'description', 'internal_package', 'project_page']
+    template_name = 'marketplace/package_form.html'
 
 
 class InternalPackageCreateView(CreateView):
-    model = Package
-    fields = ['package_name', 'description']
+    model = InternalPackage
+    fields = ['package_name', 'description', 'category', 'language']
+    template_name = 'marketplace/package_form.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
-        return context
+    def form_valid(self, form):
+        step_id = self.kwargs('step_id')
+        experiment_id = self.kwargs('experiment_id')
+
+        # create new github repository
+        # take code from module and commit it to new repo
+        # create git repository in DB
+        # save new internal package
+
+        return super(InternalPackageCreateView, self).form_valid(form)
 
 
 class PackageDetailView(DetailView):

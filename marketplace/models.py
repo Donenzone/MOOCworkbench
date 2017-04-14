@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 from autoslug import AutoSlugField
+from git_manager.models import GitRepository
 
 PYPI_URL = 'https://pypi.python.org/pypi'
 
@@ -17,9 +18,15 @@ class PackageCategory(TimeStampedModel):
     slug = AutoSlugField(populate_from='name')
     parent = models.ForeignKey(to='self', null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class PackageLanguage(TimeStampedModel):
     language = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.language
 
 
 class Package(TimeStampedModel):
@@ -44,7 +51,7 @@ class ExternalPackage(Package):
 
 
 class InternalPackage(Package):
-    pass
+    repo = models.ForeignKey(to=GitRepository)
 
 
 class PackageResource(TimeStampedModel):

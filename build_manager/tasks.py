@@ -1,6 +1,6 @@
 from celery.decorators import task
 from experiments_manager.models import Experiment
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from build_manager.travis_ci_helper import TravisCiHelper
 
 @task

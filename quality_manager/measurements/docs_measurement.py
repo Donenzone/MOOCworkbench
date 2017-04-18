@@ -3,7 +3,7 @@ from quality_manager.models import ExperimentMeasure, ExperimentMeasureResult
 from quality_manager.models import RawMeasureResult
 from docs_manager.sphinx_helper import SphinxHelper
 from experiments_manager.models import ChosenExperimentSteps
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from docs_manager.models import Docs
 
 

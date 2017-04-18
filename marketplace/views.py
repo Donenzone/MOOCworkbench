@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from markdownx.utils import markdownify
+from git_manager.helpers.git_helper import GitHelper
 
 
 class MarketplaceIndex(View):
@@ -36,12 +37,28 @@ class InternalPackageCreateView(CreateView):
 
     def form_valid(self, form):
         step_id = self.kwargs('step_id')
+        step_folder = ChosenExperimentSteps.objects.get(pk=step_id).folder_name()
         experiment_id = self.kwargs('experiment_id')
+        experiment = verify_and_get_experiment(self.request, experiment_id)
 
-        # create new github repository
-        # take code from module and commit it to new repo
+        # create new GitHub repository
+        github_helper_package = GitHubHelper(owner, package_name, create=True)
+
         # create git repository in DB
+
+        # clone current experiment
+        github_helper_experiment = GitHubHelper(experiment.owner, experiment.git_repo.name)
+        git_helper = GitHelper(github_helper_experiment)
+        git_helper.clone_git_repository()
+
+        # take code from module and commit it to new repo
+        git_helper.filter_and_checkout_subfolder(step_folder, step_folder)
+        new_remote = github_helper_package.get_clone_url()
+        git_helper.set_remote(new_remote)
+        git_helper.push_changes()
+
         # save new internal package
+
 
         return super(InternalPackageCreateView, self).form_valid(form)
 

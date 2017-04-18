@@ -6,7 +6,7 @@ from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
 from quality_manager.models import RawMeasureResult
 from build_manager.models import TravisInstance
 from build_manager.travis_ci_helper import TravisCiHelper
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 
 
 class RequirementsMeasurement(MeasurementAbstraction):

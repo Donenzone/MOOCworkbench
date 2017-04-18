@@ -13,7 +13,7 @@ from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.helper import get_steps
 from markdown2 import Markdown
 from django.contrib import messages
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from django.shortcuts import get_object_or_404
 from git_manager.mixins.repo_file_list import RepoFileListMixin
 from experiments_manager.mixins import ActiveStepMixin

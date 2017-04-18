@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect, reverse
 from docs_manager.sphinx_helper import SphinxHelper
 from experiments_manager.helper import get_steps, verify_and_get_experiment
 from django.contrib.auth.decorators import login_required
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from docs_manager.models import Docs
-from git_manager.clone_module import pull_git_repository, clone_git_repository
+from git_manager.helpers.git_helper import GitHelper
 from django.views import View
 from experiments_manager.mixins import ExperimentContextMixin
 
@@ -49,7 +49,8 @@ def toggle_docs_status(request, experiment_id):
 
     if docs.enabled:
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-        clone_git_repository(github_helper)
+        git_helper = GitHelper(github_helper)
+        git_helper.clone_git_repository()
 
     return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
 

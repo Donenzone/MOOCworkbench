@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from .models import GitRepository
 from git_manager.serializer import GitRepositorySerializer
 from django.shortcuts import render
-from .github_helper import *
+from git_manager.helpers.github_helper import *
 
 
 class GitRepositoryViewSet(viewsets.ModelViewSet):

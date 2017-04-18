@@ -8,7 +8,7 @@ from django.test import Client
 from django.core.management import call_command
 from django.shortcuts import reverse
 import json
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
 import base64
 

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from experiments_manager.helper import verify_and_get_experiment
 from build_manager.models import TravisInstance, TravisCiConfig
 from build_manager.travis_ci_helper import TravisCiHelper
-from git_manager.helper import get_github_helper
+from git_manager.helpers.helper import get_github_helper
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 

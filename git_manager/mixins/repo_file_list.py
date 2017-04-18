@@ -1,4 +1,4 @@
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from experiments_manager.helper import verify_and_get_experiment
 
 

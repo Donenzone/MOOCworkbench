@@ -1,16 +1,36 @@
 from experiments_manager.models import ChosenExperimentSteps, Experiment
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from django.template.defaultfilters import slugify
 import os
 
 class GitRepoInit(object):
+    def __init__(self, github_helper):
+        self.github_helper = github_helper
+
+    def _create_new_file_in_repo(self, file_name, commit_message, folder='', contents=''):
+        self.github_helper.add_file_to_repository(file_name, commit_message, contents=contents, folder=folder)
+
+    class Meta:
+        abstract = True
+
+
+class PackageGitRepoInit(GitRepoInit):
+    def __init__(self, github_helper, existing_repo):
+        super().__init__(gh)
+        self.existing_repo = existing_repo
+
+
+
+class ExperimentGitRepoInit(GitRepoInit):
+
     TEMPLATE_FOLDER = 'codetemplates/'
     PROJECTNAME_VAR = 'PROJECTNAME'
     STEPFOLDER_VAR = 'STEPFOLDER'
     AUTHOR_VAR = 'AUTHOR'
 
     def __init__(self, experiment, type='python'):
-        self.github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
+        gh = GitHubHelper(experiment.owner, experiment.git_repo.name)
+        super().__init__(gh)
         self.experiment = experiment
         self.template_type_folder = '{0}{1}/'.format(self.TEMPLATE_FOLDER, type)
 
@@ -58,9 +78,6 @@ class GitRepoInit(object):
 
     def create_data_folder(self):
         self.create_new_file_in_repo('__init__.py', 'Added data folder', 'data')
-
-    def create_new_file_in_repo(self, file_name, commit_message, folder='', contents=''):
-        self.github_helper.add_file_to_repository(file_name, commit_message, contents=contents, folder=folder)
 
     def get_file_contents(self, filename, part_of_step=False, folder=None):
         if part_of_step:

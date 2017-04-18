@@ -4,7 +4,7 @@ from coverage_manager.models import CodeCoverage
 from build_manager.models import TravisInstance
 from django.contrib.auth.decorators import login_required
 from experiments_manager.helper import verify_and_get_experiment
-from git_manager.helper import get_github_helper
+from git_manager.helpers.helper import get_github_helper
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 

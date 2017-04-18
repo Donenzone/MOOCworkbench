@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
+from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, DetailView, View
 from user_manager.models import get_workbench_user
@@ -8,6 +8,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from markdownx.utils import markdownify
 from git_manager.helpers.git_helper import GitHelper
+from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.models import GitRepository
+from experiments_manager.models import ChosenExperimentSteps
+from experiments_manager.helper import verify_and_get_experiment
 
 
 class MarketplaceIndex(View):
@@ -36,30 +40,35 @@ class InternalPackageCreateView(CreateView):
     template_name = 'marketplace/package_form.html'
 
     def form_valid(self, form):
-        step_id = self.kwargs('step_id')
+        step_id = self.kwargs['step_id']
         step_folder = ChosenExperimentSteps.objects.get(pk=step_id).folder_name()
-        experiment_id = self.kwargs('experiment_id')
+        experiment_id = self.kwargs['experiment_id']
         experiment = verify_and_get_experiment(self.request, experiment_id)
 
         # create new GitHub repository
-        github_helper_package = GitHubHelper(owner, package_name, create=True)
+        github_helper_package = GitHubHelper(experiment.owner, 'Data-gathering-package')#, create=True)
 
         # create git repository in DB
+        repo = github_helper_package.github_repository
+        git_repo_obj = GitRepository()
+        git_repo_obj.name = repo.name
+        git_repo_obj.owner = get_workbench_user(self.request.user)
+        git_repo_obj.github_url = repo.html_url
+        git_repo_obj.save()
 
         # clone current experiment
         github_helper_experiment = GitHubHelper(experiment.owner, experiment.git_repo.name)
         git_helper = GitHelper(github_helper_experiment)
-        git_helper.clone_git_repository()
+        #git_helper.clone_repository()
 
         # take code from module and commit it to new repo
-        git_helper.filter_and_checkout_subfolder(step_folder, step_folder)
+        git_helper.filter_and_checkout_subfolder(step_folder)
         new_remote = github_helper_package.get_clone_url()
         git_helper.set_remote(new_remote)
         git_helper.push_changes()
 
         # save new internal package
-
-
+        form.instance.repo = git_repo_obj
         return super(InternalPackageCreateView, self).form_valid(form)
 
 

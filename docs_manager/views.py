@@ -50,7 +50,7 @@ def toggle_docs_status(request, experiment_id):
     if docs.enabled:
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
         git_helper = GitHelper(github_helper)
-        git_helper.clone_git_repository()
+        git_helper.clone_repository()
 
     return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
 

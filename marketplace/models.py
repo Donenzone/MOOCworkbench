@@ -35,6 +35,7 @@ class Package(TimeStampedModel):
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
     category = models.ForeignKey(to=PackageCategory)
     language = models.ForeignKey(to=PackageLanguage)
+    owner = models.ForeignKey(to=WorkbenchUser, related_name='owner')
 
     def __str__(self):
         return self.package_name

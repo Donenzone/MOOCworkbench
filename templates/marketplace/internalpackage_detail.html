@@ -1,0 +1,147 @@
+{% extends 'marketplace/marketplace_index.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+{% load comments %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb object.package_name "package_detail" object.id %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <h2>Package: {{ object.package_name }}</h2>
+            </div>
+            <div class="col-md-3">
+                {% if not workbench_user in object.subscribed_users.all %}
+                    <a href="{% url 'package_subscribe' object.pk %}" class="btn btn-default">Subscribe for updates</a>
+                {% else %}
+                    <a href="{% url 'package_subscribe' object.pk %}">Unsubscribe</a>
+                {% endif %}
+            </div>
+        </div>
+        <p></p>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <div class="panel-heading">General information</div>
+                    <div class="panel-body">
+                        <table class="table">
+                            <tr>
+                                <td>Description</td>
+                                <td>{{ object.description }}
+                            </tr>
+                            <tr>
+                                <td>Created by</td>
+                                <td>{{ object.owner }}
+                            </tr>
+                            <tr>
+                                <td>Added at</td>
+                                <td>{{ object.created }}
+                            </tr>
+                            <tr>
+                                <td>Category</td>
+                                <td>{{ object.category }}
+                            </tr>
+                            <tr>
+                                <td>Language</td>
+                                <td>{{ object.language }}
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="panel panel-info">
+                    <div class="panel-heading">Version history</div>
+                    <div class="panel-body">
+                        <table class="table">
+                            <tr>
+                                <th>Version nr</th>
+                                <th>Date added</th>
+                            </tr>
+                            {% for version in version_history %}
+                                <tr>
+                                    <td>
+                                        {{ version.version_nr }}
+                                    </td>
+                                    <td>
+                                        {{ version.created }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <a href="{% url 'packageversion_new' object.pk %}" class="btn btn-default">Add New Version</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h3>Source code</h3>
+
+        <hr />
+        <h3>Package resources</h3>
+        <p><a href="#">View all resources for this package</a></p>
+
+        {% for resource in resources %}
+            <div class="panel panel-info">
+                <div class="panel-heading">Resource by {{ resource.added_by }}</div>
+                <div class="panel-body">
+                    <p>{{ resource.markdown|safe|truncatechars:55 }}</p>
+                </div>
+                <div class="panel-footer">Resource URL: <a href="{{ resource.url }}">{{ resource.url }}</a></div>
+            </div>
+        {% endfor %}
+
+        <p>Found a useful blog, website or other information that you wish to share with others?</p>
+        <p><a href="{% url 'packageresource_new' object.pk %}" class="btn btn-default">Add a New Resource</a></p>
+
+        <hr />
+
+        <h3>Comments</h3>
+        {% get_comment_form for object as comment_form %}
+        <div class="container" style="margin-bottom:20px">
+            <form action="{% comment_form_target %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label" for="id_comment">Comment</label>
+                    <textarea class="form-control" id="id_comment" maxlength="300" style="width:300px" name="comment" rows="5" required=""></textarea>
+                </div>
+                {{ comment_form.content_type }}
+                {{ comment_form.object_pk }}
+                {{ comment_form.timestamp }}
+                {{ comment_form.security_hash }}
+                <input type="submit" name="submit" value="Leave Comment" class="btn btn-primary">
+            </form>
+        </div>
+
+        <div class="container">
+            {% get_comment_list for object as comment_list %}
+            {% for comment in comment_list %}
+                <div class="row">
+                    <div class="col-sm-1">
+                        <div class="thumbnail">
+                            <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                        </div><!-- /thumbnail -->
+                    </div><!-- /col-sm-1 -->
+
+                    <div class="col-sm-9 col-md-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>{{ comment.user }}</strong> <span class="text-muted">{{ comment.submit_date }}</span>
+                            </div>
+                            <div class="panel-body">
+                                {{ comment.comment }}
+                            </div><!-- /panel-body -->
+                        </div><!-- /panel panel-default -->
+                    </div><!-- /col-sm-5 -->
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

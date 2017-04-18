@@ -17,8 +17,8 @@ from experiments_manager.helper import verify_and_get_experiment
 class MarketplaceIndex(View):
     def get(self, request):
         context = {}
-        context['new_packages'] = Package.objects.all().order_by('-created')[:10]
-        context['new_internal_packages'] = Package.objects.filter(internal_package=True).order_by('-created')[:10]
+        context['new_packages'] = ExternalPackage.objects.all().order_by('-created')[:10]
+        context['new_internal_packages'] = InternalPackage.objects.all().order_by('-created')[:10]
         context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:10]
         context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:10]
         return render(request, 'marketplace/marketplace_index.html', context=context)
@@ -30,7 +30,7 @@ class PackageListView(ListView):
 
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
-    fields = ['package_name', 'description', 'internal_package', 'project_page']
+    fields = ['package_name', 'description', 'project_page']
     template_name = 'marketplace/package_form.html'
 
 

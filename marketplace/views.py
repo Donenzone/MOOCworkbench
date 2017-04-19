@@ -46,7 +46,7 @@ class InternalPackageCreateView(CreateView):
         experiment = verify_and_get_experiment(self.request, experiment_id)
 
         # save new internal package
-        form.instance.repo = create_new_internal_package(experiment, step_folder, self.request.user)
+        form.instance.repo = create_new_internal_package(form.instance, experiment, step_folder, self.request.user)
         return super(InternalPackageCreateView, self).form_valid(form)
 
 

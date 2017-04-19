@@ -34,6 +34,9 @@ class GitHelper(object):
     def filter_and_checkout_subfolder(self, folder_name):
         subprocess.call(['git', 'filter-branch', '--prune-empty', '--subdirectory-filter', folder_name, 'master'], cwd=self.repo_dir)
 
+    def move_repo_contents_to_folder(self, folder_name):
+        subprocess.call(['mv', '.', folder_name], cwd=self.repo_dir)
+
     def set_remote(self, new_remote):
         subprocess.call(['git', 'remote', 'set-url', 'origin', new_remote], cwd=self.repo_dir)
 

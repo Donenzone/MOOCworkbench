@@ -10,4 +10,12 @@
 
 {% block content %}
     <h2>{{ object.package_name }}</h2>
+
+    <h3>Settings</h3>
+    {{ package_settings_form }}
+
+    <h3>Workbench services</h3>
+
+    <h4>Dependencies</h4>
+    {{ dependencies_form }}
 {% endblock %}

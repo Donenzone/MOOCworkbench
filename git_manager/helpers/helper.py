@@ -1,4 +1,4 @@
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 
 def get_github_helper(request, experiment):
     assert experiment.owner.user == request.user

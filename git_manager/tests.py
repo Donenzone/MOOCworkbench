@@ -1,16 +1,16 @@
+import base64
+
+from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
+from django.contrib.auth.models import User
+from django.core.management import call_command
+from django.test import Client
 from django.test import TestCase
 from unittest.mock import patch
-from user_manager.models import WorkbenchUser
-from django.contrib.auth.models import User
+
 from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
-from django.test import Client
-from django.core.management import call_command
-from django.shortcuts import reverse
-import json
-from git_manager.github_helper import GitHubHelper
-from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
-import base64
+from git_manager.helpers.github_helper import GitHubHelper
+from user_manager.models import WorkbenchUser
 
 
 class GitManagerTestCases(TestCase):
@@ -19,7 +19,7 @@ class GitManagerTestCases(TestCase):
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
-        self.experiment = Experiment.objects.create(title='Experiment', description='test', version='1.0', owner=self.workbench_user, git_repo=self.git_repo)
+        self.experiment = Experiment.objects.create(title='Experiment', description='test', owner=self.workbench_user, git_repo=self.git_repo)
         self.client = Client()
         self.client.login(username='test', password='test')
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
@@ -42,55 +42,55 @@ class GitManagerTestCases(TestCase):
         args = [self.user, 'test']
         self.assertRaises(ValueError, github_helper, *args)
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_init_github_helper(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_init_github_helper_create(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test', create=True)
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.github_repository.repo_name, 'newly_created_repo')
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_github_owner(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.owner, 'test')
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_init_github_helper(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.get_clone_url(), 'https://A@clone-url')
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_github_list_folder(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.list_files_in_repo('test1'), GithubMockRepo.TEST1_LIST)
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_github_list_folder_with_slash(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.list_files_in_repo('/test1'), GithubMockRepo.TEST1_LIST)
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_github_list_folder_empty(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.list_files_in_repo(), GithubMockRepo.TEST2_LIST)
 
-    @patch('git_manager.github_helper.GitHubHelper._get_github_object')
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_view_file_in_repo(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')

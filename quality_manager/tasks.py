@@ -5,7 +5,7 @@ from quality_manager.measurements.vcs_measurement import VersionControlUseMeasur
 from quality_manager.measurements.test_measurement import TestMeasurement
 from quality_manager.measurements.ci_measurement import CiEnabledMeasurement
 from quality_manager.measurements.docs_measurement import DocsMeasurement
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 
 @task
 def requirements_quality_check(experiment_id):

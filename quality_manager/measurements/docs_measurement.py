@@ -3,7 +3,7 @@ from quality_manager.models import ExperimentMeasure, ExperimentMeasureResult
 from quality_manager.models import RawMeasureResult
 from docs_manager.sphinx_helper import SphinxHelper
 from experiments_manager.models import ChosenExperimentSteps
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from docs_manager.models import Docs
 
 
@@ -17,7 +17,7 @@ class DocsMeasurement(MeasurementAbstraction):
     def measure(self):
         docs = Docs.objects.filter(experiment=self.experiment)
         docs_instance = None
-        if docs.count() is not 0:
+        if docs:
             docs_instance = docs[0]
         if docs_instance and docs_instance.enabled:
             github_helper = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)

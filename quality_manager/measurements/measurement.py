@@ -1,7 +1,7 @@
 from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
 from datetime import datetime, timedelta
 from abc import abstractmethod
-from git_manager.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from statistics import median, mean
 
 class MeasurementAbstraction(object):

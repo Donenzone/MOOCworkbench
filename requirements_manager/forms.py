@@ -1,10 +1,12 @@
 from django.forms import ModelForm
-from .models import ExperimentRequirement
 from django.forms import TextInput
 
-class ExperimentRequirementForm(ModelForm):
+from requirements_manager.models import Requirement
+
+
+class RequirementForm(ModelForm):
     class Meta:
-        model = ExperimentRequirement
+        model = Requirement
         fields = ['package_name', 'version']
 
         widgets = {

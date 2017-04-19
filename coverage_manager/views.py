@@ -4,7 +4,7 @@ from coverage_manager.models import CodeCoverage
 from build_manager.models import TravisInstance
 from django.contrib.auth.decorators import login_required
 from experiments_manager.helper import verify_and_get_experiment
-from git_manager.helper import get_github_helper
+from git_manager.helpers.helper import get_github_helper
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 
@@ -13,11 +13,11 @@ def coveralls_enable(request):
     assert 'experiment_id' in request.POST
     experiment_id = request.POST['experiment_id']
     experiment = verify_and_get_experiment(request, experiment_id)
-    travis_instance = TravisInstance.objects.get(experiment=experiment)
+    travis_instance = experiment.travis
 
     if travis_instance.enabled:
         existing_config = CodeCoverage.objects.filter(travis_instance=travis_instance)
-        if existing_config.count() is not 0:
+        if existing_config:
             existing_config = existing_config[0]
             existing_config.enabled = True
             existing_config.save()
@@ -41,7 +41,7 @@ def coveralls_disable(request):
     assert 'experiment_id' in request.POST
     experiment_id = request.POST['experiment_id']
     experiment = verify_and_get_experiment(request, experiment_id)
-    travis_instance = TravisInstance.objects.get(experiment=experiment)
+    travis_instance = experiment.travis
 
     current_config = CodeCoverage.objects.get(travis_instance=travis_instance)
     current_config.enabled = False
@@ -53,15 +53,14 @@ def coveralls_disable(request):
 @login_required
 def coveralls_status(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
-    travis_instance = TravisInstance.objects.filter(experiment=experiment)
+    travis_instance = experiment.travis
     context = {}
-    if travis_instance.count() is not 0:
-        travis_instance = travis_instance[0]
+    if travis_instance:
         current_config = CodeCoverage.objects.filter(travis_instance=travis_instance)
         context['experiment_id'] = experiment.id
         context['configured'] = False
         context['travis'] = travis_instance.enabled
-        if current_config.count() is not 0:
+        if current_config:
             context['current_config'] = current_config[0]
             context['configured'] = context['current_config'].enabled
     else:

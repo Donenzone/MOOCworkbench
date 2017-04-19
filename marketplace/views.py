@@ -1,19 +1,24 @@
 from django.shortcuts import render
-from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, DetailView, View
-from user_manager.models import get_workbench_user
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from markdownx.utils import markdownify
+
+from user_manager.models import get_workbench_user
+from experiments_manager.models import ChosenExperimentSteps
+from experiments_manager.helper import verify_and_get_experiment
+from git_manager.repo_init import PackageGitRepoInit
+from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 
 
 class MarketplaceIndex(View):
     def get(self, request):
         context = {}
-        context['new_packages'] = Package.objects.all().order_by('-created')[:10]
-        context['new_internal_packages'] = Package.objects.filter(internal_package=True).order_by('-created')[:10]
+        context['new_packages'] = ExternalPackage.objects.all().order_by('-created')[:10]
+        context['new_internal_packages'] = InternalPackage.objects.all().order_by('-created')[:10]
         context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:10]
         context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:10]
         return render(request, 'marketplace/marketplace_index.html', context=context)
@@ -25,7 +30,7 @@ class PackageListView(ListView):
 
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
-    fields = ['package_name', 'description', 'internal_package', 'project_page']
+    fields = ['package_name', 'description', 'project_page']
     template_name = 'marketplace/package_form.html'
 
 
@@ -35,22 +40,47 @@ class InternalPackageCreateView(CreateView):
     template_name = 'marketplace/package_form.html'
 
     def form_valid(self, form):
-        step_id = self.kwargs('step_id')
-        experiment_id = self.kwargs('experiment_id')
+        step_id = self.kwargs['step_id']
+        step_folder = ChosenExperimentSteps.objects.get(pk=step_id).folder_name()
+        experiment_id = self.kwargs['experiment_id']
+        experiment = verify_and_get_experiment(self.request, experiment_id)
+        form.instance.owner = experiment.owner
 
-        # create new github repository
-        # take code from module and commit it to new repo
-        # create git repository in DB
         # save new internal package
+        package_repo = PackageGitRepoInit(form.instance, experiment, step_folder)
+        git_repo_obj = package_repo.init_repo_boilerplate()
 
+        form.instance.repo = git_repo_obj
         return super(InternalPackageCreateView, self).form_valid(form)
 
 
-class PackageDetailView(DetailView):
-    model = Package
+class ExternalPackageDetailView(DetailView):
+    model = ExternalPackage
 
     def get_context_data(self, **kwargs):
-        context = super(PackageDetailView, self).get_context_data(**kwargs)
+        context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
+        context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        for resource in resources:
+            resource.markdown = markdownify(resource.resource)
+        context['resources'] = resources
+        return context
+
+
+class InternalPackageDashboard(View):
+    def get(self, request, pk):
+        package = get_object_or_404(InternalPackage, pk=pk)
+        return render(request, 'marketplace/internalpackage_dashboard.html', {'object': package})
+
+    def post(self):
+        pass
+
+
+class InternalPackageDetailView(DetailView):
+    model = InternalPackage
+
+    def get_context_data(self, **kwargs):
+        context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
         context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
         resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
         for resource in resources:

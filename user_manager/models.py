@@ -15,16 +15,19 @@ class WorkbenchUser(models.Model):
     def __str__(self):
         return self.user.username
 
+
 def get_workbench_user(user):
     return WorkbenchUser.objects.get(user=user)
+
 
 @receiver(post_save, sender=User)
 def create_workbench_user(sender, instance, created, **kwargs):
     if created:
         workbench_user = WorkbenchUser.objects.filter(user=instance)
-        if workbench_user.count() == 0:
+        if not workbench_user:
             new_workbench_user = WorkbenchUser(user=instance, netid='superuser')
             new_workbench_user.save()
+
 
 class SSHKeys(models.Model):
     ssh_key = models.CharField(max_length=1000, null=True)

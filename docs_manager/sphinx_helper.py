@@ -47,7 +47,10 @@ class SphinxHelper(object):
             conf_file.close()
 
     def _make_command(self, command, arg=None):
-        subprocess.call(['make', '-C', self.path, command, arg])
+        if arg:
+            subprocess.call(['make', '-C', self.path, command, arg])
+        else:
+            subprocess.call(['make', '-C', self.path, command])
 
     def build_and_sync_docs(self):
         build_path = '{0}_build/html/'.format(self.path)

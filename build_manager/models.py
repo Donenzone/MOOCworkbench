@@ -1,5 +1,4 @@
 from django.db import models
-from experiments_manager.models import Experiment
 
 
 class TravisCiConfig(models.Model):
@@ -16,7 +15,6 @@ class TravisInstance(models.Model):
         (SUCCESS, 'Success'),
         (CANCELLED, 'Cancelled')
     }
-    experiment = models.ForeignKey(to=Experiment)
     last_build_status = models.CharField(max_length=1, choices=BUILD_STATUS, null=True)
     config = models.ForeignKey(to=TravisCiConfig)
     enabled = models.BooleanField(default=True)

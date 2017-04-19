@@ -16,7 +16,7 @@ class Task(models.Model):
         return self.name
 
 
-class feedback(models.Model):
+class Feedback(models.Model):
     like = models.BooleanField(verbose_name="Overall, was your experience positive?")
     feedback_like = models.TextField(null=True, verbose_name="What did you like about your experience?")
     feedback_dislike = models.TextField(null=True, verbose_name="What didn't you like about your experience?")

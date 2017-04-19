@@ -7,5 +7,5 @@ setup(name='{PACKAGE_NAME}',
       author='{AUTHOR}',
       author_email='{AUTHOR_EMAIL}',
       license='{LICENSE}',
-      packages=['{PAKCAGE}'],
+      packages=['{PACKAGE}'],
       zip_safe=False)

@@ -1,5 +1,6 @@
 import subprocess
 import os
+import shutil
 
 from git import Repo
 
@@ -35,7 +36,16 @@ class GitHelper(object):
         subprocess.call(['git', 'filter-branch', '--prune-empty', '--subdirectory-filter', folder_name, 'master'], cwd=self.repo_dir)
 
     def move_repo_contents_to_folder(self, folder_name):
-        subprocess.call(['mv', '.', folder_name], cwd=self.repo_dir)
+        folder_path = '{0}/{1}'.format(self.repo_dir, folder_name)
+        current_path = '{0}'.format(self.repo_dir)
+        dir_list = os.listdir(current_path)
+        subprocess.call(['mkdir', folder_path])
+        for file in dir_list:
+            file_path = '{0}/{1}'.format(current_path, file)
+            if os.path.isfile(file_path):
+                shutil.move(file_path, folder_path)
+                self.repo.git.rm(file)
+        self.repo.git.add(folder_name)
 
     def set_remote(self, new_remote):
         subprocess.call(['git', 'remote', 'set-url', 'origin', new_remote], cwd=self.repo_dir)
@@ -43,3 +53,4 @@ class GitHelper(object):
     def push_changes(self):
         origin = self.repo.remotes.origin
         origin.push()
+        #subprocess.call(['git', 'push'], cwd=self.repo_dir)

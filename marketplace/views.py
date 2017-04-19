@@ -10,7 +10,7 @@ from markdownx.utils import markdownify
 from user_manager.models import get_workbench_user
 from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
-from marketplace.helpers.internal_package_helper import create_new_internal_package
+from git_manager.repo_init import PackageGitRepoInit
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 
 
@@ -44,9 +44,13 @@ class InternalPackageCreateView(CreateView):
         step_folder = ChosenExperimentSteps.objects.get(pk=step_id).folder_name()
         experiment_id = self.kwargs['experiment_id']
         experiment = verify_and_get_experiment(self.request, experiment_id)
+        form.instance.owner = experiment.owner
 
         # save new internal package
-        form.instance.repo = create_new_internal_package(form.instance, experiment, step_folder, self.request.user)
+        package_repo = PackageGitRepoInit(form.instance, experiment, step_folder)
+        git_repo_obj = package_repo.init_repo_boilerplate()
+
+        form.instance.repo = git_repo_obj
         return super(InternalPackageCreateView, self).form_valid(form)
 
 

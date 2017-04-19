@@ -19,7 +19,7 @@ class ExperimentTestCase(TestCase):
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
-        self.experiment = Experiment.objects.create(title='Experiment', description='test', version='1.0', owner=self.workbench_user, git_repo=self.git_repo)
+        self.experiment = Experiment.objects.create(title='Experiment', description='test', owner=self.workbench_user, git_repo=self.git_repo)
         self.client = Client()
         self.client.login(username='test', password='test')
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)

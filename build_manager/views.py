@@ -13,9 +13,8 @@ def enable_ci_builds(request):
     experiment_id = request.POST['experiment_id']
     experiment = verify_and_get_experiment(request, experiment_id)
 
-    existing_config = TravisInstance.objects.filter(experiment=experiment)
-    if existing_config.count() is not 0:
-        existing_config = existing_config[0]
+    existing_config = experiment.travis
+    if existing_config:
         existing_config.enabled = True
         existing_config.save()
         enable_travis(request, experiment)
@@ -62,11 +61,11 @@ def build_experiment_now(request):
 def build_status(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     context = {}
-    current_config = TravisInstance.objects.filter(experiment=experiment)
+    current_config = experiment.travis
     context['experiment_id'] = experiment.id
     context['configured'] = False
-    if current_config.count() is not 0:
-        context['current_config'] = current_config[0]
+    if current_config:
+        context['current_config'] = current_config
         context['configured'] = context['current_config'].enabled
         github_helper = get_github_helper(request, experiment)
         context['reposlug'] = experiment.git_repo.name
@@ -86,8 +85,11 @@ def get_log_from_last_build(request, experiment_id):
 def create_new_ci_config(request, experiment):
     new_ci_config = TravisCiConfig()
     new_ci_config.save()
-    new_ci = TravisInstance(experiment=experiment, config=new_ci_config)
+    new_ci = TravisInstance(config=new_ci_config)
     new_ci.save()
+
+    experiment.travis = new_ci
+    experiment.save()
 
     enable_travis(request, experiment)
 

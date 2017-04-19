@@ -1,13 +1,19 @@
-from django.db import models
-from user_manager.models import WorkbenchUser
-from markdownx.models import MarkdownxField
 import xmlrpc.client
-from notifications.signals import notify
+
+from autoslug import AutoSlugField
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from markdownx.models import MarkdownxField
 from model_utils.models import TimeStampedModel
-from autoslug import AutoSlugField
+from notifications.signals import notify
+
+from build_manager.models import TravisInstance
+from docs_manager.models import Docs
 from git_manager.models import GitRepository
+from requirements_manager.models import Requirement
+from user_manager.models import WorkbenchUser
+
 
 PYPI_URL = 'https://pypi.python.org/pypi'
 
@@ -42,7 +48,7 @@ class Package(TimeStampedModel):
 
     def get_latest_package_version(self):
         package_version = PackageVersion.objects.filter(package=self).order_by('-created')
-        if package_version.count() is not 0:
+        if package_version:
             return package_version[0]
         return None
 
@@ -53,6 +59,9 @@ class ExternalPackage(Package):
 
 class InternalPackage(Package):
     repo = models.ForeignKey(to=GitRepository)
+    travis = models.ForeignKey(to=TravisInstance, null=True)
+    docs = models.ForeignKey(to=Docs, null=True)
+    requirements = models.ManyToManyField(to=Requirement)
 
 
 class PackageResource(TimeStampedModel):

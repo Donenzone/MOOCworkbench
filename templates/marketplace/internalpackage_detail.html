@@ -23,7 +23,11 @@
                 {% endif %}
             </div>
         </div>
-        <p></p>
+        <p>
+            {% if request.user == object.owner.user %}
+                <a href="{% url 'internalpackage_dashboard' object.pk %}" class="btn btn-primary">Go To Package Dashboard</a>
+            {% endif %}
+        </p>
         <div class="row">
             <div class="col-md-6">
                 <div class="panel panel-info">
@@ -80,9 +84,6 @@
                 </div>
             </div>
         </div>
-
-        <hr />
-        <h3>Source code</h3>
 
         <hr />
         <h3>Package resources</h3>

@@ -11,5 +11,5 @@ class DocsMixin(object):
 
     def _get_docs(self, experiment):
         docs = Docs.objects.filter(experiment=experiment)
-        if docs.count() is not 0:
+        if docs:
             return docs[0]

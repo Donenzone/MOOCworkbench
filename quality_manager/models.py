@@ -1,7 +1,7 @@
 from django.db import models
 from experiments_manager.models import Experiment
 from model_utils.models import TimeStampedModel
-# Create your models here.
+
 
 class ExperimentMeasure(models.Model):
     name = models.CharField(max_length=255)
@@ -23,12 +23,14 @@ class ExperimentMeasure(models.Model):
     def get_high_message(self):
         return '{0}: {1}'.format(self.name, self.high_message)
 
+
 class RawMeasureResult(models.Model):
     key = models.CharField(max_length=255)
     value = models.FloatField(max_length=255)
 
     def __str__(self):
         return 'Key: {0} with value: {1}'.format(self.key, str(self.value))
+
 
 class ExperimentMeasureResult(TimeStampedModel):
     HIGH = 'H'

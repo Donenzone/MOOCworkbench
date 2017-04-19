@@ -26,4 +26,7 @@ def create_new_internal_package(experiment, step_folder, user):
     new_remote = github_helper_package.get_clone_url()
     git_helper.set_remote(new_remote)
     git_helper.push_changes()
+
+    # add boilerplate code, e.g. setup.py for pip
+
     return git_repo_obj

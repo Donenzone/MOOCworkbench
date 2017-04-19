@@ -17,7 +17,7 @@ class DocsMeasurement(MeasurementAbstraction):
     def measure(self):
         docs = Docs.objects.filter(experiment=self.experiment)
         docs_instance = None
-        if docs.count() is not 0:
+        if docs:
             docs_instance = docs[0]
         if docs_instance and docs_instance.enabled:
             github_helper = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)

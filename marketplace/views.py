@@ -1,14 +1,17 @@
 from django.shortcuts import render
-from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, DetailView, View
-from user_manager.models import get_workbench_user
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from markdownx.utils import markdownify
+
+from user_manager.models import get_workbench_user
 from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
+from marketplace.helpers.internal_package_helper import create_new_internal_package
+from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 
 
 class MarketplaceIndex(View):
@@ -37,16 +40,14 @@ class InternalPackageCreateView(CreateView):
     template_name = 'marketplace/package_form.html'
 
     def form_valid(self, form):
-        response = super(InternalPackageCreateView, self).form_valid(form)
-        print(response)
         step_id = self.kwargs['step_id']
         step_folder = ChosenExperimentSteps.objects.get(pk=step_id).folder_name()
         experiment_id = self.kwargs['experiment_id']
         experiment = verify_and_get_experiment(self.request, experiment_id)
 
         # save new internal package
-        form.instance.repo = git_repo_obj
-        return
+        form.instance.repo = create_new_internal_package(experiment, step_folder, self.request.user)
+        return super(InternalPackageCreateView, self).form_valid(form)
 
 
 class ExternalPackageDetailView(DetailView):
@@ -60,6 +61,15 @@ class ExternalPackageDetailView(DetailView):
             resource.markdown = markdownify(resource.resource)
         context['resources'] = resources
         return context
+
+
+class InternalPackageDashboard(View):
+    def get(self, request, pk):
+        package = get_object_or_404(InternalPackage, pk=pk)
+        return render(request, 'marketplace/internalpackage_dashboard.html', {'object': package})
+
+    def post(self):
+        pass
 
 
 class InternalPackageDetailView(DetailView):

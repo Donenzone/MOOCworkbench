@@ -1,7 +1,7 @@
 import re
 
 from quality_manager.measurements.measurement import MeasurementAbstraction
-from requirements_manager.models import ExperimentRequirement
+from requirements_manager.models import Requirement
 from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
 from quality_manager.models import RawMeasureResult
 from build_manager.models import TravisInstance
@@ -16,7 +16,7 @@ class RequirementsMeasurement(MeasurementAbstraction):
         self.raw = RawMeasureResult()
 
     def measure(self):
-        requirements = ExperimentRequirement.objects.filter(experiment=self.experiment)
+        requirements = Requirement.objects.filter(experiment=self.experiment)
         travis_ci_config = TravisInstance.objects.filter(experiment=self.experiment).first()
         if travis_ci_config:
             if travis_ci_config.enabled:

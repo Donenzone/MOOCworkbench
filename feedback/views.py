@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from feedback.models import feedback, Task, UserTask
+from feedback.models import Feedback, Task, UserTask
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
 from user_manager.models import get_workbench_user
@@ -13,7 +13,7 @@ def set_task_active(request, task_id):
     task = Task.objects.get(id=task_id)
     w_user = get_workbench_user(request.user)
     existing_user_task = UserTask.objects.filter(active=True, for_task=task, user=w_user)
-    if existing_user_task.count() is 0:
+    if not existing_user_task:
         task_user = UserTask()
         task_user.for_task = task
         task_user.user = get_workbench_user(request.user)
@@ -32,6 +32,7 @@ class UserTaskListView(ListView):
         context['available_tasks'] = get_available_tasks(workbench_user)
         return context
 
+
 def get_available_tasks(w_user):
     completed_and_active_tasks = [i.for_task for i in UserTask.objects.filter((Q(completed=True) | Q(active=True))).filter(user=w_user)]
     tasks = Task.objects.all()
@@ -44,8 +45,9 @@ def get_available_tasks(w_user):
                 final_tasks.append(task)
     return final_tasks
 
-class feedbackCreateView(CreateView):
-    model = feedback
+
+class FeedbackCreateView(CreateView):
+    model = Feedback
     fields = ['like', 'feedback_like', 'feedback_dislike', 'other_comments']
 
     def form_valid(self, form):
@@ -58,7 +60,7 @@ class feedbackCreateView(CreateView):
             user_task.left_feedback = True
             user_task.save()
 
-        return super(feedbackCreateView, self).form_valid(form)
+        return super(FeedbackCreateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('task_list')

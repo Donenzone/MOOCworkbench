@@ -1,6 +1,7 @@
 from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
 from experiments_manager.helper import verify_and_get_experiment
 
+
 class MeasurementMixin(object):
 
     def get_context_data(self, **kwargs):

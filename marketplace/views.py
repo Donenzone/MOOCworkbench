@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic.list import ListView
-from django.views.generic import CreateView, DetailView, View
+from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -12,7 +12,8 @@ from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.repo_init import PackageGitRepoInit
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from requirements_manager.forms import RequirementForm
+from marketplace.forms import InternalPackageForm
+from requirements_manager.mixins import RequirementTypeMixin
 
 
 class MarketplaceIndex(View):
@@ -35,7 +36,7 @@ class ExternalPackageCreateView(CreateView):
     template_name = 'marketplace/package_form.html'
 
 
-class InternalPackageCreateView(CreateView):
+class InternalPackageCreateView(RequirementTypeMixin, CreateView):
     model = InternalPackage
     fields = ['package_name', 'description', 'category', 'language']
     template_name = 'marketplace/package_form.html'
@@ -68,16 +69,29 @@ class ExternalPackageDetailView(DetailView):
         return context
 
 
-class InternalPackageDashboard(View):
+class InternalPackageDashboard(RequirementTypeMixin, View):
     def get(self, request, pk):
         package = get_object_or_404(InternalPackage, pk=pk)
         context = {}
         context['object'] = package
-        context['dependency_form'] = RequirementForm()
+        context['object_type'] = self.get_requirement_type(package)
+        context['edit_form'] = InternalPackageForm(instance=package)
         return render(request, 'marketplace/internalpackage_dashboard.html', context)
 
     def post(self):
         pass
+
+
+class InternalPackageUpdateView(UpdateView):
+    model = InternalPackage
+    form_class = InternalPackageForm
+
+    def get_success_url(self):
+        return reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['pk']})
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, 'Package successfully updated')
+        return super(InternalPackageUpdateView, self).form_valid(form)
 
 
 class InternalPackageDetailView(DetailView):

@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^(?P<package_id>\d+)/resource/new/$', login_required(PackageResourceCreateView.as_view()), name="packageresource_new"),
     url(r'^subscribe/(?P<package_id>\d+)/$', login_required(PackageSubscriptionView.as_view()), name="package_subscribe"),
     url(r'^dashboard/(?P<pk>\d+)/$', login_required(InternalPackageDashboard.as_view()), name="internalpackage_dashboard"),
+    url(r'^edit/(?P<pk>\d+)/$', login_required(InternalPackageUpdateView.as_view()), name="internalpackage_update"),
 ]

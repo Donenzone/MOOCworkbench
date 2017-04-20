@@ -6,9 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from requirements_manager.models import Requirement
+from requirements_manager.mixins import RequirementTypeMixin
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.github_helper import GitHubHelper
 from requirements_manager.forms import RequirementForm
+from marketplace.models import InternalPackage
 
 
 def parse_requirements_file(experiment, requirements_file):
@@ -21,34 +23,51 @@ def parse_requirements_file(experiment, requirements_file):
         requirement.save()
 
 
-class RequirementListView(ListView):
+class RequirementListView(RequirementTypeMixin, ListView):
     model = Requirement
 
     def get_queryset(self):
-        experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
-        return Requirement.objects.filter(experiment=experiment)
+        if self.kwargs['object_type'] == self.EXPERIMENT_TYPE:
+            exp_or_package = verify_and_get_experiment(self.request, self.kwargs['pk'])
+        elif self.kwargs['object_type'] == self.PACKAGE_TYPE:
+            exp_or_package = InternalPackage.objects.get(id=self.kwargs['pk'])
+        return exp_or_package.requirements.all()
 
     def get_context_data(self, **kwargs):
         context = super(RequirementListView, self).get_context_data(**kwargs)
         context['requirements_form'] = RequirementForm()
-        context['experiment_id'] = self.kwargs['pk']
+        context['object_id'] = self.kwargs['pk']
+        context['object_type'] = self.kwargs['object_type']
         return context
 
 
-class RequirementCreateView(CreateView):
+class RequirementCreateView(RequirementTypeMixin, CreateView):
     model = Requirement
     fields = ['package_name', 'version']
 
     def form_valid(self, form):
         response = super(RequirementCreateView, self).form_valid(form)
-        experiment = verify_and_get_experiment(self.request, self.kwargs['experiment_id'])
-        experiment.requirements.add(form.instance)
-        experiment.save()
+        req_type = self.kwargs['object_type']
+        object_id = self.kwargs['object_id']
+        if req_type == self.EXPERIMENT_TYPE:
+            experiment = verify_and_get_experiment(self.request, object_id)
+            self.add_req_to_object(form.instance, experiment)
+        elif req_type == self.PACKAGE_TYPE:
+            internal_package = InternalPackage.objects.get(id=object_id)
+            self.add_req_to_object(form.instance, internal_package)
         return response
 
+    def add_req_to_object(self, req, obj):
+        obj.requirements.add(req)
+        obj.save()
+
     def get_success_url(self):
-        experiment = verify_and_get_experiment(self.request, self.kwargs['experiment_id'])
-        return reverse('experiment_detail', kwargs={'pk': experiment.id, 'slug': experiment.slug()})
+        if self.kwargs['object_type'] == self.EXPERIMENT_TYPE:
+            experiment = verify_and_get_experiment(self.request, self.kwargs['object_id'])
+            response = reverse('experiment_detail', kwargs={'pk': experiment.id, 'slug': experiment.slug()})
+        elif self.kwargs['object_type']  == self.PACKAGE_TYPE:
+            response = reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['object_id']})
+        return response
 
 
 @login_required

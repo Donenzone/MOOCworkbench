@@ -1,34 +1,38 @@
-from experiments_manager.tables import ExperimentTable
-from experiments_manager.forms import ExperimentForm
-from experiments_manager.models import *
+import json
+
 from django.views.generic.detail import DetailView
-from git_manager.views import get_user_repositories, create_new_github_repository_local
+from markdown2 import Markdown
 from django.views import View
 from django.shortcuts import render, redirect, reverse
 from django.http import JsonResponse
-from experiments_manager.tasks import initialize_repository
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
-import json
+
+from docs_manager.mixins import DocsMixin
+from experiments_manager.tables import ExperimentTable
+from experiments_manager.forms import ExperimentForm
+from experiments_manager.models import *
+from experiments_manager.tasks import initialize_repository
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.helper import get_steps
-from markdown2 import Markdown
-from django.contrib import messages
-from git_manager.helpers.github_helper import GitHubHelper
-from django.shortcuts import get_object_or_404
-from git_manager.mixins.repo_file_list import RepoFileListMixin
 from experiments_manager.mixins import ActiveStepMixin
 from experiments_manager.mixins import ExperimentContextMixin
+from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.mixins.repo_file_list import RepoFileListMixin
+from git_manager.views import get_user_repositories, create_new_github_repository_local
 from quality_manager.mixins import MeasurementMixin
-from docs_manager.mixins import DocsMixin
+from requirements_manager.mixins import RequirementTypeMixin
 
 
-class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, DetailView):
+class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, RequirementTypeMixin, DetailView):
     model = Experiment
 
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         context['steps'] = get_steps(experiment)
+        context['object_type'] = self.get_requirement_type(experiment)
         return context
 
 

@@ -168,7 +168,7 @@
 
     url_dict = {
       'dashboard': "{% url 'dashboard' object.id %}",
-      'requirements': "{% url 'requirements_list' object.id %}",
+      'requirements': "{% url 'requirements_list' object.id object_type %}",
       'readme': "{% url 'readme_view' object.id %}",
     }
 

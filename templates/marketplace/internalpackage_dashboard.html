@@ -1,21 +1,38 @@
-{% extends 'marketplace/marketplace_index.html' %}
+{% extends 'marketplace/internalpackage_detail.html' %}
 {% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
 {% load comments %}
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.package_name "package_detail" object.id %}
+    {% breadcrumb 'Dashboard' "internalpackage_dashboard" object.id %}
 {% endblock %}
 
 {% block content %}
     <h2>{{ object.package_name }}</h2>
 
     <h3>Settings</h3>
-    {{ dependency_form|bootstrap_inline }}
+    <form action="{% url 'internalpackage_update' object.id %}" method="post">
+        {% csrf_token %}
+        {{ edit_form|bootstrap }}
+        <button class="btn btn-primary" value="Save">Save changes</button>
+    </form>
 
     <h3>Workbench services</h3>
+    <div id="requirements">
+        Loading...
+    </div>
 
-    <h4>Dependencies</h4>
-    {{ dependencies_form }}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            url_dict = {
+              'dashboard': "{% url 'dashboard' object.id %}",
+              'requirements': "{% url 'requirements_list' object.id object_type %}",
+              'readme': "{% url 'readme_view' object.id %}",
+            };
+
+            $("#requirements").load(url_dict['requirements']);
+        })
+    </script>
 {% endblock %}

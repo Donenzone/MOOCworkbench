@@ -12,6 +12,7 @@ from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.repo_init import PackageGitRepoInit
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
+from requirements_manager.forms import RequirementForm
 
 
 class MarketplaceIndex(View):
@@ -70,7 +71,10 @@ class ExternalPackageDetailView(DetailView):
 class InternalPackageDashboard(View):
     def get(self, request, pk):
         package = get_object_or_404(InternalPackage, pk=pk)
-        return render(request, 'marketplace/internalpackage_dashboard.html', {'object': package})
+        context = {}
+        context['object'] = package
+        context['dependency_form'] = RequirementForm()
+        return render(request, 'marketplace/internalpackage_dashboard.html', context)
 
     def post(self):
         pass

@@ -3,7 +3,7 @@
 {% block content %}
 <div id="requirements">
   <h4>Add New Requirement</h4>
-  <form class="form-inline" id="add-new-requirement" method="post" action="{% url 'requirement_add' experiment_id %}">
+  <form class="form-inline" id="add-new-requirement" method="post" action="{% url 'requirement_add' object_type object_id %}">
       {% csrf_token %}
       {{ requirements_form|bootstrap_inline }}
       <div class="form-group">
@@ -32,5 +32,5 @@
 </div>
 
   <p>Once you have added all the required dependencies, write your changes to your GitHub repository.</p>
-  <a href="{% url 'requirements_write' experiment_id %}" class="btn btn-primary">Update requirements in repository</button>
+  <a href="{% url 'requirements_write' experiment_id %}" class="btn btn-primary">Update requirements in repository</a>
 {% endblock %}

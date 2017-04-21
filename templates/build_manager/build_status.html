@@ -30,7 +30,7 @@
     $(document).ready(function () {
 
       $.get({
-        url: '{% url 'last_build_log' experiment_id %}',
+        url: '{% url 'last_build_log' object_id object_type %}',
         data: {},
         success: function(data) {
           $('#build-log').html(data.log);
@@ -40,7 +40,7 @@
       $('#enable-builds').click(function() {
         $.post({
           url: '{% url 'enable_ci_builds' %}',
-          data: {'experiment_id': {{ experiment_id }}, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          data: {'object_id': {{ object_id }}, 'object_type': '{{ object_type }}', 'csrfmiddlewaretoken': '{{ csrf_token }}' },
           success: function(data) {
             if (data.enabled) {
               location.reload();
@@ -52,7 +52,7 @@
       $('#build-now').click(function() {
         $.post({
           url: '{% url 'build_experiment_now' %}',
-          data: {'experiment_id': {{ experiment_id }}, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          data: {'object_id': {{ object_id }}, 'object_type': '{{ object_type }}', 'csrfmiddlewaretoken': '{{ csrf_token }}' },
           success: function(data) {
             if (data.build_started) {
                 $('#build-status').html('Build started... please wait')
@@ -68,7 +68,7 @@
       $('#disable-builds').click(function() {
         $.post({
           url: '{% url 'disable_ci_builds' %}',
-          data: {'experiment_id': {{ experiment_id }}, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+          data: {'object_id': {{ object_id }}, 'object_type': '{{ object_type }}', 'csrfmiddlewaretoken': '{{ csrf_token }}' },
           success: function(data) {
             if (data.disabled) {
               location.reload();

@@ -66,11 +66,11 @@
   <script type='text/javascript'>
     $(document).ready(function() {
       url_dict = {
-        'ci': "{% url 'build_status' experiment.id %}",
-        'docs': "{% url 'docs_status' experiment.id %}",
+        'ci': "{% url 'build_status' experiment.id object_type %}",
+        'docs': "{% url 'docs_status' experiment.id object_type %}",
         'vcs': "{% url 'vcs_overview' experiment.id %}",
-        'coverage': "{% url 'coveralls_status' experiment.id %}",
-      }
+        'coverage': "{% url 'coveralls_status' experiment.id object_type %}"
+      };
 
       $("#docs-dashboard").load(url_dict['docs']);
       $("#ci-dashboard").load(url_dict['ci']);

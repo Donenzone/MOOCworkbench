@@ -23,16 +23,27 @@
         Loading...
     </div>
 
+    <div id="ci">
+        Loading...
+    </div>
+
+    <div id="docs">
+        Loading...
+    </div>
+
 
     <script type="text/javascript">
         $(document).ready(function() {
             url_dict = {
-              'dashboard': "{% url 'dashboard' object.id %}",
               'requirements': "{% url 'requirements_list' object.id object_type %}",
               'readme': "{% url 'readme_view' object.id %}",
+              'ci': "{% url 'build_status' object.id object_type %}",
+              'docs': "{% url 'docs_status' object.id object_type %}",
             };
 
             $("#requirements").load(url_dict['requirements']);
+            $("#ci").load(url_dict['ci']);
+            $("#docs").load(url_dict['docs']);
         })
     </script>
 {% endblock %}

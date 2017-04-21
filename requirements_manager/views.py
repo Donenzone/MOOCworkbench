@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from requirements_manager.models import Requirement
-from requirements_manager.mixins import RequirementTypeMixin
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.github_helper import GitHubHelper
 from requirements_manager.forms import RequirementForm
@@ -23,7 +23,7 @@ def parse_requirements_file(experiment, requirements_file):
         requirement.save()
 
 
-class RequirementListView(RequirementTypeMixin, ListView):
+class RequirementListView(ExperimentPackageTypeMixin, ListView):
     model = Requirement
 
     def get_queryset(self):
@@ -41,7 +41,7 @@ class RequirementListView(RequirementTypeMixin, ListView):
         return context
 
 
-class RequirementCreateView(RequirementTypeMixin, CreateView):
+class RequirementCreateView(ExperimentPackageTypeMixin, CreateView):
     model = Requirement
     fields = ['package_name', 'version']
 

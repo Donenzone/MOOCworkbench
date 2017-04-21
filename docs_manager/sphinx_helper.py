@@ -8,12 +8,12 @@ class SphinxHelper(object):
     GITHUB_REPO_FOLDER = 'github_repositories'
     UNDOC_PICKLE_LOCATION = '_build/coverage/undoc.pickle'
 
-    def __init__(self, experiment, steps, github_login):
+    def __init__(self, experiment, folders, github_login):
         self.owner = github_login
         self.repo_name = experiment.git_repo.name
         self.path = '{0}/{1}/{2}/docs/'.format(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
         self.base_path = '{0}/{1}/{2}/'.format(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
-        self.steps = steps
+        self.folders = folders
 
     def add_sphinx_to_repo(self):
         self._quickstart_sphinx()
@@ -25,9 +25,9 @@ class SphinxHelper(object):
         subprocess.call(['sphinx-quickstart', '-q', '-a', self.owner, '-v', '0.1', '-p', self.repo_name, self.path, '--ext-autodoc', '--ext-coverage'])
 
     def _gen_docs_per_folder(self):
-        for step in self.steps:
-            step_folder = '{0}{1}'.format(self.base_path, step.folder_name())
-            subprocess.call(['sphinx-apidoc', '-o', self.path, step_folder])
+        for folder in self.folders:
+            folder_path = '{0}{1}'.format(self.base_path, folder)
+            subprocess.call(['sphinx-apidoc', '-o', self.path, folder_path])
 
     def _make_first_html(self):
         self._make_command('clean')

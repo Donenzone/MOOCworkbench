@@ -1,11 +1,13 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-
+from django.urls import reverse
 from model_utils.models import TimeStampedModel
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from user_manager.models import WorkbenchUser
 from git_manager.models import GitRepository
-from build_manager.models import TravisInstance
+from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
 from requirements_manager.models import Requirement
 
@@ -22,6 +24,28 @@ class Experiment(TimeStampedModel):
 
     def slug(self):
         return slugify(self.title)
+
+    def get_absolute_url(self):
+        return reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
+
+    def get_docs_folder(self):
+        return [x.folder_name() for x in ChosenExperimentSteps.objects.filter(experiment=self).order_by('step_nr')]
+
+
+@receiver(post_save, sender=Experiment)
+def add_experiment_config(sender, instance, created, **kwargs):
+    if created:
+        docs = Docs()
+        docs.save()
+        instance.docs = docs
+
+        travis_config = TravisCiConfig()
+        travis_config.save()
+        travis = TravisInstance(config=travis_config)
+        travis.save()
+        instance.travis = travis
+
+        instance.save()
 
 
 class ExperimentStep(models.Model):

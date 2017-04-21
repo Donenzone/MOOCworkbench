@@ -22,10 +22,10 @@ from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import RepoFileListMixin
 from git_manager.views import get_user_repositories, create_new_github_repository_local
 from quality_manager.mixins import MeasurementMixin
-from requirements_manager.mixins import RequirementTypeMixin
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 
-class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, RequirementTypeMixin, DetailView):
+class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
 
     def get_context_data(self, **kwargs):

@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib.auth.decorators import login_required
 
-from docs_manager.models import Docs
 from docs_manager.sphinx_helper import SphinxHelper
 from experiments_manager.helper import get_steps, verify_and_get_experiment
 from experiments_manager.mixins import ExperimentContextMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
+from helpers.helper import get_package_or_experiment
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 
 class DocExperimentView(ExperimentContextMixin, View):
@@ -24,50 +25,39 @@ class DocExperimentView(ExperimentContextMixin, View):
         return render(request, 'docs_manager/docs_template.html', context)
 
 
-class DocStatusView(ExperimentContextMixin, View):
-
-    def get(self, request, experiment_id):
-        context = super(DocStatusView, self).get(request, experiment_id)
-        experiment = verify_and_get_experiment(request, experiment_id)
-        context['docs'] = self.get_docs(experiment)
+class DocStatusView(ExperimentPackageTypeMixin, View):
+    def get(self, request, object_id, object_type):
+        context = {}
+        django_object = get_package_or_experiment(request, object_type, object_id)
+        context['object'] = django_object
+        context['docs'] = django_object.docs
+        context['object_type'] = object_type
         return render(request, 'docs_manager/docs_status.html', context)
-
-    def get_docs(self, experiment):
-        docs = experiment.docs
-        if docs:
-            return docs
-        else:
-            docs = Docs()
-            docs.save()
-
-            experiment.docs = docs
-            experiment.save()
-            return docs
 
 
 @login_required
-def toggle_docs_status(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
-    docs = experiment.docs
+def toggle_docs_status(request, object_id, object_type):
+    exp_or_package = get_package_or_experiment(request, object_type, object_id)
+    docs = exp_or_package.docs
     docs.enabled = not docs.enabled
     docs.save()
 
     if docs.enabled:
-        github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+        github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
         git_helper = GitHelper(github_helper)
         git_helper.clone_repository()
 
-    return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+    return redirect(exp_or_package.get_absolute_url())
 
 
 @login_required
-def docs_generate(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
-    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+def docs_generate(request, object_id, object_type):
+    exp_or_package = get_package_or_experiment(request, object_type, object_id)
+    github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
     git_helper = GitHelper(github_helper)
     git_helper.pull_repository()
-    steps = get_steps(experiment)
-    sphinx_helper = SphinxHelper(experiment, steps, github_helper.github_repository.owner.login)
+    folders = exp_or_package.get_docs_folder()
+    sphinx_helper = SphinxHelper(exp_or_package, folders, github_helper.github_repository.owner.login)
     sphinx_helper.add_sphinx_to_repo()
     sphinx_helper.build_and_sync_docs()
-    return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+    return redirect(exp_or_package.get_absolute_url())

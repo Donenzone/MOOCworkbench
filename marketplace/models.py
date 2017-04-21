@@ -1,14 +1,16 @@
 import xmlrpc.client
 
 from autoslug import AutoSlugField
+from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.defaultfilters import slugify
 from markdownx.models import MarkdownxField
 from model_utils.models import TimeStampedModel
 from notifications.signals import notify
 
-from build_manager.models import TravisInstance
+from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
 from git_manager.models import GitRepository
 from requirements_manager.models import Requirement
@@ -58,10 +60,35 @@ class ExternalPackage(Package):
 
 
 class InternalPackage(Package):
-    repo = models.ForeignKey(to=GitRepository)
+    git_repo = models.ForeignKey(to=GitRepository)
     travis = models.ForeignKey(to=TravisInstance, null=True)
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
+
+    def get_absolute_url(self):
+        return reverse('internalpackage_dashboard', kwargs={'pk': self.pk})
+
+    def get_docs_folder(self):
+        return [slugify(self.package_name).replace('-', '_')]
+
+
+@receiver(post_save, sender=InternalPackage)
+def add_package_config(sender, instance, created, **kwargs):
+    if created:
+        docs = Docs()
+        docs.save()
+        instance.docs = docs
+
+        travis_config = TravisCiConfig()
+        travis_config.save()
+        travis = TravisInstance(config=travis_config)
+        travis.save()
+        instance.travis = travis
+
+        instance.save()
+
+        package_version = PackageVersion(package=instance, version_nr='0.1', changelog='Initial version', added_by=instance.owner, url='')
+        package_version.save()
 
 
 class PackageResource(TimeStampedModel):

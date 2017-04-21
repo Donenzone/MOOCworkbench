@@ -7,13 +7,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from markdownx.utils import markdownify
 
-from user_manager.models import get_workbench_user
+from docs_manager.mixins import DocsMixin
 from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.repo_init import PackageGitRepoInit
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from marketplace.forms import InternalPackageForm
-from requirements_manager.mixins import RequirementTypeMixin
+from helpers.helper_mixins import ExperimentPackageTypeMixin
+from user_manager.models import get_workbench_user
 
 
 class MarketplaceIndex(View):
@@ -36,7 +37,20 @@ class ExternalPackageCreateView(CreateView):
     template_name = 'marketplace/package_form.html'
 
 
-class InternalPackageCreateView(RequirementTypeMixin, CreateView):
+class ExternalPackageDetailView(DetailView):
+    model = ExternalPackage
+
+    def get_context_data(self, **kwargs):
+        context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
+        context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        for resource in resources:
+            resource.markdown = markdownify(resource.resource)
+        context['resources'] = resources
+        return context
+
+
+class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
     model = InternalPackage
     fields = ['package_name', 'description', 'category', 'language']
     template_name = 'marketplace/package_form.html'
@@ -56,23 +70,11 @@ class InternalPackageCreateView(RequirementTypeMixin, CreateView):
         return super(InternalPackageCreateView, self).form_valid(form)
 
 
-class ExternalPackageDetailView(DetailView):
-    model = ExternalPackage
-
-    def get_context_data(self, **kwargs):
-        context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
-        context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        for resource in resources:
-            resource.markdown = markdownify(resource.resource)
-        context['resources'] = resources
-        return context
-
-
-class InternalPackageDashboard(RequirementTypeMixin, View):
+class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
     def get(self, request, pk):
         package = get_object_or_404(InternalPackage, pk=pk)
         context = {}
+        context['docs'] = package.docs
         context['object'] = package
         context['object_type'] = self.get_requirement_type(package)
         context['edit_form'] = InternalPackageForm(instance=package)

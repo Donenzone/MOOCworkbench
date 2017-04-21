@@ -18,8 +18,11 @@ class GitHelper(object):
 
     def clone_repository(self):
         clone_url = self.github_helper.get_clone_url()
-        Repo.clone_from(clone_url, self.repo_dir)
-        self.repo = Repo(self.repo_dir)
+        if not os.path.isdir(self.repo_dir):
+            Repo.clone_from(clone_url, self.repo_dir)
+        else:
+            self.repo = Repo(self.repo_dir)
+            self.pull_repository()
 
     def pull_repository(self):
         origin = self.repo.remotes.origin
@@ -53,4 +56,3 @@ class GitHelper(object):
     def push_changes(self):
         origin = self.repo.remotes.origin
         origin.push()
-        #subprocess.call(['git', 'push'], cwd=self.repo_dir)

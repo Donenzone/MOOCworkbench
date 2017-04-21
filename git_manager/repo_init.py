@@ -4,6 +4,7 @@ from experiments_manager.models import ChosenExperimentSteps
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.models import GitRepository
+from requirements_manager.helper import build_requirements_file
 
 
 class GitRepoInit(object):
@@ -12,6 +13,13 @@ class GitRepoInit(object):
     def __init__(self, github_helper, type):
         self.github_helper = github_helper
         self.template_type_folder = '{0}{1}/'.format(self.TEMPLATE_FOLDER, type)
+
+    def create_travis_file(self):
+        self._create_new_file_in_repo('.travis.yml', 'Added Travis CI config',
+                                      contents=self.get_file_contents('.travis.yml'))
+
+    def create_readme_file(self):
+        self._create_new_file_in_repo('README.md', 'Added README file', contents=self.get_file_contents('README.md'))
 
     def _create_new_file_in_repo(self, file_name, commit_message, folder='', contents=''):
         self.github_helper.add_file_to_repository(file_name, commit_message, contents=contents, folder=folder)
@@ -72,7 +80,10 @@ class PackageGitRepoInit(GitRepoInit):
         # clone the new repository
         module_git_helper = self.clone_new_module_repo()
         self.move_module_into_folder(module_git_helper)
+
         self.create_setup_py(self.step_folder)
+        self.create_travis_file()
+        self.create_readme_file()
 
         return git_repo_obj
 
@@ -125,6 +136,10 @@ class PackageGitRepoInit(GitRepoInit):
             setup_py_template = self.replace_variable_in_file(setup_py_template, var[0], var[1])
         self._create_new_file_in_repo('setup.py', commit_message='Added setup.py file', contents=setup_py_template)
 
+    def copy_requirements_txt(self):
+        requirements_txt = build_requirements_file(self.experiment.pk, self.experiment.get_object_type())
+        self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file', contents=requirements_txt)
+
 
 class ExperimentGitRepoInit(GitRepoInit):
 
@@ -167,17 +182,11 @@ class ExperimentGitRepoInit(GitRepoInit):
         self._create_new_file_in_repo('main.py', commit_message='Added main.py file', folder=folder, contents=main_contents)
         self._create_new_file_in_repo('tests.py', commit_message='Added test.py file', folder=folder, contents=self.get_file_contents('tests.py', part_of_step=True, folder=folder))
 
-    def create_travis_file(self):
-        self._create_new_file_in_repo('.travis.yml', 'Added Travis CI config', contents=self.get_file_contents('.travis.yml'))
-
     def create_settings_file(self):
         self._create_new_file_in_repo('settings.py', 'Added settings.py', contents=self.get_file_contents('settings.py'))
 
     def create_test_runner_file(self):
         self._create_new_file_in_repo('test_runner.py', 'Added test_runner.py', contents=self.get_file_contents('test_runner.py'))
-
-    def create_readme_file(self):
-        self._create_new_file_in_repo('README.md', 'Added README file', contents=self.get_file_contents('README.md'))
 
     def create_data_folder(self):
         self._create_new_file_in_repo('__init__.py', 'Added data folder', 'data')

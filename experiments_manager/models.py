@@ -10,6 +10,7 @@ from git_manager.models import GitRepository
 from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
 from requirements_manager.models import Requirement
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 
 class Experiment(TimeStampedModel):
@@ -30,6 +31,9 @@ class Experiment(TimeStampedModel):
 
     def get_docs_folder(self):
         return [x.folder_name() for x in ChosenExperimentSteps.objects.filter(experiment=self).order_by('step_nr')]
+
+    def get_object_type(self):
+        return ExperimentPackageTypeMixin.EXPERIMENT_TYPE
 
 
 @receiver(post_save, sender=Experiment)

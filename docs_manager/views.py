@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 
 from docs_manager.sphinx_helper import SphinxHelper
-from experiments_manager.helper import get_steps, verify_and_get_experiment
+from experiments_manager.helper import get_steps
 from experiments_manager.mixins import ExperimentContextMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper

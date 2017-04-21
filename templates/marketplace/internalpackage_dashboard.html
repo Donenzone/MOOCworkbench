@@ -9,28 +9,53 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{{ object.package_name }}</h2>
-
-    <h3>Settings</h3>
-    <form action="{% url 'internalpackage_update' object.id %}" method="post">
-        {% csrf_token %}
-        {{ edit_form|bootstrap }}
-        <button class="btn btn-primary" value="Save">Save changes</button>
-    </form>
-
-    <h3>Workbench services</h3>
-    <div id="requirements">
-        Loading...
+    <h2>Dashboard of {{ object.package_name }}</h2>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="panel panel-default">
+            <div class="panel-heading">Settings</div>
+              <div class="panel-body">
+                <form action="{% url 'internalpackage_update' object.id %}" method="post">
+                    {% csrf_token %}
+                    {{ edit_form|bootstrap }}
+                    <button class="btn btn-primary" value="Save">Save changes</button>
+                </form>
+              </div>
+            </div>
+        </div>
     </div>
 
-    <div id="ci">
-        Loading...
-    </div>
 
-    <div id="docs">
-        Loading...
-    </div>
+    <div class="row">
+        <h3>Workbench services</h3>
 
+        <div class="col-md-9">
+            <div class="panel panel-default">
+              <div class="panel-heading">Dependencies</div>
+                  <div class="panel-body"  id="requirements">
+                    Loading...
+                  </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">Automated builds</div>
+                  <div class="panel-body"  id="ci">
+                    Loading...
+                  </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">Documentation</div>
+                  <div class="panel-body"  id="docs">
+                    Loading...
+                  </div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/javascript">
         $(document).ready(function() {

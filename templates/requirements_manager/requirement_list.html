@@ -1,8 +1,7 @@
 {% load bootstrap %}
 
 {% block content %}
-<div id="requirements">
-  <h4>Add New Requirement</h4>
+  <h4>Add New Dependency</h4>
   <form class="form-inline" id="add-new-requirement" method="post" action="{% url 'requirement_add' object_id object_type %}">
       {% csrf_token %}
       {{ requirements_form|bootstrap_inline }}
@@ -12,7 +11,7 @@
         </div>
       </div>
   </form>
-  <h4>Requirements In Your Project</h4>
+  <h4>Dependencies In Your Project</h4>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -29,7 +28,6 @@
       {% endfor %}
     </tbody>
   </table>
-</div>
 
   <p>Once you have added all the required dependencies, write your changes to your GitHub repository.</p>
   <a href="{% url 'requirements_write' object_id object_type %}" class="btn btn-primary">Update requirements in repository</a>

@@ -1,18 +1,20 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views import View
+from django.template.defaultfilters import slugify
+
 from experiments_manager.helper import verify_and_get_experiment
 from quality_manager.models import ExperimentMeasure
-from django.contrib.auth.decorators import login_required
 from quality_manager.mixins import MeasurementMixin
 from quality_manager.helpers.what_now_helper import WhatNow
-from django.views import View
 from experiments_manager.mixins import ExperimentContextMixin
 from quality_manager.tasks import version_control_quality_check
 from quality_manager.tasks import requirements_quality_check
 from quality_manager.tasks import test_quality_check
 from quality_manager.tasks import ci_quality_check
 from quality_manager.tasks import docs_coverage_check
-from django.template.defaultfilters import slugify
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -21,6 +23,7 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
         context = super(DashboardView, self).get(request, experiment_id)
         what_now = WhatNow(self.experiment)
         context['what_now_list'] = what_now.what_to_do_now()
+        context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
 
         messages = {}
         for measurement in self._get_recent_measurements_for_all_types(self.experiment):

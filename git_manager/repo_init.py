@@ -5,6 +5,9 @@ from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.models import GitRepository
 from requirements_manager.helper import build_requirements_file
+from helpers.helper import replace_variable_in_file
+from helpers.helper import get_absolute_path
+from marketplace.helpers.helper import SetupPyVariables, build_setup_py
 
 
 class GitRepoInit(object):
@@ -27,16 +30,11 @@ class GitRepoInit(object):
     def replace_folder_in_file(self, contents, folder):
         return contents.replace('{0}', folder)
 
-    def replace_variable_in_file(self, contents, variable, value):
-        variable_name = '{{{0}}}'.format(variable)
-        print(variable_name)
-        return contents.replace(variable_name, value)
-
     def get_file_contents(self, filename, part_of_step=False, folder=None):
         if part_of_step:
-            path = '{0}{1}steps/{2}'.format(self.get_script_path(), self.template_type_folder, filename)
+            path = '{0}{1}steps/{2}'.format(get_absolute_path(), self.template_type_folder, filename)
         else:
-            path = '{0}{1}{2}'.format(self.get_script_path(), self.template_type_folder, filename)
+            path = '{0}{1}{2}'.format(get_absolute_path(), self.template_type_folder, filename)
         file_to_open = open(path, 'r')
 
         contents = file_to_open.read()
@@ -44,23 +42,12 @@ class GitRepoInit(object):
             contents = self.replace_folder_in_file(contents, folder)
         return contents
 
-    def get_script_path(self):
-        return '{0}/'.format(os.path.dirname(os.path.realpath(__file__)))
 
     class Meta:
         abstract = True
 
 
 class PackageGitRepoInit(GitRepoInit):
-
-    PACKAGE_NAME_VAR = 'PACKAGE_NAME'
-    VERSION_VAR = 'VERSION'
-    AUTHOR_VAR = 'AUTHOR'
-    DESCRIPTION_VAR = 'DESCRIPTION'
-    URL_VAR = 'URL'
-    AUTHOR_MAIL = 'AUTHOR_EMAIL'
-    LICENSE_VAR = 'LICENSE'
-    PACKAGE_VAR = 'PACKAGE'
 
     def __init__(self, internal_package, experiment, step_folder):
         github_helper_package = GitHubHelper(experiment.owner, internal_package.package_name, create=True)
@@ -81,7 +68,7 @@ class PackageGitRepoInit(GitRepoInit):
         module_git_helper = self.clone_new_module_repo()
         self.move_module_into_folder(module_git_helper)
 
-        self.create_setup_py(self.step_folder)
+        self.create_setup_py()
         self.create_travis_file()
         self.create_readme_file()
 
@@ -121,20 +108,10 @@ class PackageGitRepoInit(GitRepoInit):
         git_helper.repo.index.commit('Moved module into own folder')
         git_helper.push_changes()
 
-    def create_setup_py(self, package_name_python):
+    def create_setup_py(self):
         setup_py_template = self.get_file_contents('setup.py_template')
-        var_list = []
-        var_list.append((self.PACKAGE_NAME_VAR, self.internal_package.package_name))
-        var_list.append((self.VERSION_VAR, '0.1'))
-        var_list.append((self.AUTHOR_VAR, str(self.internal_package.owner.user)))
-        var_list.append((self.DESCRIPTION_VAR, self.internal_package.description))
-        var_list.append((self.URL_VAR, 'http://test'))
-        var_list.append((self.AUTHOR_MAIL, self.experiment.owner.user.email))
-        var_list.append((self.LICENSE_VAR, 'MIT'))
-        var_list.append((self.PACKAGE_VAR, package_name_python))
-        for var in var_list:
-            setup_py_template = self.replace_variable_in_file(setup_py_template, var[0], var[1])
-        self._create_new_file_in_repo('setup.py', commit_message='Added setup.py file', contents=setup_py_template)
+        setup_py = build_setup_py(self.internal_package, setup_py_template)
+        self._create_new_file_in_repo('setup.py', commit_message='Added setup.py file', contents=setup_py)
 
     def copy_requirements_txt(self):
         requirements_txt = build_requirements_file(self.experiment.pk, self.experiment.get_object_type())
@@ -176,9 +153,9 @@ class ExperimentGitRepoInit(GitRepoInit):
     def create_main_and_test_file(self, folder):
         main_contents = self.get_file_contents('main.py', part_of_step=True, folder=folder)
         project_name = self.github_helper.github_repository.name
-        main_contents = self.replace_variable_in_file(main_contents, self.PROJECTNAME_VAR, project_name)
-        main_contents = self.replace_variable_in_file(main_contents, self.STEPFOLDER_VAR, folder)
-        main_contents = self.replace_variable_in_file(main_contents, self.AUTHOR_VAR, str(self.experiment.owner))
+        main_contents = replace_variable_in_file(main_contents, self.PROJECTNAME_VAR, project_name)
+        main_contents = replace_variable_in_file(main_contents, self.STEPFOLDER_VAR, folder)
+        main_contents = replace_variable_in_file(main_contents, self.AUTHOR_VAR, str(self.experiment.owner))
         self._create_new_file_in_repo('main.py', commit_message='Added main.py file', folder=folder, contents=main_contents)
         self._create_new_file_in_repo('tests.py', commit_message='Added test.py file', folder=folder, contents=self.get_file_contents('tests.py', part_of_step=True, folder=folder))
 

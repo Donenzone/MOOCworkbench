@@ -69,7 +69,11 @@ class InternalPackage(Package):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.pk})
 
     def get_docs_folder(self):
-        return [slugify(self.package_name).replace('-', '_')]
+        return [self.python_package_name]
+
+    @property
+    def python_package_name(self):
+        return slugify(self.package_name).replace('-', '_')
 
 
 @receiver(post_save, sender=InternalPackage)
@@ -103,7 +107,8 @@ class PackageVersion(TimeStampedModel):
     version_nr = models.CharField(max_length=50)
     changelog = models.TextField()
     added_by = models.ForeignKey(to=WorkbenchUser, null=True)
-    url = models.URLField()
+    pre_release = models.BooleanField(default=False)
+    url = models.URLField(null=True)
 
     def check_if_version_is_newer(self, version_nr):
         return self.version_nr != version_nr

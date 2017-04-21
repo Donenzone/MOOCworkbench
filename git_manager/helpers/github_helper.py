@@ -43,7 +43,7 @@ class GitHubHelper(object):
     def view_file_in_repo(self, file_name):
         try:
             encoded = self.github_repository.get_file_contents(file_name)
-            decoded = base64.b64decode(encoded.content)
+            decoded = base64.b64decode(encoded.content).decode("utf-8")
             return decoded
         except GithubException as e:
             print([e.data['message']])
@@ -62,6 +62,9 @@ class GitHubHelper(object):
         repo_file_name = self._get_repo_file_name(file_name, folder)
         current_file = self.github_repository.get_file_contents(repo_file_name)
         self.github_repository.update_file(repo_file_name, commit_message, contents, current_file.sha)
+
+    def create_release(self, tag_name, name, body, pre_release):
+        self.github_repository.create_git_release(tag_name, name, body, prerelease=pre_release)
 
     def _get_repo_file_name(self, file_name, folder=''):
         return '/{0}/{1}'.format(folder, file_name) if folder else '/{0}'.format(file_name)

@@ -7,7 +7,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from markdownx.utils import markdownify
 
-from docs_manager.mixins import DocsMixin
 from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.repo_init import PackageGitRepoInit
@@ -15,6 +14,8 @@ from marketplace.models import Package, InternalPackage, ExternalPackage, Packag
 from marketplace.forms import InternalPackageForm
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from user_manager.models import get_workbench_user
+from marketplace.helpers.helper import create_tag_for_package_version
+from marketplace.helpers.helper import update_setup_py_with_new_version
 
 
 class MarketplaceIndex(View):
@@ -107,6 +108,23 @@ class InternalPackageDetailView(DetailView):
             resource.markdown = markdownify(resource.resource)
         context['resources'] = resources
         return context
+
+
+class InternalPackageVersionCreateView(CreateView):
+    model = PackageVersion
+    fields = ['version_nr', 'changelog', 'pre_release']
+
+    def form_valid(self, form):
+        package = InternalPackage.objects.get(id=self.kwargs['package_id'])
+        form.instance.package = package
+        form.instance.added_by = get_workbench_user(self.request.user)
+        response = super(InternalPackageVersionCreateView, self).form_valid(form)
+        create_tag_for_package_version(package.pk)
+        update_setup_py_with_new_version(package.pk)
+        return response
+
+    def get_success_url(self):
+        return reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['package_id']})
 
 
 class PackageVersionCreateView(CreateView):

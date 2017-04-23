@@ -13,8 +13,8 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 class DocExperimentView(ExperimentContextMixin, View):
 
-    def get(self, request, experiment_id, page_slug=None):
-        context = super(DocExperimentView, self).get(request, experiment_id)
+    def get(self, request, object_id, object_type, page_slug=None):
+        context = super(DocExperimentView, self).get(request, object_id)
         steps = get_steps(self.experiment)
         github_helper = GitHubHelper(request.user, self.experiment.git_repo.name)
         sphinx_helper = SphinxHelper(self.experiment, steps, github_helper.owner)

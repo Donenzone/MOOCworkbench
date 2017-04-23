@@ -1,6 +1,9 @@
 from django.conf.urls import url
-from feedback.views import *
 from django.contrib.auth.decorators import login_required
+
+from feedback.views import set_task_active
+from feedback.views import UserTaskListView
+from feedback.views import FeedbackCreateView
 
 urlpatterns = [
     url(r'^task-active/(?P<task_id>[-\w]+)/$', set_task_active, name="task_active"),

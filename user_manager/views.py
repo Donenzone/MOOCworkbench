@@ -1,26 +1,12 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from rest_framework import viewsets
-from user_manager.serializer import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from user_manager.forms import *
-from django.views.generic.detail import DetailView
-from django.utils import timezone
-from experiments_manager.models import Experiment
-from user_manager.models import get_workbench_user
 from django.views.generic import View
-from feedback.models import Task, UserTask
+
+from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-
-class WorkbenchUserViewset(viewsets.ModelViewSet):
-    queryset = WorkbenchUser.objects.all()
-    serializer_class = WorkbenchUserSerializer
-
-
-class UserViewset(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from user_manager.models import get_workbench_user, WorkbenchUser
+from user_manager.forms import WorkbenchUserForm, UserLoginForm
 
 
 @login_required
@@ -29,6 +15,7 @@ def index(request):
     experiments = Experiment.objects.filter(owner=workbench_user)[:5]
 
     return render(request, 'index.html', {'experiments': experiments, 'tasks': get_available_tasks(workbench_user)})
+
 
 def sign_in(request):
     if request.method == 'GET':
@@ -67,6 +54,7 @@ class EditProfileView(View):
             return redirect(to='/')
         else:
             return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
+
 
 def sign_out(request):
     logout(request)

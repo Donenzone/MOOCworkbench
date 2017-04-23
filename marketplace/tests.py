@@ -143,6 +143,9 @@ class MarketplaceTestCase(TestCase):
         self.assertIsNotNone(response.context['version_history'])
         self.assertIsNotNone(response.context['resources'])
 
+    def test_packageversion_create(self):
+        pass
+
 
 class RepoInitMock(object):
     def __init__(self, git_repo):

@@ -27,8 +27,6 @@ from git_manager.views import GitRepositoryViewSet
 
 router = routers.DefaultRouter()
 router.register(r'git-repository', GitRepositoryViewSet)
-router.register(r'user', user_manager.views.UserViewset)
-router.register(r'workbench-user', user_manager.views.WorkbenchUserViewset)
 
 urlpatterns = [
     url(r'^$', user_manager.views.index, name="index"),

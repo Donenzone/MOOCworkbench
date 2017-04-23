@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from git_manager.models import *
+from git_manager.models import GitRepository
 
 
 class GitRepositorySerializer(serializers.HyperlinkedModelSerializer):

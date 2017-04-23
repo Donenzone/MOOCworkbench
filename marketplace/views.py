@@ -136,6 +136,9 @@ class PackageVersionCreateView(CreateView):
         form.instance.added_by = get_workbench_user(self.request.user)
         return super(PackageVersionCreateView, self).form_valid(form)
 
+    def get_success_url(self):
+        return reverse('package_detail', kwargs={'pk': self.kwargs['package_id']})
+
 
 class PackageResourceCreateView(CreateView):
     model = PackageResource

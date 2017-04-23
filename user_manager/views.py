@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
 from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
 from user_manager.models import get_workbench_user, WorkbenchUser
 from user_manager.forms import WorkbenchUserForm, UserLoginForm
+from user_manager.forms import RegisterForm
 
 
 @login_required

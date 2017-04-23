@@ -1,14 +1,18 @@
+from unittest.mock import patch
+from collections import namedtuple
+
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import Client
 from django.shortcuts import reverse
-from unittest.mock import patch
 from django.core.management import call_command
 
 from user_manager.models import WorkbenchUser
-from experiments_manager.models import Experiment
+from experiments_manager.models import Experiment, ChosenExperimentSteps
 from git_manager.models import GitRepository
 from marketplace.models import ExternalPackage, InternalPackage, PackageLanguage
+from helpers.helper import ExperimentPackageTypeMixin
 
 
 class MarketplaceTestCase(TestCase):
@@ -19,6 +23,8 @@ class MarketplaceTestCase(TestCase):
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
         self.experiment = Experiment.objects.create(title='Experiment', description='test', owner=self.workbench_user, git_repo=self.git_repo)
+        self.chosen_step = ChosenExperimentSteps.objects.create(step_id=1, experiment_id=1, step_nr=1)
+
         self.client = Client()
         self.client.login(username='test', password='test')
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
@@ -76,4 +82,71 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
+    @patch('marketplace.views.PackageGitRepoInit')
+    def test_create_internal_package_post(self, mock_package_repo_init):
+        internal_package_data = {'package_name': 'My new package',
+                                 'description': 'Desc',
+                                 'category': '1',
+                                 'language': '1'
+                                 }
+        mock_package_repo_init.return_value = RepoInitMock(self.git_repo)
+        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 1}),
+                                    data=internal_package_data)
+        self.assertEqual(response.status_code, 302)
+        internal_package = InternalPackage.objects.filter(id=1)
+        self.assertTrue(internal_package)
 
+    def test_create_internal_package_post_missing_data(self):
+        internal_package_data = {'package_name': 'My new package',
+                                 'description': 'Desc',
+                                 }
+        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 1}),
+                                    data=internal_package_data)
+        self.assertEqual(response.status_code, 200)
+        internal_package = InternalPackage.objects.filter(id=1)
+        self.assertFalse(internal_package)
+
+    def test_create_internal_package_post_missing_experiment_id(self):
+        internal_package_data = {'package_name': 'My new package',
+                                 'description': 'Desc',
+                                 }
+        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 0, 'step_id': 1}),
+                                    data=internal_package_data)
+        self.assertEqual(response.status_code, 200)
+        internal_package = InternalPackage.objects.filter(id=1)
+        self.assertFalse(internal_package)
+
+    def test_create_internal_package_post_missing_step_id(self):
+        internal_package_data = {'package_name': 'My new package',
+                                 'description': 'Desc',
+                                 }
+        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 0}),
+                                    data=internal_package_data)
+        self.assertEqual(response.status_code, 200)
+        internal_package = InternalPackage.objects.filter(id=1)
+        self.assertFalse(internal_package)
+
+    def test_internal_package_dashboard(self):
+        self.test_create_internal_package_post()
+        response = self.client.get(reverse('internalpackage_dashboard', kwargs={'pk': 1}))
+        package = InternalPackage.objects.get(id=1)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['docs'])
+        self.assertEqual(response.context['object'], package)
+        self.assertEqual(response.context['object_type'], ExperimentPackageTypeMixin.PACKAGE_TYPE)
+        self.assertIsNotNone(response.context['edit_form'])
+
+    def test_internal_package_detail(self):
+        self.test_create_internal_package_post()
+        response = self.client.get(reverse('package_detail', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['version_history'])
+        self.assertIsNotNone(response.context['resources'])
+
+
+class RepoInitMock(object):
+    def __init__(self, git_repo):
+        self.git_repo = git_repo
+
+    def init_repo_boilerplate(self):
+        return self.git_repo

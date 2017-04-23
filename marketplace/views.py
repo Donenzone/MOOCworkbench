@@ -69,9 +69,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
 
         # save new internal package
         package_repo = PackageGitRepoInit(form.instance, experiment, step_folder)
-        git_repo_obj = package_repo.init_repo_boilerplate()
-
-        form.instance.repo = git_repo_obj
+        form.instance.git_repo = package_repo.init_repo_boilerplate()
         return super(InternalPackageCreateView, self).form_valid(form)
 
 
@@ -84,9 +82,6 @@ class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
         context['object_type'] = self.get_requirement_type(package)
         context['edit_form'] = InternalPackageForm(instance=package)
         return render(request, 'marketplace/internalpackage_dashboard.html', context)
-
-    def post(self):
-        pass
 
 
 class InternalPackageUpdateView(UpdateView):

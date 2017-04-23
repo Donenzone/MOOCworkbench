@@ -1,3 +1,5 @@
+ignore-paths:
+  - travis/
 uses:
   - django
 python-targets:

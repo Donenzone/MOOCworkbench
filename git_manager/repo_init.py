@@ -51,7 +51,7 @@ class PackageGitRepoInit(GitRepoInit):
 
     def __init__(self, internal_package, experiment, step_folder):
         github_helper_package = GitHubHelper(experiment.owner, internal_package.package_name, create=True)
-        super().__init__(github_helper_package, 'pip')
+        super().__init__(github_helper_package, type='pip')
         self.experiment = experiment
         self.internal_package = internal_package
         self.step_folder = step_folder
@@ -126,7 +126,7 @@ class ExperimentGitRepoInit(GitRepoInit):
 
     def __init__(self, experiment, type='python'):
         gh = GitHubHelper(experiment.owner, experiment.git_repo.name)
-        super().__init__(gh, type)
+        super().__init__(gh, type=type)
         self.experiment = experiment
 
     def init_repo_boilerplate(self):

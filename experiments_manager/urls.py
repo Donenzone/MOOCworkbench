@@ -12,5 +12,4 @@ urlpatterns = [
     url(r'^(?P<pk>\d+)/(?P<slug>[-\w]+)$', login_required(experiments_manager.views.ExperimentDetailView.as_view()), name='experiment_detail'),
     url(r'^file/(?P<experiment_id>\d+)/$', login_required(experiments_manager.views.FileViewGitRepository.as_view()), name='file_detail'),
     url(r'^readme/(?P<experiment_id>\d+)/$', experiments_manager.views.readme_of_experiment, name='readme_view'),
-    url(r'^folder/(?P<pk>\d+)/$', experiments_manager.views.view_list_files_in_repo_folder, name='folder_detail'),
 ]

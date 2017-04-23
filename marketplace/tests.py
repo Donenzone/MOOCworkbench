@@ -71,3 +71,9 @@ class MarketplaceTestCase(TestCase):
         external_package = ExternalPackage.objects.filter(id=1)
         self.assertFalse(external_package)
 
+    def test_create_internal_package_get(self):
+        response = self.client.get(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+
+

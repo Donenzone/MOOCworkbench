@@ -152,12 +152,3 @@ def readme_of_experiment(request, experiment_id):
     md = Markdown()
     content_file = md.convert(content_file)
     return render(request, 'experiments_manager/experiment_readme.html', {'readme': content_file})
-
-
-@login_required
-def view_list_files_in_repo_folder(request, pk):
-    if request.method == 'GET':
-        folder_name = request.GET['folder_name']
-        expirement = verify_and_get_experiment(request, experiment_id)
-        data = list_files_in_repo_folder('gitrepository1', request.user.username, folder_name)
-        return render(request, 'experiments_manager/folder_detail.html', {'contents': data, 'pk': pk})

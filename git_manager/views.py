@@ -6,7 +6,7 @@ from django.shortcuts import render
 from user_manager.views import get_workbench_user
 from git_manager.models import GitRepository
 from git_manager.serializer import GitRepositorySerializer
-from git_manager.helpers.github_helper import *
+from git_manager.helpers.github_helper import GitHubHelper
 
 
 class GitRepositoryViewSet(viewsets.ModelViewSet):

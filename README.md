@@ -1,5 +1,6 @@
 ![build](https://travis-ci.org/jlmdegoede/MOOCworkbench.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/jlmdegoede/MOOCworkbench/badge.svg?branch=master)](https://coveralls.io/github/jlmdegoede/MOOCworkbench?branch=master)
+[![Code Health](https://landscape.io/github/jlmdegoede/MOOCworkbench/master/landscape.svg?style=flat)](https://landscape.io/github/jlmdegoede/MOOCworkbench/master)
 
 # MOOC workbench
 A workbench for MOOC research, written in Django, meant to improve the reproducibility of experiments.

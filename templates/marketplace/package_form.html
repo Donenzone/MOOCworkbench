@@ -11,7 +11,8 @@
 
 <h2>Create New Package</h2>
 
-<form action="" method="post">{% csrf_token %}
+<form action="" method="post">
+    {% csrf_token %}
     {{ form|bootstrap }}
     <div class='input-field'>
         <p>When you create the new package, a new GitHub repository is created for your module and the package is added to the MOOC Marketplace in the workbench.</p>

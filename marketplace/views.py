@@ -34,8 +34,12 @@ class PackageListView(ListView):
 
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
-    fields = ['package_name', 'description', 'project_page']
+    fields = ['package_name', 'description', 'project_page', 'category', 'language']
     template_name = 'marketplace/package_form.html'
+
+    def form_valid(self, form):
+        form.instance.owner = get_workbench_user(self.request.user)
+        return super(ExternalPackageCreateView, self).form_valid(form)
 
 
 class ExternalPackageDetailView(DetailView):

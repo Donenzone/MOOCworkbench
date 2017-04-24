@@ -4,13 +4,14 @@ from django.views.generic.list import ListView
 from django.views.generic import CreateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 
 from requirements_manager.models import Requirement
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.github_helper import GitHubHelper
 from requirements_manager.forms import RequirementForm
-from marketplace.models import InternalPackage
+from helpers.helper import get_package_or_experiment
 
 
 def parse_requirements_file(experiment, requirements_file):
@@ -27,10 +28,7 @@ class RequirementListView(ExperimentPackageTypeMixin, ListView):
     model = Requirement
 
     def get_queryset(self):
-        if self.kwargs['object_type'] == self.EXPERIMENT_TYPE:
-            exp_or_package = verify_and_get_experiment(self.request, self.kwargs['pk'])
-        elif self.kwargs['object_type'] == self.PACKAGE_TYPE:
-            exp_or_package = InternalPackage.objects.get(id=self.kwargs['pk'])
+        exp_or_package = get_package_or_experiment(self.request, self.kwargs['object_type'], self.kwargs['pk'])
         return exp_or_package.requirements.all()
 
     def get_context_data(self, **kwargs):
@@ -44,17 +42,14 @@ class RequirementListView(ExperimentPackageTypeMixin, ListView):
 class RequirementCreateView(ExperimentPackageTypeMixin, CreateView):
     model = Requirement
     fields = ['package_name', 'version']
+    template_name = 'requirements_manager/requirement_list.html'
 
     def form_valid(self, form):
         response = super(RequirementCreateView, self).form_valid(form)
-        req_type = self.kwargs['object_type']
+        object_type = self.kwargs['object_type']
         object_id = self.kwargs['object_id']
-        if req_type == self.EXPERIMENT_TYPE:
-            experiment = verify_and_get_experiment(self.request, object_id)
-            self.add_req_to_object(form.instance, experiment)
-        elif req_type == self.PACKAGE_TYPE:
-            internal_package = InternalPackage.objects.get(id=object_id)
-            self.add_req_to_object(form.instance, internal_package)
+        exp_or_package = get_package_or_experiment(self.request, object_type, object_id)
+        self.add_req_to_object(form.instance, exp_or_package)
         return response
 
     def add_req_to_object(self, req, obj):
@@ -64,17 +59,23 @@ class RequirementCreateView(ExperimentPackageTypeMixin, CreateView):
     def get_success_url(self):
         if self.kwargs['object_type'] == self.EXPERIMENT_TYPE:
             experiment = verify_and_get_experiment(self.request, self.kwargs['object_id'])
-            response = reverse('experiment_detail', kwargs={'pk': experiment.id, 'slug': experiment.slug()})
+            success_url = reverse('experiment_detail', kwargs={'pk': experiment.id, 'slug': experiment.slug()})
         elif self.kwargs['object_type']  == self.PACKAGE_TYPE:
-            response = reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['object_id']})
-        return response
+            success_url = reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['object_id']})
+        return success_url
 
 
 @login_required
-def remove_experiment_requirement(request, experiment_id, requirement_id):
-    verify_and_get_experiment(request, experiment_id)
-    requirement = Requirement.objects.get(id=requirement_id)
-    requirement.delete()
+def remove_experiment_requirement(request, object_id, object_type):
+    if request.POST:
+        assert 'requirement_id' in request.POST
+        requirement_id = request.POST['requirement_id']
+        exp_or_package = get_package_or_experiment(request, object_type, object_id)
+        requirement = Requirement.objects.get(id=requirement_id)
+        exp_or_package.requirements.remove(requirement)
+        exp_or_package.save()
+        requirement.delete()
+        return JsonResponse({'deleted': True})
 
 
 @login_required

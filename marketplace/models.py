@@ -15,6 +15,7 @@ from docs_manager.models import Docs
 from git_manager.models import GitRepository
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 
 PYPI_URL = 'https://pypi.python.org/pypi'
@@ -70,6 +71,9 @@ class InternalPackage(Package):
 
     def get_docs_folder(self):
         return [self.python_package_name]
+
+    def get_object_type(self):
+        return ExperimentPackageTypeMixin.PACKAGE_TYPE
 
     @property
     def python_package_name(self):

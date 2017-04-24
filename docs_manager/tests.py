@@ -101,7 +101,7 @@ class DocsManagerTestCase(TestCase):
     @patch('docs_manager.views.GitHubHelper')
     @patch('docs_manager.views.GitHelper')
     @patch('docs_manager.views.SphinxHelper')
-    def test_docs_generate(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
+    def test_docs_generate_enabled(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
         """
         Test if the documentation view can be loaded.
         :return: 
@@ -113,7 +113,7 @@ class DocsManagerTestCase(TestCase):
     @patch('docs_manager.views.GitHubHelper')
     @patch('docs_manager.views.GitHelper')
     @patch('docs_manager.views.SphinxHelper')
-    def test_docs_generate(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
+    def test_docs_generate_disabled(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
         """
         Test if the documentation view can be loaded.
         :return: 

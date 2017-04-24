@@ -50,9 +50,10 @@ class CoverageManagerTestCase(TestCase):
 
     @patch('coverage_manager.views.get_github_helper')
     @patch('coverage_manager.views.CoverallsHelper.coverage_enabled_check')
-    def test_enable_coverage_with_travis(self, mock_coverage_check, mock_github_helper):
+    def test_enable_coverage_with_travis_true_coverage_enabled(self, mock_coverage_check, mock_github_helper):
         """
         Test if code coverage can be enabled when Travis builds are enabled
+        and when CoverallsHelper checks for enabled and returns True
         :return: 
         """
         travis_instance = self.enable_travis_for_experiment()
@@ -64,6 +65,45 @@ class CoverageManagerTestCase(TestCase):
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
+        self.assertTrue(code_coverage.enabled)
+
+    @patch('coverage_manager.views.get_github_helper')
+    @patch('coverage_manager.views.CoverallsHelper.coverage_enabled_check')
+    def test_enable_coverage_with_travis_false_coverage_enabled(self, mock_coverage_check, mock_github_helper):
+        """
+        Test if code coverage can be enabled when Travis builds are enabled
+        and when CoverallsHelper checks for enabled and returns False
+        :return: 
+        """
+        travis_instance = self.enable_travis_for_experiment()
+
+        mock_coverage_check.return_value = False
+        mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
+
+        coverage_data = {'experiment_id': 1}
+        response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
+        self.assertEqual(response.status_code, 200)
+        code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
+        self.assertTrue(code_coverage.enabled)
+
+    @patch('coverage_manager.views.get_github_helper')
+    @patch('coverage_manager.views.CoverallsHelper.coverage_enabled_check')
+    def test_enable_coverage_with_travis_true_existing_config(self, mock_coverage_check, mock_github_helper):
+        """
+        Test if code coverage can be enabled when Travis builds are enabled
+        with existing CodeCoverage instance
+        :return: 
+        """
+        travis_instance = self.enable_travis_for_experiment()
+        code_coverage = CodeCoverage.objects.create(travis_instance=travis_instance, enabled=False)
+
+        mock_coverage_check.return_value = True
+        mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
+
+        coverage_data = {'experiment_id': 1}
+        response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
+        self.assertEqual(response.status_code, 200)
+        code_coverage.refresh_from_db()
         self.assertTrue(code_coverage.enabled)
 
     @patch('coverage_manager.views.get_github_helper')
@@ -92,7 +132,7 @@ class CoverageManagerTestCase(TestCase):
         :return: 
         """
         travis_instance = self.enable_travis_for_experiment()
-        self.test_enable_coverage_with_travis()
+        self.test_enable_coverage_with_travis_true_coverage_enabled()
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
         self.assertTrue(code_coverage.enabled)
 
@@ -121,7 +161,7 @@ class CoverageManagerTestCase(TestCase):
 
     def test_coveralls_status_enabled(self):
         travis_instance = self.enable_travis_for_experiment()
-        self.test_enable_coverage_with_travis()
+        self.test_enable_coverage_with_travis_true_coverage_enabled()
 
         response = self.client.get(reverse('coveralls_status', kwargs={'object_id': 1,
                                                                        'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))

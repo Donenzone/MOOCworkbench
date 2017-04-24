@@ -40,7 +40,6 @@ class VcsOverviewView(ExperimentContextMixin, View):
 
 
 class NrOfCommitsView(MeasurementMixin, View):
-
     def get(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
         experiment_measure = ExperimentMeasure.objects.get(name='Version control use')
@@ -57,7 +56,7 @@ class NrOfCommitsView(MeasurementMixin, View):
 
 @login_required
 def refresh_measurements(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
+    verify_and_get_experiment(request, experiment_id)
     version_control_quality_check.delay(experiment_id)
     requirements_quality_check.delay(experiment_id)
     test_quality_check.delay(experiment_id)

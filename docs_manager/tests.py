@@ -1,6 +1,4 @@
 from unittest.mock import patch
-from collections import namedtuple
-import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User

@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
 
 from quality_manager.views import DashboardView
 from quality_manager.views import NrOfCommitsView

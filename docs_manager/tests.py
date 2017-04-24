@@ -33,19 +33,98 @@ class DocsManagerTestCase(TestCase):
     @patch('docs_manager.views.GitHubHelper')
     @patch('docs_manager.views.SphinxHelper')
     def test_doc_experiment_view(self, mock_gh_helper, mock_sphinx_helper):
+        """
+        Test if the DocExperimentView loads, for the default documentation view.
+        :param mock_gh_helper: Autoloaded by the mock framework
+        :param mock_sphinx_helper: Autoloaded by the mock framework
+        :return: 
+        """
         response = self.client.get(reverse('docs_view', kwargs={'object_id': 1, 'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
-        mock_gh_helper = None
-        mock_sphinx_helper = None
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['document'])
 
     @patch('docs_manager.views.GitHubHelper')
     @patch('docs_manager.views.SphinxHelper')
     def test_doc_experiment_view_with_page_slug(self, mock_gh_helper, mock_sphinx_helper):
+        """
+        Test if the DocExperimentView loads, given a pageslug to load.
+        :param mock_gh_helper: Autoloaded by the mock framework
+        :param mock_sphinx_helper:  Autoloaded by the mock framework
+        :return: 
+        """
         response = self.client.get(reverse('docs_view', kwargs={'object_id': 1,
                                                                 'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE,
                                                                 'page_slug': 'test'}))
-        mock_gh_helper = None
-        mock_sphinx_helper = None
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['document'])
+
+    def test_doc_status_view(self):
+        """
+        Test if the doc status view loads successfully.
+        :return: 
+        """
+        response = self.client.get(reverse('docs_status', kwargs={'object_id': 1,
+                                                                  'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
+        self.assertEqual(response.context['object'], self.experiment)
+        self.assertEqual(response.context['docs'], self.experiment.docs)
+
+    def test_toggle_doc_status_true_to_false(self):
+        """
+        Test if the documentation status is toggled from True to False.
+        :return: 
+        """
+        docs = self.experiment.docs
+        docs.enabled = True
+        docs.save()
+
+        response = self.client.get(reverse('toggle_docs_status', kwargs={'object_id': 1,
+                                                                  'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
+        self.assertEqual(response.status_code, 302)
+        docs.refresh_from_db()
+        self.assertFalse(docs.enabled)
+
+    @patch('docs_manager.views.GitHubHelper')
+    @patch('docs_manager.views.GitHelper')
+    def test_toggle_doc_status_false_to_true(self, mock_gh_helper, mock_git_helper):
+        """
+        Test if the documentation status is toggled from True to False.
+        :return: 
+        """
+        docs = self.experiment.docs
+        docs.enabled = False
+        docs.save()
+
+        response = self.client.get(reverse('toggle_docs_status', kwargs={'object_id': 1,
+                                                                  'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
+        self.assertEqual(response.status_code, 302)
+        docs.refresh_from_db()
+        self.assertTrue(docs.enabled)
+
+    @patch('docs_manager.views.GitHubHelper')
+    @patch('docs_manager.views.GitHelper')
+    @patch('docs_manager.views.SphinxHelper')
+    def test_docs_generate(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
+        """
+        Test if the documentation view can be loaded.
+        :return: 
+        """
+        response = self.client.get(reverse('docs_generate', kwargs={'object_id': 1,
+                                                                  'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
+        self.assertEqual(response.status_code, 302)
+
+    @patch('docs_manager.views.GitHubHelper')
+    @patch('docs_manager.views.GitHelper')
+    @patch('docs_manager.views.SphinxHelper')
+    def test_docs_generate(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
+        """
+        Test if the documentation view can be loaded.
+        :return: 
+        """
+        docs = self.experiment.docs
+        docs.enabled = False
+        docs.save()
+
+        response = self.client.get(reverse('docs_generate', kwargs={'object_id': 1,
+                                                                  'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
+        self.assertEqual(response.status_code, 302)
+

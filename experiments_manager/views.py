@@ -3,7 +3,7 @@ import json
 from django.views.generic.detail import DetailView
 from markdown2 import Markdown
 from django.views import View
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404

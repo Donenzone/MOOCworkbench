@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from docs_manager.sphinx_helper import SphinxHelper
 from experiments_manager.helper import get_steps
@@ -53,11 +54,15 @@ def toggle_docs_status(request, object_id, object_type):
 @login_required
 def docs_generate(request, object_id, object_type):
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
-    github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
-    git_helper = GitHelper(github_helper)
-    git_helper.pull_repository()
-    folders = exp_or_package.get_docs_folder()
-    sphinx_helper = SphinxHelper(exp_or_package, folders, github_helper.github_repository.owner.login)
-    sphinx_helper.add_sphinx_to_repo()
-    sphinx_helper.build_and_sync_docs()
+    if exp_or_package.docs.enabled:
+        github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
+        git_helper = GitHelper(github_helper)
+        git_helper.pull_repository()
+        folders = exp_or_package.get_docs_folder()
+        sphinx_helper = SphinxHelper(exp_or_package, folders, github_helper.github_repository.owner.login)
+        sphinx_helper.add_sphinx_to_repo()
+        sphinx_helper.build_and_sync_docs()
+    else:
+        messages.add_message(request, messages.WARNING,
+                             'Before you can generate docs, first enable docs for your experiment.')
     return redirect(exp_or_package.get_absolute_url())

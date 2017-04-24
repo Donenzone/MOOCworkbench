@@ -1,6 +1,7 @@
 import requests
 import json
 
+
 class CoverallsHelper(object):
     COVERALLS_URL = 'https://coveralls.io/github'
 

@@ -1,11 +1,11 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from coverage_manager.models import CodeCoverage
-from build_manager.models import TravisInstance
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render
+
+from coverage_manager.models import CodeCoverage
+from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.helper import get_github_helper
-from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 
 @login_required
@@ -31,7 +31,8 @@ def coveralls_enable(request):
             existing_config.save()
             return JsonResponse({'enabled': True})
         else:
-            return JsonResponse({'enabled': False, 'message': 'Invalid response from Coveralls. Are you sure you flipped the switch on Coveralls?'})
+            return JsonResponse({'enabled': False, 'message': 'Invalid response from Coveralls. '
+                                                              'Are you sure you flipped the switch on Coveralls?'})
     else:
         return JsonResponse({'enabled': False, 'message': 'First enable Travis CI builds!'})
 

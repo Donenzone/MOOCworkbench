@@ -25,4 +25,3 @@ coveralls
 sphinx
 sqlalchemy
 django-autoslug
-pylint-django

@@ -15,7 +15,9 @@ from os.path import dirname, abspath, basename, normpath, join
 from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), ".."),
+)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -91,6 +93,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -133,8 +136,6 @@ REST_FRAMEWORK = {
 }
 
 WSGI_APPLICATION = 'MOOCworkbench.wsgi.application'
-
-
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
@@ -183,7 +184,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+STATIC_ROOT = '{0}/static'.format(PROJECT_ROOT)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "staticfiles"),
+    os.path.join(BASE_DIR, "bower_components"),
 ]

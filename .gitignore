@@ -1,4 +1,6 @@
 static/
+bower_components/
+
 MOOCworkbench/production_settings.py
 .idea/
 github_repositories/

@@ -14,16 +14,6 @@ from requirements_manager.forms import RequirementForm
 from helpers.helper import get_package_or_experiment
 
 
-def parse_requirements_file(experiment, requirements_file):
-    for req in requirements.parse(requirements_file):
-        requirement = Requirement()
-        requirement.package_name = req.name
-        if req.specs:
-            requirement.version = req.specs[0][1]
-        requirement.experiment = experiment
-        requirement.save()
-
-
 class RequirementListView(ExperimentPackageTypeMixin, ListView):
     model = Requirement
 
@@ -79,12 +69,31 @@ def remove_experiment_requirement(request, object_id, object_type):
 
 
 @login_required
-def write_requirements_file(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
-    requirements_txt = ''
-    for requirement in Requirement.objects.filter(experiment=experiment):
-        requirements_txt += '{0}\n'.format(str(requirement))
-    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-    github_helper.update_file_in_repository('requirements.txt', 'Updated requirements.txt file by MOOC workbench', requirements_txt)
+def write_requirements_file(request, object_id, object_type):
+    exp_or_package = get_package_or_experiment(request, object_type, object_id)
+    requirements_txt = build_requirements_file(exp_or_package)
+    github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
+    github_helper.update_file_in_repository('requirements.txt', 'Updated requirements.txt file by MOOC workbench',
+                                            requirements_txt)
     messages.add_message(request, messages.INFO, 'Successfully updated requirements in your repository')
-    return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id}))
+    return redirect(to=exp_or_package.get_absolute_url())
+
+
+def build_requirements_file(exp_or_package):
+    requirements_txt = ''
+    for requirement in exp_or_package.requirements.all():
+        requirements_txt += '{0}\n'.format(str(requirement))
+    return requirements_txt
+
+
+def parse_requirements_file(exp_or_package, requirements_file):
+    for req in requirements.parse(requirements_file):
+        requirement = Requirement()
+        requirement.package_name = req.name
+        if req.specs:
+            requirement.version = req.specs[0][1]
+        requirement.save()
+
+        exp_or_package.requirements.add(requirement)
+        exp_or_package.save()
+

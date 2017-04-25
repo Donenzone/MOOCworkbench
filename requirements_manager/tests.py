@@ -1,16 +1,19 @@
 from unittest.mock import patch
 
+import requirements
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import Client
 from django.shortcuts import reverse
 from django.core.management import call_command
 
-from user_manager.models import WorkbenchUser
 from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
-from requirements_manager.models import Requirement
 from marketplace.models import InternalPackage
+from requirements_manager.models import Requirement
+from requirements_manager.views import build_requirements_file
+from requirements_manager.views import parse_requirements_file
+from user_manager.models import WorkbenchUser
 
 
 class RequirementsManagerTestCase(TestCase):
@@ -95,6 +98,54 @@ class RequirementsManagerTestCase(TestCase):
         self.assertFalse(requirement_one)
         self.experiment.refresh_from_db()
         self.assertFalse(requirement_one in self.experiment.requirements.all())
+
+    @patch('requirements_manager.views.GitHubHelper')
+    def test_write_requirements_file(self, mock_gh_helper):
+        response = self.client.get(reverse('requirements_write', kwargs={'object_id': self.experiment.id,
+                                                                        'object_type': self.experiment.get_object_type()}))
+        self.assertEqual(response.status_code, 302)
+
+    def test_build_requirements_file_requirements_present(self):
+        self.experiment.requirements.add(self.requirement_two)
+        self.experiment.requirements.add(self.requirement_three)
+        requirements_txt = build_requirements_file(self.experiment)
+        self.assertFalse(self.requirement_one.package_name in requirements_txt)
+        self.assertTrue(self.requirement_two.package_name in requirements_txt)
+        self.assertTrue(self.requirement_three.package_name in requirements_txt)
+
+    def test_build_requirements_file_valid_requirement(self):
+        self.experiment.requirements.add(self.requirement_one)
+        self.experiment.requirements.add(self.requirement_two)
+        self.experiment.requirements.add(self.requirement_three)
+        requirements_list = [self.requirement_one, self.requirement_two, self.requirement_three]
+        requirements_list_name = [x.package_name for x in requirements_list]
+        requirements_txt = build_requirements_file(self.experiment)
+        for req in requirements.parse(requirements_txt):
+            self.assertTrue(req.name in requirements_list_name)
+
+    def test_parse_requirements_file_package_name(self):
+        self.experiment.requirements.add(self.requirement_one)
+        self.experiment.requirements.add(self.requirement_two)
+        self.experiment.requirements.add(self.requirement_three)
+        requirements_txt = build_requirements_file(self.experiment)
+        parse_requirements_file(self.internal_package, requirements_txt)
+        self.assertTrue(self.internal_package.requirements)
+        package_req_list = [x.package_name for x in self.internal_package.requirements.all()]
+        self.assertTrue(self.requirement_one.package_name in package_req_list)
+        self.assertTrue(self.requirement_two.package_name in package_req_list)
+        self.assertTrue(self.requirement_three.package_name in package_req_list)
+
+    def test_parse_requirements_file_version(self):
+        self.experiment.requirements.add(self.requirement_one)
+        self.experiment.requirements.add(self.requirement_two)
+        self.experiment.requirements.add(self.requirement_three)
+        requirements_txt = build_requirements_file(self.experiment)
+        parse_requirements_file(self.internal_package, requirements_txt)
+        self.assertTrue(self.internal_package.requirements)
+        package_req_version_list = [x.version for x in self.internal_package.requirements.all()]
+        self.assertTrue(self.requirement_one.version in package_req_version_list)
+        self.assertTrue(self.requirement_two.version in package_req_version_list)
+        self.assertTrue(self.requirement_three.version in package_req_version_list)
 
 
 

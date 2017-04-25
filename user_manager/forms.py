@@ -10,11 +10,10 @@ class UserLoginForm(forms.Form):
 
 class WorkbenchUserForm(forms.ModelForm):
     netid = forms.CharField(required=True, label="TU Delft Net ID")
-    ssh_key = forms.MultipleChoiceField(required=False, label="SSH key (optional)")
 
     class Meta:
         model = WorkbenchUser
-        fields = ('netid', 'ssh_key')
+        fields = ('netid',)
 
 
 class RegisterForm(forms.ModelForm):

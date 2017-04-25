@@ -16,7 +16,8 @@ def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user)[:5]
 
-    return render(request, 'index.html', {'experiments': experiments, 'tasks': get_available_tasks(workbench_user)})
+    return render(request, 'index.html', {'experiments': experiments,
+                                          'tasks': get_available_tasks(workbench_user)})
 
 
 def sign_in(request):
@@ -63,12 +64,13 @@ def sign_out(request):
     return redirect(to='/')
 
 
-def register(request):
-    if request.method == 'GET':
+class RegisterView(View):
+    def get(self):
         form = RegisterForm()
-        return render(request, 'user_manager/register.html', {'form': form})
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        return render(self.request, 'user_manager/register.html', {'form': form})
+
+    def post(self):
+        form = RegisterForm(self.request.POST)
         if form.is_valid():
             user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'], form.cleaned_data['password'])
             workbench_user = WorkbenchUser()
@@ -78,4 +80,5 @@ def register(request):
             workbench_user.save()
             return redirect(to='/')
         else:
-            return render(request, 'user_manager/register.html', {'form': form})
+            return render(self.request, 'user_manager/register.html', {'form': form})
+

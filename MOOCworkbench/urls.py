@@ -31,12 +31,11 @@ router.register(r'git-repository', GitRepositoryViewSet)
 urlpatterns = [
     url(r'^$', user_manager.views.index, name="index"),
     url(r'^admin/', admin.site.urls),
-    #url(r'^api/', include(router.urls)),
     url(r'^accounts/login/$', user_manager.views.sign_in, name="sign_in"),
     url(r'^accounts/logout/$', user_manager.views.sign_out, name="sign_out"),
     url(r'^my-account/$', login_required(user_manager.views.DetailProfileView.as_view()), name="view_my_profile"),
     url(r'^accounts/edit/$', login_required(user_manager.views.EditProfileView.as_view()), name="edit_profile"),
-    url(r'^accounts/register/$', user_manager.views.register, name="register"),
+    url(r'^accounts/register/$', user_manager.views.RegisterView.as_view(), name="register"),
 
     url(r'^experiments/', include('experiments_manager.urls')),
     url(r'^experiments/requirements/', include('requirements_manager.urls')),
@@ -47,10 +46,6 @@ urlpatterns = [
     url(r'^feedback/', include('feedback.urls')),
     url(r'^git/$', git_manager.views.index, name="git_index"),
     url(r'^docs/', include('docs_manager.urls')),
-
-    #url(r'^worker-manager/output/$', ReceiveWorkerOutputView.as_view(), name="worker_manager_output"),
-    #url(r'^worker/$', WorkerIndexView.as_view(), name="worker_index"),
-    #url(r'^workers/$', login_required(WorkerList.as_view()), name="worker_list"),
 
     # Installed apps URLs
     url(r'^markdownx/', include('markdownx.urls')),

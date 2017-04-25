@@ -9,6 +9,12 @@ class SphinxHelper(object):
     UNDOC_PICKLE_LOCATION = '_build/coverage/undoc.pickle'
 
     def __init__(self, experiment, folders, github_login):
+        """
+        SphinxHelper helps with tasks related to document generation with Sphinx
+        :param experiment: The package or experiment for which documents should be generated/managed
+        :param folders: The relevant folders that where source files live in the exp/package (for an experiment, the steps)
+        :param github_login: The GitHub username under which the git repository lives
+        """
         self.owner = github_login
         self.repo_name = experiment.git_repo.name
         self.path = '{0}/{1}/{2}/docs/'.format(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
@@ -16,6 +22,11 @@ class SphinxHelper(object):
         self.folders = folders
 
     def add_sphinx_to_repo(self):
+        """
+        Add Sphinx to an existing repository.
+        Assumes that this repository has already been cloned.
+        :return: 
+        """
         self._quickstart_sphinx()
         self._gen_docs_per_folder()
         self._prepend_to_conf_py()
@@ -53,6 +64,11 @@ class SphinxHelper(object):
             subprocess.call(['make', '-C', self.path, command])
 
     def build_and_sync_docs(self):
+        """
+        After a pull, run this function to rebuild the docs.
+        
+        :return: 
+        """
         build_path = '{0}_build/html/'.format(self.path)
         support = WebSupport(srcdir=self.path,
                              builddir=build_path)

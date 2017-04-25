@@ -18,7 +18,7 @@ from helpers.helper import ExperimentPackageTypeMixin
 class SphinxHelperTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        clone_url = 'git@github.com:jlmdegoede/Sandbox-Research-5.git'
+        clone_url = 'https://github.com/jlmdegoede/Sandbox-Research-5.git'
         cls.repo_dir = 'github_repositories/jlmdegoede/Sandbox-Research-5/'
         Repo.clone_from(clone_url, cls.repo_dir)
 

@@ -1,17 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from rest_framework import viewsets
 from django.shortcuts import render
 
 
 from user_manager.views import get_workbench_user
 from git_manager.models import GitRepository
-from git_manager.serializer import GitRepositorySerializer
 from git_manager.helpers.github_helper import GitHubHelper
-
-
-class GitRepositoryViewSet(viewsets.ModelViewSet):
-    queryset = GitRepository.objects.all().order_by('-created')
-    serializer_class = GitRepositorySerializer
 
 
 @login_required

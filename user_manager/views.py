@@ -65,20 +65,27 @@ def sign_out(request):
 
 
 class RegisterView(View):
-    def get(self):
+    def get(self, request):
         form = RegisterForm()
-        return render(self.request, 'user_manager/register.html', {'form': form})
+        return render(request, 'user_manager/register.html', {'form': form})
 
-    def post(self):
+    def post(self, request):
         form = RegisterForm(self.request.POST)
         if form.is_valid():
-            user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'], form.cleaned_data['password'])
-            workbench_user = WorkbenchUser()
-            workbench_user.netid = form.cleaned_data['netid']
-            workbench_user.can_run_experiments = True
-            workbench_user.user = user
-            workbench_user.save()
-            return redirect(to='/')
+            new_email = form.cleaned_data['email']
+            if not existing_user_check(new_email):
+                user = User.objects.create_user(form.cleaned_data['username'],
+                                                new_email,
+                                                form.cleaned_data['password'])
+                workbench_user = WorkbenchUser.objects.get(user=user)
+                workbench_user.netid = form.cleaned_data['netid']
+                workbench_user.save()
+                return redirect(to='/')
+            else:
+                return render(request, 'user_manager/register.html', {'form': form})
         else:
-            return render(self.request, 'user_manager/register.html', {'form': form})
+            return render(request, 'user_manager/register.html', {'form': form})
 
+
+def existing_user_check(email_address):
+    return User.objects.filter(email=email_address)

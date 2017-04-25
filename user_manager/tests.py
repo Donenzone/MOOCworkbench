@@ -17,7 +17,6 @@ class RequirementsManagerTestCase(TestCase):
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
-        self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment',
                                                      owner=self.workbench_user,
                                                      github_url='https://github')
@@ -53,12 +52,49 @@ class RequirementsManagerTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.context['user']), 'AnonymousUser')
 
-    def test_sign_in(self):
+    def test_sign_in_get(self):
+        response = self.client.get(reverse('sign_in'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+
+    def test_sign_in_post(self):
         c = Client()
         data = {'username': 'test', 'password': 'test'}
         response = c.post(reverse('sign_in'), data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'], self.user)
+
+    def test_sign_in_post_incorrect_username(self):
+        c = Client()
+        data = {'username': 'NON_EXISTENT_USER', 'password': 'test'}
+        response = c.post(reverse('sign_in'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+        self.assertEqual(str(response.context['user']), 'AnonymousUser')
+
+    def test_sign_in_post_incorrect_password(self):
+        c = Client()
+        data = {'username': 'test', 'password': 'INCORRECT_PASSWORD'}
+        response = c.post(reverse('sign_in'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+        self.assertEqual(str(response.context['user']), 'AnonymousUser')
+
+    def test_sign_in_post_missing_password(self):
+        c = Client()
+        data = {'username': 'test'}
+        response = c.post(reverse('sign_in'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+        self.assertEqual(str(response.context['user']), 'AnonymousUser')
+
+    def test_sign_in_post_missing_username(self):
+        c = Client()
+        data = {'password': 'RANDOM_PASSWORD'}
+        response = c.post(reverse('sign_in'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+        self.assertEqual(str(response.context['user']), 'AnonymousUser')
 
     def test_edit_profile_view_get(self):
         response = self.client.get(reverse('edit_profile'))
@@ -77,4 +113,58 @@ class RequirementsManagerTestCase(TestCase):
         response = self.client.post(reverse('edit_profile'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
+
+    def test_register_view_get(self):
+        c = Client()
+        response = c.get(reverse('register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+
+    def test_register_view_post(self):
+        c = Client()
+        data = {'username': 'test3',
+                'email': 'test2@test2.nl',
+                'password': 'test',
+                'password_again': 'test',
+                'netid': '123456789'}
+        response = c.post(reverse('register'), data=data)
+        self.assertEqual(response.status_code, 302)
+        new_user = User.objects.filter(email=data['email'])
+        self.assertTrue(new_user)
+
+    def test_register_view_post_missing_data(self):
+        c = Client()
+        data = {'username': 'test3',
+                'email': 'test2@test2.nl',
+                'password': 'test',
+                'password_again': 'test',}
+        response = c.post(reverse('register'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+
+    def test_register_view_post_same_username(self):
+        c = Client()
+        data = {'username': 'test',
+                'email': 'test2@test2.nl',
+                'password': 'DIFFERENT_PASSWORD',
+                'password_again': 'DIFFERENT_PASSWORD',
+                'netid': '123456789'}
+        response = c.post(reverse('register'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+        self.user.refresh_from_db()
+        self.assertNotEqual(self.user.email, data['email'])
+
+    def test_register_view_post_same_email(self):
+        c = Client()
+        data = {'username': 'test2',
+                'email': self.user.email,
+                'password': 'DIFFERENT_PASSWORD',
+                'password_again': 'DIFFERENT_PASSWORD',
+                'netid': '123456789'}
+        response = c.post(reverse('register'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['form'])
+        new_user = User.objects.filter(username=data['username'])
+        self.assertFalse(new_user)
 

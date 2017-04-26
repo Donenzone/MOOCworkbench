@@ -1,13 +1,5 @@
-static/
-bower_components/
+*.csv
 
-MOOCworkbench/production_settings.py
-.idea/
-github_repositories/
-waliki_data/
-dump.rdb
-moocv
-.idea/workspace.xml
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -18,7 +10,6 @@ RunManager/Dockerfile
 
 # NPM modules
 node_modules/
-
 # Distribution / packaging
 .Python
 env/
@@ -47,8 +38,6 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 
-gitrepositories/
-
 # Unit test / coverage reports
 htmlcov/
 .tox/
@@ -60,13 +49,9 @@ coverage.xml
 *,cover
 .hypothesis/
 
-
 # Translations
 *.mo
 *.pot
-
-# Django stuff:
-*.log
 
 # Sphinx documentation
 docs/_build/
@@ -77,12 +62,4 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-db.sqlite3
-
-static/bundle.js
-
-celerybeat-schedule.db
-
 dump.rdb
-
-MOOCv/

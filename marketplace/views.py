@@ -11,6 +11,7 @@ from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.repo_init import PackageGitRepoInit
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
+from marketplace.models import PackageCategory
 from marketplace.forms import InternalPackageForm
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from user_manager.models import get_workbench_user
@@ -60,17 +61,32 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
     fields = ['package_name', 'description', 'category', 'language']
     template_name = 'marketplace/package_form.html'
 
+    def get_form(self, form_class=None):
+        step = self.get_step()
+        category = PackageCategory.objects.get(name=step.step.name)
+        initial_data = {'language': 1, 'category': category.pk}
+        form = InternalPackageForm(initial=initial_data)
+        return form
+
     def form_valid(self, form):
-        step_id = self.kwargs['step_id']
-        step_folder = ChosenExperimentSteps.objects.get(pk=step_id).folder_name()
-        experiment_id = self.kwargs['experiment_id']
-        experiment = verify_and_get_experiment(self.request, experiment_id)
+        step_folder = self.get_step().folder_name()
+        experiment = self.get_experiment()
         form.instance.owner = experiment.owner
 
         # save new internal package
         package_repo = PackageGitRepoInit(form.instance, experiment, step_folder)
         form.instance.git_repo = package_repo.init_repo_boilerplate()
         return super(InternalPackageCreateView, self).form_valid(form)
+
+    def get_experiment(self):
+        experiment_id = self.kwargs['experiment_id']
+        experiment = verify_and_get_experiment(self.request, experiment_id)
+        return experiment
+
+    def get_step(self):
+        step_id = self.kwargs['step_id']
+        step = ChosenExperimentSteps.objects.get(pk=step_id)
+        return step
 
 
 class InternalPackageDashboard(ExperimentPackageTypeMixin, View):

@@ -21,10 +21,10 @@ from marketplace.helpers.helper import update_setup_py_with_new_version
 class MarketplaceIndex(View):
     def get(self, request):
         context = {}
-        context['new_packages'] = ExternalPackage.objects.all().order_by('-created')[:10]
-        context['new_internal_packages'] = InternalPackage.objects.all().order_by('-created')[:10]
-        context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:10]
-        context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:10]
+        context['new_packages'] = ExternalPackage.objects.all().order_by('-created')[:5]
+        context['new_internal_packages'] = InternalPackage.objects.all().order_by('-created')[:5]
+        context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:5]
+        context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:5]
         return render(request, 'marketplace/marketplace_index.html', context=context)
 
 

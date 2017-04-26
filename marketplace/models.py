@@ -118,7 +118,7 @@ class PackageVersion(TimeStampedModel):
         return self.version_nr != version_nr
 
     def __str__(self):
-        return '{0}v{1} added at {2}'.format(self.package, self.version_nr, self.created)
+        return '{0} updated to version {1}'.format(self.package, self.version_nr)
 
 
 @receiver(post_save, sender=PackageVersion)

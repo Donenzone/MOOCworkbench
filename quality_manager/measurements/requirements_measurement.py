@@ -10,13 +10,12 @@ from git_manager.helpers.github_helper import GitHubHelper
 
 
 class RequirementsMeasurement(MeasurementAbstraction):
-    def __init__(self, experiment):
-        super().__init__(experiment)
+    def __init__(self, experiment_step):
+        super().__init__(experiment_step)
         self.measurement = ExperimentMeasure.objects.get(name='Dependencies defined')
         self.raw = RawMeasureResult()
 
     def measure(self):
-        requirements = Requirement.objects.filter(experiment=self.experiment)
         travis_ci_config = TravisInstance.objects.filter(experiment=self.experiment).first()
         if travis_ci_config:
             if travis_ci_config.enabled:

@@ -1,5 +1,5 @@
 from django.db import models
-from experiments_manager.models import Experiment
+from experiments_manager.models import ChosenExperimentSteps
 from model_utils.models import TimeStampedModel
 
 
@@ -42,7 +42,7 @@ class ExperimentMeasureResult(TimeStampedModel):
         (MEDIUM, 'Medium'),
         (LOW, 'Low'),
     )
-    experiment = models.ForeignKey(to=Experiment)
+    step = models.ForeignKey(to=ChosenExperimentSteps)
     measurement = models.ForeignKey(to=ExperimentMeasure)
     result = models.CharField(max_length=1, choices=SCALE)
     raw_values = models.ManyToManyField(to=RawMeasureResult)

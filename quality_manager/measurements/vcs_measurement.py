@@ -8,8 +8,8 @@ from statistics import mean, median
 class VersionControlUseMeasurement(MeasurementAbstraction):
     THREE_WEEKS = 21
 
-    def __init__(self, experiment):
-        super().__init__(experiment)
+    def __init__(self, experiment_step):
+        super().__init__(experiment_step)
         self.measurement = ExperimentMeasure.objects.get(name='Version control use')
         self.raw = RawMeasureResult()
 
@@ -32,7 +32,7 @@ class VersionControlUseMeasurement(MeasurementAbstraction):
 
         if median_nr_of_commits < 0.9:
             self.result.result = ExperimentMeasureResult.LOW
-        if median_nr_of_commits > 0.9 and median_nr_of_commits < 1.5:
+        if median_nr_of_commits < 1.5:
             self.result.result = ExperimentMeasureResult.MEDIUM
         if median_nr_of_commits > 1.5:
             self.result.result = ExperimentMeasureResult.HIGH

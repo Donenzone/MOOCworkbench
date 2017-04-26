@@ -11,8 +11,6 @@ from user_manager.models import WorkbenchUser
 from experiments_manager.models import Experiment, ChosenExperimentSteps
 from experiments_manager.models import ExperimentStep
 from git_manager.models import GitRepository
-from coverage_manager.models import CodeCoverage
-from helpers.helper import ExperimentPackageTypeMixin
 
 
 class SphinxHelperTest(TestCase):

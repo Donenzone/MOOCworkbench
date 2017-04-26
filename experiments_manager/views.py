@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from django.views.generic.detail import DetailView
 from markdown2 import Markdown
@@ -99,6 +100,7 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
                 chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, step=step, step_nr=counter)
                 if counter == 1:
                     chosen_experiment_step.active = True
+                    chosen_experiment_step.started_at = datetime.now()
                 chosen_experiment_step.save()
                 counter += 1
             initialize_repository.delay(experiment_id)
@@ -132,6 +134,7 @@ def complete_step_and_go_to_next(request, experiment_id):
     active_step = ChosenExperimentSteps.objects.get(experiment=experiment, active=True)
     active_step.active = False
     active_step.completed = True
+    active_step.completed_at = datetime.now()
     active_step.save()
     next_step_nr = active_step.step_nr + 1
     next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)

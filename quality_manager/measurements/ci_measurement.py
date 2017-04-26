@@ -4,8 +4,8 @@ from build_manager.models import TravisInstance
 
 
 class CiEnabledMeasurement(MeasurementAbstraction):
-    def __init__(self, experiment):
-        super().__init__(experiment)
+    def __init__(self, experiment_step):
+        super().__init__(experiment_step)
         self.measurement = ExperimentMeasure.objects.get(name='Use of CI')
 
     def measure(self):

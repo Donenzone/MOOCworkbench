@@ -3,10 +3,11 @@ from abc import abstractmethod
 
 
 class MeasurementAbstraction(object):
-    def __init__(self, experiment):
+    def __init__(self, experiment_step):
         self.result = ExperimentMeasureResult()
-        self.experiment = experiment
-        self.result.experiment = experiment
+        self.experiment_step = experiment_step
+        self.experiment = experiment_step.experiment
+        self.result.step = experiment_step
 
     @abstractmethod
     def measure(self):

@@ -8,8 +8,8 @@ from docs_manager.models import Docs
 
 
 class DocsMeasurement(MeasurementAbstraction):
-    def __init__(self, experiment):
-        super().__init__(experiment)
+    def __init__(self, experiment_step):
+        super().__init__(experiment_step)
         self.measurement = ExperimentMeasure.objects.get(name='Documentation')
         self.raw_funcs = RawMeasureResult()
         self.raw_class = RawMeasureResult()

@@ -24,6 +24,7 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
         what_now = WhatNow(self.experiment)
         context['what_now_list'] = what_now.what_to_do_now()
         context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
+        context['active_step_id'] = self.experiment.get_active_step()
 
         messages = {}
         for measurement in self._get_recent_measurements_for_all_types(self.experiment):
@@ -55,12 +56,12 @@ class NrOfCommitsView(MeasurementMixin, View):
 
 
 @login_required
-def refresh_measurements(request, experiment_id):
-    verify_and_get_experiment(request, experiment_id)
-    version_control_quality_check.delay(experiment_id)
-    requirements_quality_check.delay(experiment_id)
-    test_quality_check.delay(experiment_id)
-    ci_quality_check.delay(experiment_id)
-    docs_coverage_check.delay(experiment_id)
+def refresh_measurements(request, step_id):
+    verify_and_get_experiment(request, step_id)
+    version_control_quality_check.delay(step_id)
+    requirements_quality_check.delay(step_id)
+    test_quality_check.delay(step_id)
+    ci_quality_check.delay(step_id)
+    docs_coverage_check.delay(step_id)
 
     return JsonResponse({'refresh': True})

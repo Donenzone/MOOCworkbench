@@ -8,8 +8,8 @@ from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 
 class TestMeasurement(MeasurementAbstraction):
-    def __init__(self, experiment, github_helper):
-        super().__init__(experiment)
+    def __init__(self, experiment_step, github_helper):
+        super().__init__(experiment_step)
         self.measurement = ExperimentMeasure.objects.get(name='Testing')
         self.github_helper = github_helper
         self.raw = RawMeasureResult()

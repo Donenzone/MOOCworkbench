@@ -35,6 +35,9 @@ class Experiment(TimeStampedModel):
     def get_object_type(self):
         return ExperimentPackageTypeMixin.EXPERIMENT_TYPE
 
+    def get_active_step(self):
+        return ChosenExperimentSteps.objects.get(experiment=self, active=True)
+
 
 @receiver(post_save, sender=Experiment)
 def add_experiment_config(sender, instance, created, **kwargs):
@@ -65,8 +68,10 @@ class ChosenExperimentSteps(models.Model):
     step = models.ForeignKey(to=ExperimentStep)
     experiment = models.ForeignKey(to=Experiment)
     step_nr = models.IntegerField()
+    started_at = models.DateTimeField()
     active = models.BooleanField(default=False)
     completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True)
 
     def folder_name(self):
         return slugify(self.step.name).replace('-', '_')

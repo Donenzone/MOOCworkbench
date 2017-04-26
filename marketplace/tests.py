@@ -113,7 +113,7 @@ class MarketplaceTestCase(TestCase):
         self.assertFalse(external_package)
 
     def test_create_internal_package_get(self):
-        response = self.client.get(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 1}))
+        response = self.client.get(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
@@ -125,7 +125,7 @@ class MarketplaceTestCase(TestCase):
                                  'language': '1'
                                  }
         mock_package_repo_init.return_value = RepoInitMock(self.git_repo)
-        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 1}),
+        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 302)
         internal_package = InternalPackage.objects.filter(id=2)
@@ -135,7 +135,7 @@ class MarketplaceTestCase(TestCase):
         internal_package_data = {'package_name': 'My new package',
                                  'description': 'Desc',
                                  }
-        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 1, 'step_id': 1}),
+        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 200)
         internal_package = InternalPackage.objects.filter(id=2)
@@ -145,7 +145,7 @@ class MarketplaceTestCase(TestCase):
         internal_package_data = {'package_name': 'My new package',
                                  'description': 'Desc',
                                  }
-        response = self.client.post(reverse('internal_package_new', kwargs={'experiment_id': 0, 'step_id': 1}),
+        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 0, 'step_id': 1}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 200)
         internal_package = InternalPackage.objects.filter(id=2)

@@ -22,12 +22,13 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
     def get(self, request, experiment_id):
         context = super(DashboardView, self).get(request, experiment_id)
         what_now = WhatNow(self.experiment)
+        active_step = self.experiment.get_active_step()
         context['what_now_list'] = what_now.what_to_do_now()
         context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
-        context['active_step_id'] = self.experiment.get_active_step()
+        context['active_step_id'] = active_step.id
 
         messages = {}
-        for measurement in self._get_recent_measurements_for_all_types(self.experiment):
+        for measurement in self._get_recent_measurements_for_all_types(active_step):
             measurement_slug = slugify(measurement.measurement.name).replace('-', '_')
             messages[measurement_slug] = measurement.get_message()
         context['messages'] = messages
@@ -44,7 +45,8 @@ class NrOfCommitsView(MeasurementMixin, View):
     def get(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
         experiment_measure = ExperimentMeasure.objects.get(name='Version control use')
-        measurement = self.get_recent_measurements_for_type(experiment, experiment_measure)
+        measurement = self.get_recent_measurements_for_type(experiment.get_active_step(),
+                                                            experiment_measure)
 
         raw_values = []
         key_values = []

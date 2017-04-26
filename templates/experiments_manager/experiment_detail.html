@@ -125,7 +125,7 @@
             <div class="panel-footer">
               {% if step.active %}
                 <p>
-                    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#myModal">Complete and go to next step</a>
+                    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#step-modal">Complete and go to next step</a>
                 </p>
               {% endif %}
             </div>
@@ -150,7 +150,7 @@
 
 </div>
 
-<div class="modal fade" id="myModal" role="dialog">
+<div class="modal fade" id="step-modal" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -163,10 +163,10 @@
       </div>
       <div class="modal-footer">
         <p>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Do not create a package</button>
+            <a href="{% url 'complete_step_and_go_to_next' object.id %}" class="btn btn-default" data-dismiss="modal">Do not create a package</a>
         </p>
         <p>
-            <button type="button" class="btn btn-primary">Yes, create a package from the code in this step and publish it on the Marketplace</button>
+            <a href="{% url 'internalpackage_create' object.id active_step_id %}" class="btn btn-primary">Yes, create a package from the code in this step and publish it on the Marketplace</a>
         </p>
       </div>
     </div><!-- /.modal-content -->

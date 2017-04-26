@@ -34,6 +34,7 @@ class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin,
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         context['steps'] = get_steps(experiment)
         context['object_type'] = self.get_requirement_type(experiment)
+        context['active_step_id'] = experiment.get_active_step().id
         return context
 
 

@@ -117,7 +117,7 @@ class FileViewGitRepository(ExperimentContextMixin, View):
         file_name = request.GET['file_name']
         experiment = verify_and_get_experiment(request, experiment_id)
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-        context['content_file'] = github_helper.view_file_in_repo(file_name)
+        context['content_file'] = github_helper.view_file(file_name)
         return render(request, 'experiments_manager/file_detail.html', context)
 
 
@@ -152,7 +152,7 @@ def complete_step_and_go_to_next(request, experiment_id):
 def readme_of_experiment(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-    content_file = github_helper.view_file_in_repo('README.md')
+    content_file = github_helper.view_file('README.md')
     md = Markdown()
     content_file = md.convert(content_file)
     return render(request, 'experiments_manager/experiment_readme.html', {'readme': content_file})

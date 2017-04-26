@@ -1,22 +1,22 @@
-from django.shortcuts import render
-from django.views.generic.list import ListView
-from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from django.views.generic import CreateView, DetailView, UpdateView, View
+from django.views.generic.list import ListView
 from markdownx.utils import markdownify
 
-from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.helper import verify_and_get_experiment
-from git_manager.repo_init import PackageGitRepoInit
-from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from marketplace.models import PackageCategory
-from marketplace.forms import InternalPackageForm
+from experiments_manager.models import ChosenExperimentSteps
+from git_manager.utils.repo_init import PackageGitRepoInit
 from helpers.helper_mixins import ExperimentPackageTypeMixin
-from user_manager.models import get_workbench_user
+from marketplace.forms import InternalPackageForm
 from marketplace.helpers.helper import create_tag_for_package_version
 from marketplace.helpers.helper import update_setup_py_with_new_version
+from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
+from marketplace.models import PackageCategory
+from user_manager.models import get_workbench_user
 
 
 class MarketplaceIndex(View):

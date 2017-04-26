@@ -18,7 +18,7 @@ def update_setup_py_with_new_version(package_version_id):
     github = GitHubHelper(internal_package.owner, internal_package.git_repo.name)
     setup_py_template = get_file_from_code_template(CodeTemplateTypes.PACKAGE_TYPE, 'setup.py_template')
     setup_py = build_setup_py(internal_package, setup_py_template, package_version)
-    github.update_file_in_repository('setup.py', contents=setup_py, commit_message="Updated setup.py for new version")
+    github.update_file('setup.py', contents=setup_py, commit_message="Updated setup.py for new version")
 
 
 def build_setup_py(internal_package, setup_py_template, package_version=None):

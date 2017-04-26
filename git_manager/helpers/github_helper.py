@@ -30,7 +30,7 @@ class GitHubHelper(object):
         remaining_clone_url = clone_url.split('https://')[1]
         return 'https://{0}@{1}'.format(self.socialtoken, remaining_clone_url)
 
-    def list_files_in_repo(self, folder=''):
+    def list_files_in_folder(self, folder=''):
         try:
             if folder.startswith('/'):
                 folder_name = '{0}'.format(folder)
@@ -40,7 +40,7 @@ class GitHubHelper(object):
         except GithubException as e:
             return [e.data['message']]
 
-    def view_file_in_repo(self, file_name):
+    def view_file(self, file_name):
         try:
             encoded = self.github_repository.get_file_contents(file_name)
             decoded = base64.b64decode(encoded.content).decode("utf-8")
@@ -58,7 +58,7 @@ class GitHubHelper(object):
         except GithubException as e:
             print(e)
 
-    def update_file_in_repository(self, file_name, commit_message, contents, folder=''):
+    def update_file(self, file_name, commit_message, contents, folder=''):
         repo_file_name = self._get_repo_file_name(file_name, folder)
         current_file = self.github_repository.get_file_contents(repo_file_name)
         self.github_repository.update_file(repo_file_name, commit_message, contents, current_file.sha)

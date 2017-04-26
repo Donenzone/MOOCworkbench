@@ -23,13 +23,10 @@ class GitHelper(object):
         else:
             self.repo = Repo(self.repo_dir)
             self.pull_repository()
-
-    def pull_repository(self):
-        origin = self.repo.remotes.origin
-        origin.pull()
-
     def get_repo_dir(self):
-        return '{0}{1}/{2}'.format(REPO_DIR, self.github_helper.github_repository.owner.login, self.github_helper.github_repository.name)
+        return '{0}{1}/{2}'.format(REPO_DIR,
+                                   self.github_helper.github_repository.owner.login,
+                                   self.github_helper.github_repository.name)
 
     def create_branch(self, branch_name):
         new_branch = self.repo.create_head(branch_name)
@@ -52,6 +49,10 @@ class GitHelper(object):
 
     def set_remote(self, new_remote):
         subprocess.call(['git', 'remote', 'set-url', 'origin', new_remote], cwd=self.repo_dir)
+
+    def pull_repository(self):
+        origin = self.repo.remotes.origin
+        origin.pull()
 
     def push_changes(self):
         origin = self.repo.remotes.origin

@@ -11,4 +11,4 @@ class RepoFileListMixin(object):
 
     def _get_files_in_repository(self, user, repo_name, folder_name):
         github_helper = GitHubHelper(user, repo_name)
-        return github_helper.list_files_in_repo(folder_name)
+        return github_helper.list_files_in_folder(folder_name)

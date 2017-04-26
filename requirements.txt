@@ -23,5 +23,5 @@ travispy
 GitPython
 coveralls
 sphinx
-sqlalchemy
 django-autoslug
+cookiecutter

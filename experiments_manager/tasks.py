@@ -1,7 +1,8 @@
 from celery.decorators import task
 
-from git_manager.repo_init import ExperimentGitRepoInit
 from experiments_manager.models import Experiment
+from git_manager.utils.repo_init import ExperimentGitRepoInit
+
 
 @task
 def initialize_repository(experiment_id):

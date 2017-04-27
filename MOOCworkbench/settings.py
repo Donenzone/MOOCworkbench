@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'feedback',
     'docs_manager',
     'coverage_manager',
+    'cookiecutter_manager',
 
     'bootstrapform',
     'django_tables2',

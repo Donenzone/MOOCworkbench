@@ -1,11 +1,13 @@
 from django import forms
+
+from cookiecutter_manager.models import CookieCutterTemplate
 from .models import *
 
 
 class ExperimentForm(forms.ModelForm):
-    new_git_repo = forms.BooleanField(required=False, label="Create new GitHub repository", initial=True)
     description = forms.CharField(widget=forms.Textarea, required=True)
+    template = forms.ModelChoiceField(queryset=CookieCutterTemplate.objects.filter(meant_for=CookieCutterTemplate.EXPERIMENT))
 
     class Meta:
         model = Experiment
-        fields = ('title', 'description')
+        fields = ('title', 'description', 'template')

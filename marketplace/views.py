@@ -15,7 +15,7 @@ from marketplace.forms import InternalPackageForm
 from marketplace.helpers.helper import create_tag_for_package_version
 from marketplace.helpers.helper import update_setup_py_with_new_version
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from marketplace.models import PackageCategory
+from marketplace.models import Category
 from user_manager.models import get_workbench_user
 
 
@@ -63,7 +63,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
 
     def get_form(self, form_class=None):
         step = self.get_step()
-        category = PackageCategory.objects.get(name=step.step.name)
+        category = Category.objects.get(name=step.step.name)
         initial_data = {'language': 1, 'category': category.pk}
         form = InternalPackageForm(initial=initial_data)
         return form

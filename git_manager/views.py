@@ -23,7 +23,7 @@ def get_user_repositories(user):
     return []
 
 
-def create_new_github_repository_local(title, user, type, experiment):
+def create_new_github_repository(title, user):
     github_helper = GitHubHelper(user, title, create=True)
     repo = github_helper.github_repository
 

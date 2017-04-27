@@ -5,15 +5,16 @@ from model_utils.models import TimeStampedModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from user_manager.models import WorkbenchUser
-from git_manager.models import GitRepository
 from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
-from requirements_manager.models import Requirement
+from git_manager.models import GitRepository
 from helpers.helper_mixins import ExperimentPackageTypeMixin
+from marketplace.models import BasePackage
+from requirements_manager.models import Requirement
+from user_manager.models import WorkbenchUser
 
 
-class Experiment(TimeStampedModel):
+class Experiment(BasePackage):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(to=WorkbenchUser)

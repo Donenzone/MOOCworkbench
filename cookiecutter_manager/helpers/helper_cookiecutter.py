@@ -17,7 +17,7 @@ def _clone_cookiecutter_template(cookiecutter_template, repo_dir, project_name, 
     extra_context = {'project_name': project_name}
     extra_context['author_name'] = author_name
     extra_context['description'] = description
-    cookiecutter(cookiecutter_template.location,
+    cookiecutter(cookiecutter_template,
                  no_input=True,
                  extra_context=extra_context,
                  output_dir=repo_dir,

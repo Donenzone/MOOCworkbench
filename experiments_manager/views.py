@@ -21,7 +21,7 @@ from experiments_manager.mixins import ActiveStepMixin
 from experiments_manager.mixins import ExperimentContextMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import RepoFileListMixin
-from git_manager.views import get_user_repositories, create_new_github_repository_local
+from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
@@ -53,12 +53,10 @@ class ExperimentCreateView(View):
         experiment = Experiment()
         form = ExperimentForm(request.POST, instance=experiment)
         if form.is_valid():
+            cookiecutter = form.cleaned_data['template']
+            experiment.language = cookiecutter.language
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
             experiment.save()
-            if form.cleaned_data['new_git_repo']:
-                git_repo = create_new_github_repository_local(experiment.title, request.user, 'python', experiment)
-                experiment.git_repo = git_repo
-                experiment.save()
             return redirect(to=reverse('experimentsteps_choose', kwargs={'experiment_id': experiment.id}))
         else:
             repository_list = get_user_repositories(request.user)

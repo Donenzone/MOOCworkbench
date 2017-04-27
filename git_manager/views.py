@@ -33,4 +33,4 @@ def create_new_github_repository(title, user):
     git_repo.github_url = repo.html_url
     git_repo.save()
 
-    return git_repo
+    return git_repo, github_helper

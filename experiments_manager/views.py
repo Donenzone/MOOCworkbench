@@ -15,7 +15,7 @@ from experiments_manager.tables import ExperimentTable
 from experiments_manager.forms import ExperimentForm
 from experiments_manager.models import *
 from experiments_manager.tasks import initialize_repository
-from experiments_manager.helper import verify_and_get_experiment
+from experiments_manager.helper import verify_and_get_experiment, init_git_repo_for_experiment
 from experiments_manager.helper import get_steps
 from experiments_manager.mixins import ActiveStepMixin
 from experiments_manager.mixins import ExperimentContextMixin
@@ -57,6 +57,7 @@ class ExperimentCreateView(View):
             experiment.language = cookiecutter.language
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
             experiment.save()
+            init_git_repo_for_experiment(experiment, cookiecutter)
             return redirect(to=reverse('experimentsteps_choose', kwargs={'experiment_id': experiment.id}))
         else:
             repository_list = get_user_repositories(request.user)
@@ -91,7 +92,7 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
         step_list = []
         step_json_list = json.loads(request.POST['steplist'])
         counter = 1
-        if len(step_json_list) is not 0:
+        if step_json_list:
             delete_existing_chosen_steps(experiment)
             for step in step_json_list:
                 step = int(step)

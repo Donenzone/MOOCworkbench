@@ -25,3 +25,4 @@ coveralls
 sphinx
 django-autoslug
 cookiecutter
+virtualenv

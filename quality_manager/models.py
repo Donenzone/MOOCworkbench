@@ -26,7 +26,7 @@ class ExperimentMeasure(models.Model):
 
 class RawMeasureResult(models.Model):
     key = models.CharField(max_length=255)
-    value = models.FloatField(max_length=255)
+    value = models.CharField(max_length=1000)
 
     def __str__(self):
         return 'Key: {0} with value: {1}'.format(self.key, str(self.value))

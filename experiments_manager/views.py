@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import ast
 
 from django.views.generic.detail import DetailView
 from markdown2 import Markdown
@@ -16,6 +17,7 @@ from git_manager.mixins.repo_file_list import RepoFileListMixin
 from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
+from quality_manager.models import ExperimentMeasureResult
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm
@@ -91,7 +93,6 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
 
     def post(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
-        step_list = []
         step_json_list = json.loads(request.POST['steplist'])
         counter = 1
         if step_json_list:
@@ -115,13 +116,44 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
 
 
 class FileViewGitRepository(ExperimentContextMixin, View):
+
     def get(self, request, experiment_id):
         context = super(FileViewGitRepository, self).get(request, experiment_id)
         file_name = request.GET['file_name']
+        context['file_name'] = file_name
         experiment = verify_and_get_experiment(request, experiment_id)
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-        context['content_file'] = github_helper.view_file(file_name)
+        content_file = github_helper.view_file(file_name)
+        pylint_results = self.get_pylint_results()
+        context['content_file'] = self.add_pylint_results_to_content(pylint_results, content_file)
         return render(request, 'experiments_manager/file_detail.html', context)
+
+    def get_pylint_results(self):
+        pylint_measurement = ExperimentMeasureResult.objects.get(id=1)
+        result_list = []
+        for message in pylint_measurement.raw_values.all():
+            message_dict = ast.literal_eval(message.value)
+            result_list.append(message_dict)
+        return result_list
+
+    def add_pylint_results_to_content(self, pylint_results, content_file):
+        counter = 0
+        new_content_file_str = ''
+        for line in content_file.split('\n'):
+            message = self.get_messages_for_line(pylint_results, counter)
+            if message:
+                new_content_file_str += line + '\n'
+                new_content_file_str += '# {0}\n'.format(message['message'])
+            else:
+                new_content_file_str += line + '\n'
+            counter += 1
+        return new_content_file_str
+
+    def get_messages_for_line(self, message_dict, line_nr):
+        for message in message_dict:
+            if line_nr == message['line']:
+                return message
+
 
 
 @login_required

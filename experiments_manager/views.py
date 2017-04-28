@@ -11,22 +11,24 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from docs_manager.mixins import DocsMixin
-from experiments_manager.tables import ExperimentTable
-from experiments_manager.forms import ExperimentForm
-from experiments_manager.models import *
-from experiments_manager.tasks import initialize_repository
-from experiments_manager.helper import verify_and_get_experiment, init_git_repo_for_experiment
-from experiments_manager.helper import get_steps
-from experiments_manager.mixins import ActiveStepMixin
-from experiments_manager.mixins import ExperimentContextMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import RepoFileListMixin
 from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
+from .tables import ExperimentTable
+from .forms import ExperimentForm
+from .models import *
+from .helper import verify_and_get_experiment
+from .helper import get_steps
+from .mixins import ActiveStepMixin
+from .mixins import ExperimentContextMixin
+from .utils import init_git_repo_for_experiment
 
-class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
+
+class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
+                           MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
 
     def get_context_data(self, **kwargs):
@@ -43,8 +45,9 @@ class ExperimentCreateView(View):
         try:
             form = ExperimentForm()
             repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/experiment_edit_new.html", {'form': form, 'experiment_id': experiment_id,
-                                                                'repository_list': repository_list})
+            return render(request, "experiments_manager/experiment_edit_new.html", {'form': form,
+                                                                                    'experiment_id': experiment_id,
+                                                                                    'repository_list': repository_list})
         except ValueError as a:
             messages.add_message(request, messages.INFO, 'Before creating an experiment, please sign in with GitHub')
             return redirect(to=reverse('view_my_profile'))
@@ -56,7 +59,6 @@ class ExperimentCreateView(View):
             cookiecutter = form.cleaned_data['template']
             experiment.language = cookiecutter.language
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
-            experiment.save()
             init_git_repo_for_experiment(experiment, cookiecutter)
             return redirect(to=reverse('experimentsteps_choose', kwargs={'experiment_id': experiment.id}))
         else:
@@ -74,7 +76,7 @@ class FileListForStep(RepoFileListMixin, View):
         experiment = verify_and_get_experiment(request, experiment_id)
 
         step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
-        file_list = self._get_files_in_repository(request.user, experiment.git_repo.name, step.folder_name())
+        file_list = self._get_files_in_repository(request.user, experiment.git_repo.name, step.location)
         return_dict = []
         for content_file in file_list:
             return_dict.append((content_file.name, content_file.type))
@@ -94,6 +96,7 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
         counter = 1
         if step_json_list:
             delete_existing_chosen_steps(experiment)
+            cookiecutter = experiment.template
             for step in step_json_list:
                 step = int(step)
                 step = ExperimentStep.objects.get(id=step)
@@ -101,9 +104,10 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
                 if counter == 1:
                     chosen_experiment_step.active = True
                     chosen_experiment_step.started_at = datetime.now()
+                cookiecutter_location = cookiecutter.folder_file_locations.get(step=step)
+                chosen_experiment_step.location = cookiecutter_location.location
                 chosen_experiment_step.save()
                 counter += 1
-            initialize_repository.delay(experiment_id)
             url = reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()})
             return JsonResponse({'url': url})
         else:

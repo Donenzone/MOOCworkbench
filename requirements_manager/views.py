@@ -1,4 +1,3 @@
-import requirements
 from django.shortcuts import reverse, redirect
 from django.views.generic.list import ListView
 from django.views.generic import CreateView
@@ -84,16 +83,3 @@ def build_requirements_file(exp_or_package):
     for requirement in exp_or_package.requirements.all():
         requirements_txt += '{0}\n'.format(str(requirement))
     return requirements_txt
-
-
-def parse_requirements_file(exp_or_package, requirements_file):
-    for req in requirements.parse(requirements_file):
-        requirement = Requirement()
-        requirement.package_name = req.name
-        if req.specs:
-            requirement.version = req.specs[0][1]
-        requirement.save()
-
-        exp_or_package.requirements.add(requirement)
-        exp_or_package.save()
-

@@ -32,11 +32,9 @@ class GitHubHelper(object):
 
     def list_files_in_folder(self, folder=''):
         try:
-            if folder.startswith('/'):
-                folder_name = '{0}'.format(folder)
-            else:
-                folder_name = '/{0}'.format(folder)
-            return self.github_repository.get_contents(folder_name)
+            if not folder.startswith('/'):
+                folder = '/{0}'.format(folder)
+            return self.github_repository.get_contents(folder)
         except GithubException as e:
             return [e.data['message']]
 

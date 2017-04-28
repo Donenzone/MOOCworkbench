@@ -1,6 +1,15 @@
 from django.db import models
 
 from marketplace.models import Language
+from experiments_manager.models import ExperimentStep
+
+
+class CookieCutterLocationToStepMapping(models.Model):
+    location = models.CharField(max_length=100)
+    step = models.ForeignKey(to=ExperimentStep)
+
+    def __str__(self):
+        return self.location
 
 
 class CookieCutterTemplate(models.Model):
@@ -14,6 +23,9 @@ class CookieCutterTemplate(models.Model):
     name = models.CharField(max_length=100)
     meant_for = models.CharField(choices=MEANT_FOR_CHOICES, default=EXPERIMENT, max_length=10)
     language = models.ForeignKey(to=Language)
+    folder_file_locations = models.ManyToManyField(to=CookieCutterLocationToStepMapping)
 
     def __str__(self):
         return self.name
+
+

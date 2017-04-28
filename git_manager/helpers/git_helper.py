@@ -25,7 +25,6 @@ class GitHelper(object):
         return '{0}{1}'.format(REPO_DIR,
                                self.github_helper.github_repository.owner.login)
 
-
     def clone_repository(self):
         clone_url = self.github_helper.get_clone_url()
         if not os.path.isdir(self.repo_dir):

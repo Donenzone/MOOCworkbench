@@ -1,10 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-
-from user_manager.views import get_workbench_user
-from git_manager.models import GitRepository
-from git_manager.helpers.github_helper import GitHubHelper
+from .helpers.github_helper import GitHubHelper
 
 
 @login_required
@@ -24,13 +21,6 @@ def get_user_repositories(user):
 
 
 def create_new_github_repository(title, user):
-    github_helper = GitHubHelper(user, title, create=True)
-    repo = github_helper.github_repository
+    github_helper = GitHubHelper(user, 'Sandbox-Research-5') #title, create=True)
 
-    git_repo = GitRepository()
-    git_repo.name = repo.name
-    git_repo.owner = get_workbench_user(user)
-    git_repo.github_url = repo.html_url
-    git_repo.save()
-
-    return git_repo, github_helper
+    return github_helper

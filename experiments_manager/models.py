@@ -18,6 +18,7 @@ class Experiment(BasePackage):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(to=WorkbenchUser)
+    template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
 
     git_repo = models.ForeignKey(to=GitRepository, null=True)
     travis = models.ForeignKey(to=TravisInstance, null=True)
@@ -69,13 +70,11 @@ class ChosenExperimentSteps(models.Model):
     step = models.ForeignKey(to=ExperimentStep)
     experiment = models.ForeignKey(to=Experiment)
     step_nr = models.IntegerField()
-    started_at = models.DateTimeField()
+    started_at = models.DateTimeField(null=True)
     active = models.BooleanField(default=False)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True)
-
-    def folder_name(self):
-        return slugify(self.step.name).replace('-', '_')
+    location = models.CharField(max_length=100, blank=True)
 
 
 def delete_existing_chosen_steps(experiment):

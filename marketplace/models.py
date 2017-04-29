@@ -21,7 +21,7 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 PYPI_URL = 'https://pypi.python.org/pypi'
 
 
-class PackageCategory(TimeStampedModel):
+class Category(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     slug = AutoSlugField(populate_from='name')
@@ -31,23 +31,29 @@ class PackageCategory(TimeStampedModel):
         return self.name
 
 
-class PackageLanguage(TimeStampedModel):
+class Language(TimeStampedModel):
     language = models.CharField(max_length=255)
 
     def __str__(self):
         return self.language
 
 
-class Package(TimeStampedModel):
-    package_name = models.CharField(max_length=255, unique=True)
+class BasePackage(TimeStampedModel):
+    language = models.ForeignKey(to=Language)
+
+    class Meta:
+        abstract = True
+
+
+class Package(BasePackage):
+    name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
-    category = models.ForeignKey(to=PackageCategory)
-    language = models.ForeignKey(to=PackageLanguage)
     owner = models.ForeignKey(to=WorkbenchUser, related_name='owner')
+    category = models.ForeignKey(to=Category)
 
     def __str__(self):
-        return self.package_name
+        return self.name
 
     def get_latest_package_version(self):
         package_version = PackageVersion.objects.filter(package=self).order_by('-created')
@@ -77,7 +83,7 @@ class InternalPackage(Package):
 
     @property
     def python_package_name(self):
-        return slugify(self.package_name).replace('-', '_')
+        return slugify(self.name).replace('-', '_')
 
 
 @receiver(post_save, sender=InternalPackage)

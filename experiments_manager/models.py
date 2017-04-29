@@ -5,23 +5,27 @@ from model_utils.models import TimeStampedModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from user_manager.models import WorkbenchUser
-from git_manager.models import GitRepository
 from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
-from requirements_manager.models import Requirement
+from git_manager.models import GitRepository
 from helpers.helper_mixins import ExperimentPackageTypeMixin
+from marketplace.models import BasePackage
+from requirements_manager.models import Requirement
+from user_manager.models import WorkbenchUser
+from pylint_manager.models import PylintScan
 
 
-class Experiment(TimeStampedModel):
+class Experiment(BasePackage):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(to=WorkbenchUser)
+    template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
 
     git_repo = models.ForeignKey(to=GitRepository, null=True)
     travis = models.ForeignKey(to=TravisInstance, null=True)
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
+    pylint = models.ForeignKey(to=PylintScan, null=True)
 
     def slug(self):
         return slugify(self.title)
@@ -52,6 +56,10 @@ def add_experiment_config(sender, instance, created, **kwargs):
         travis.save()
         instance.travis = travis
 
+        pylint = PylintScan()
+        pylint.save()
+        instance.pylint = pylint
+
         instance.save()
 
 
@@ -68,13 +76,11 @@ class ChosenExperimentSteps(models.Model):
     step = models.ForeignKey(to=ExperimentStep)
     experiment = models.ForeignKey(to=Experiment)
     step_nr = models.IntegerField()
-    started_at = models.DateTimeField()
+    started_at = models.DateTimeField(null=True)
     active = models.BooleanField(default=False)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True)
-
-    def folder_name(self):
-        return slugify(self.step.name).replace('-', '_')
+    location = models.CharField(max_length=100, blank=True)
 
 
 def delete_existing_chosen_steps(experiment):

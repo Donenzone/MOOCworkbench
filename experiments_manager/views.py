@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import ast
 
 from django.views.generic.detail import DetailView
 from markdown2 import Markdown
@@ -11,22 +12,25 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from docs_manager.mixins import DocsMixin
-from experiments_manager.tables import ExperimentTable
-from experiments_manager.forms import ExperimentForm
-from experiments_manager.models import *
-from experiments_manager.tasks import initialize_repository
-from experiments_manager.helper import verify_and_get_experiment
-from experiments_manager.helper import get_steps
-from experiments_manager.mixins import ActiveStepMixin
-from experiments_manager.mixins import ExperimentContextMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import RepoFileListMixin
-from git_manager.views import get_user_repositories, create_new_github_repository_local
+from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
+from pylint_manager.helper import return_results_for_file
+
+from .tables import ExperimentTable
+from .forms import ExperimentForm
+from .models import *
+from .helper import verify_and_get_experiment
+from .helper import get_steps
+from .mixins import ActiveStepMixin
+from .mixins import ExperimentContextMixin
+from .utils import init_git_repo_for_experiment
 
 
-class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin, MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
+class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
+                           MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
 
     def get_context_data(self, **kwargs):
@@ -43,8 +47,9 @@ class ExperimentCreateView(View):
         try:
             form = ExperimentForm()
             repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/experiment_edit_new.html", {'form': form, 'experiment_id': experiment_id,
-                                                                'repository_list': repository_list})
+            return render(request, "experiments_manager/experiment_edit_new.html", {'form': form,
+                                                                                    'experiment_id': experiment_id,
+                                                                                    'repository_list': repository_list})
         except ValueError as a:
             messages.add_message(request, messages.INFO, 'Before creating an experiment, please sign in with GitHub')
             return redirect(to=reverse('view_my_profile'))
@@ -53,12 +58,10 @@ class ExperimentCreateView(View):
         experiment = Experiment()
         form = ExperimentForm(request.POST, instance=experiment)
         if form.is_valid():
+            cookiecutter = form.cleaned_data['template']
+            experiment.language = cookiecutter.language
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
-            experiment.save()
-            if form.cleaned_data['new_git_repo']:
-                git_repo = create_new_github_repository_local(experiment.title, request.user, 'python', experiment)
-                experiment.git_repo = git_repo
-                experiment.save()
+            init_git_repo_for_experiment(experiment, cookiecutter)
             return redirect(to=reverse('experimentsteps_choose', kwargs={'experiment_id': experiment.id}))
         else:
             repository_list = get_user_repositories(request.user)
@@ -75,7 +78,7 @@ class FileListForStep(RepoFileListMixin, View):
         experiment = verify_and_get_experiment(request, experiment_id)
 
         step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
-        file_list = self._get_files_in_repository(request.user, experiment.git_repo.name, step.folder_name())
+        file_list = self._get_files_in_repository(request.user, experiment.git_repo.name, step.location)
         return_dict = []
         for content_file in file_list:
             return_dict.append((content_file.name, content_file.type))
@@ -90,11 +93,11 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
 
     def post(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
-        step_list = []
         step_json_list = json.loads(request.POST['steplist'])
         counter = 1
-        if len(step_json_list) is not 0:
+        if step_json_list:
             delete_existing_chosen_steps(experiment)
+            cookiecutter = experiment.template
             for step in step_json_list:
                 step = int(step)
                 step = ExperimentStep.objects.get(id=step)
@@ -102,9 +105,10 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
                 if counter == 1:
                     chosen_experiment_step.active = True
                     chosen_experiment_step.started_at = datetime.now()
+                cookiecutter_location = cookiecutter.folder_file_locations.get(step=step)
+                chosen_experiment_step.location = cookiecutter_location.location
                 chosen_experiment_step.save()
                 counter += 1
-            initialize_repository.delay(experiment_id)
             url = reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()})
             return JsonResponse({'url': url})
         else:
@@ -112,13 +116,32 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
 
 
 class FileViewGitRepository(ExperimentContextMixin, View):
+
     def get(self, request, experiment_id):
         context = super(FileViewGitRepository, self).get(request, experiment_id)
         file_name = request.GET['file_name']
+        context['file_name'] = file_name
         experiment = verify_and_get_experiment(request, experiment_id)
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-        context['content_file'] = github_helper.view_file_in_repo(file_name)
+        content_file = github_helper.view_file(file_name)
+        pylint_results = return_results_for_file(experiment, file_name)
+        context['content_file'] = self.add_pylint_results_to_content(pylint_results, content_file)
         return render(request, 'experiments_manager/file_detail.html', context)
+
+    def add_pylint_results_to_content(self, pylint_results, content_file):
+        counter = 0
+        new_content_file_str = ''
+        for line in content_file.split('\n'):
+            pylint_for_line = pylint_results.filter(line_nr=counter)
+            if pylint_for_line:
+                new_content_file_str += "{0}\n".format(line)
+                for pylint_line in pylint_for_line:
+                    new_content_file_str += '<span class="nocode" id="{0}style">{1}</span>'.format(pylint_line.pylint_type,
+                                                                                                     pylint_line.message)
+            else:
+                new_content_file_str += line + '\n'
+            counter += 1
+        return new_content_file_str
 
 
 @login_required
@@ -152,7 +175,7 @@ def complete_step_and_go_to_next(request, experiment_id):
 def readme_of_experiment(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-    content_file = github_helper.view_file_in_repo('README.md')
+    content_file = github_helper.view_file('README.md')
     md = Markdown()
     content_file = md.convert(content_file)
     return render(request, 'experiments_manager/experiment_readme.html', {'readme': content_file})

@@ -1,9 +1,5 @@
 from quality_manager.measurements.measurement import MeasurementAbstraction
 from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure, RawMeasureResult
-from build_manager.models import TravisCiConfig
-from build_manager.travis_ci_helper import TravisCiHelper
-import re
-from statistics import mean
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 

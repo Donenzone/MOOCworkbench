@@ -1,4 +1,3 @@
-import requirements
 from django.shortcuts import reverse, redirect
 from django.views.generic.list import ListView
 from django.views.generic import CreateView
@@ -73,8 +72,8 @@ def write_requirements_file(request, object_id, object_type):
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
     requirements_txt = build_requirements_file(exp_or_package)
     github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
-    github_helper.update_file_in_repository('requirements.txt', 'Updated requirements.txt file by MOOC workbench',
-                                            requirements_txt)
+    github_helper.update_file('requirements.txt', 'Updated requirements.txt file by MOOC workbench',
+                              requirements_txt)
     messages.add_message(request, messages.INFO, 'Successfully updated requirements in your repository')
     return redirect(to=exp_or_package.get_absolute_url())
 
@@ -84,16 +83,3 @@ def build_requirements_file(exp_or_package):
     for requirement in exp_or_package.requirements.all():
         requirements_txt += '{0}\n'.format(str(requirement))
     return requirements_txt
-
-
-def parse_requirements_file(exp_or_package, requirements_file):
-    for req in requirements.parse(requirements_file):
-        requirement = Requirement()
-        requirement.package_name = req.name
-        if req.specs:
-            requirement.version = req.specs[0][1]
-        requirement.save()
-
-        exp_or_package.requirements.add(requirement)
-        exp_or_package.save()
-

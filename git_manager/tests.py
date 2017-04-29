@@ -74,21 +74,21 @@ class GitManagerTestCases(TestCase):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
-        self.assertEqual(github_helper.list_files_in_repo('test1'), GithubMockRepo.TEST1_LIST)
+        self.assertEqual(github_helper.list_files_in_folder('test1'), GithubMockRepo.TEST1_LIST)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_github_list_folder_with_slash(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
-        self.assertEqual(github_helper.list_files_in_repo('/test1'), GithubMockRepo.TEST1_LIST)
+        self.assertEqual(github_helper.list_files_in_folder('/test1'), GithubMockRepo.TEST1_LIST)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_github_list_folder_empty(self, mock_github):
         mock_github.return_value = GithubMock()
         github_helper = GitHubHelper(self.user, 'test')
         self.assertIsNotNone(github_helper)
-        self.assertEqual(github_helper.list_files_in_repo(), GithubMockRepo.TEST2_LIST)
+        self.assertEqual(github_helper.list_files_in_folder(), GithubMockRepo.TEST2_LIST)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
     def test_view_file_in_repo(self, mock_github):

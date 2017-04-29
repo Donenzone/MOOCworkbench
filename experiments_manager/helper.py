@@ -1,5 +1,5 @@
-from experiments_manager.models import Experiment
-from experiments_manager.models import ChosenExperimentSteps
+from .models import Experiment
+from .models import ChosenExperimentSteps
 
 
 def verify_and_get_experiment(request, experiment_id):
@@ -10,3 +10,7 @@ def verify_and_get_experiment(request, experiment_id):
 
 def get_steps(experiment):
     return ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
+
+
+
+

@@ -1,10 +1,13 @@
 from celery.decorators import task
 
-from git_manager.repo_init import ExperimentGitRepoInit
-from experiments_manager.models import Experiment
+from cookiecutter_manager.models import CookieCutterTemplate
+
+from .models import Experiment
+from .helper import init_git_repo_for_experiment
+
 
 @task
-def initialize_repository(experiment_id):
+def initialize_repository(experiment_id, cookiecutter_id):
     experiment = Experiment.objects.get(id=experiment_id)
-    git_init = ExperimentGitRepoInit(experiment)
-    git_init.init_repo_boilerplate()
+    cookiecutter = CookieCutterTemplate.objects.get(id=cookiecutter_id)
+    init_git_repo_for_experiment(experiment, cookiecutter)

@@ -4,3 +4,22 @@ a.headerlink {
     text-decoration: none;
     visibility: hidden;
 }
+
+span.nocode {
+    display:block;
+    background-color:darkgray;
+    padding:2px;
+
+}
+
+#estyle {
+    color:red;
+}
+
+#wstyle {
+    color:yellow;
+}
+
+#cstyle {
+    color:blue;
+}

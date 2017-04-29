@@ -8,8 +8,10 @@
 
 {% block content %}
 
-    <h2>File contents of {{ name }}</h2>
-    <pre><code class="python">
-    {{ content_file|linebreaks }}
-        </code></pre>
+    <h2>File contents of {{ file_name }}</h2>
+    <pre>
+        <code class="prettyprint">
+        {{ content_file|safe }}
+        </code>
+    </pre>
 {% endblock %}

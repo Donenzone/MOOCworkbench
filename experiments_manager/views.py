@@ -17,7 +17,7 @@ from git_manager.mixins.repo_file_list import RepoFileListMixin
 from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
-from quality_manager.models import ExperimentMeasureResult
+from pylint_manager.helper import return_results_for_file
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm
@@ -124,36 +124,24 @@ class FileViewGitRepository(ExperimentContextMixin, View):
         experiment = verify_and_get_experiment(request, experiment_id)
         github_helper = GitHubHelper(request.user, experiment.git_repo.name)
         content_file = github_helper.view_file(file_name)
-        pylint_results = self.get_pylint_results()
+        pylint_results = return_results_for_file(experiment, file_name)
         context['content_file'] = self.add_pylint_results_to_content(pylint_results, content_file)
         return render(request, 'experiments_manager/file_detail.html', context)
-
-    def get_pylint_results(self):
-        pylint_measurement = ExperimentMeasureResult.objects.get(id=1)
-        result_list = []
-        for message in pylint_measurement.raw_values.all():
-            message_dict = ast.literal_eval(message.value)
-            result_list.append(message_dict)
-        return result_list
 
     def add_pylint_results_to_content(self, pylint_results, content_file):
         counter = 0
         new_content_file_str = ''
         for line in content_file.split('\n'):
-            message = self.get_messages_for_line(pylint_results, counter)
-            if message:
-                new_content_file_str += line + '\n'
-                new_content_file_str += '# {0}\n'.format(message['message'])
+            pylint_for_line = pylint_results.filter(line_nr=counter)
+            if pylint_for_line:
+                new_content_file_str += "{0}\n".format(line)
+                for pylint_line in pylint_for_line:
+                    new_content_file_str += '<span class="nocode" id="{0}style">{1}</span>'.format(pylint_line.pylint_type,
+                                                                                                     pylint_line.message)
             else:
                 new_content_file_str += line + '\n'
             counter += 1
         return new_content_file_str
-
-    def get_messages_for_line(self, message_dict, line_nr):
-        for message in message_dict:
-            if line_nr == message['line']:
-                return message
-
 
 
 @login_required

@@ -12,6 +12,7 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.models import BasePackage
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
+from pylint_manager.models import PylintScan
 
 
 class Experiment(BasePackage):
@@ -24,6 +25,7 @@ class Experiment(BasePackage):
     travis = models.ForeignKey(to=TravisInstance, null=True)
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
+    pylint = models.ForeignKey(to=PylintScan, null=True)
 
     def slug(self):
         return slugify(self.title)
@@ -53,6 +55,10 @@ def add_experiment_config(sender, instance, created, **kwargs):
         travis = TravisInstance(config=travis_config)
         travis.save()
         instance.travis = travis
+
+        pylint = PylintScan()
+        pylint.save()
+        instance.pylint = pylint
 
         instance.save()
 

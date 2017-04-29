@@ -10,8 +10,8 @@
 
     <h2>File contents of {{ file_name }}</h2>
     <pre>
-        <code class="python">
-    {{ content_file|linebreaks }}
+        <code class="prettyprint">
+        {{ content_file|safe }}
         </code>
     </pre>
 {% endblock %}

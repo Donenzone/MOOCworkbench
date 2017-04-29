@@ -75,25 +75,35 @@
                             File/Folder name
                         </th>
                         <th>
-                            Type
+                            Static code analysis
                         </th>
                     </tr>
                   </thead>
                   <tbody id="tbody-{{ step.id }}">
                     {% if step.active %}
                     {% for item in git_list %}
-                    <tr>
+                    <tr class="clickable-row">
                         <td>
                             {% if item.type == 'dir' %}
-                              <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}">{{ item.name }}</a>
+                              <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}" class="base-url">{{ item.name }}</a>
 
                             {% else %}
-                              <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}">{{ item.name }}</a>
+                              <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}" class="base-url">{{ item.name }}</a>
 
                             {% endif %}
                         </td>
                         <td>
-                            {{ item.type }}
+                            {% if item.pylint_results.e %}
+                                <span class="label label-danger">{{ item.pylint_results.e }} errors</span>
+                            {% endif %}
+
+                            {% if item.pylint_results.w %}
+                                <span class="label label-warning">{{ item.pylint_results.w }} warnings</span>
+                            {% endif %}
+
+                            {% if item.pylint_results.c %}
+                                <span class="label label-info">{{ item.pylint_results.c }} other issues</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -176,6 +186,10 @@
 <script type='text/javascript'>
 
   $(document).ready(function() {
+   $(".clickable-row").click(function() {
+        window.location = $(this).find('.base-url').attr('href');
+    });
+
     var hash = window.location.hash;
     hash && $('ul.nav a[href="' + hash + '"]').tab('show');
     
@@ -195,7 +209,7 @@
       'dashboard': "{% url 'dashboard' object.id %}",
       'requirements': "{% url 'requirements_list' object.id object_type %}",
       'readme': "{% url 'readme_view' object.id %}",
-    }
+    };
 
     $('#readme-click').click(function() {
       $("#readme").load(url_dict['readme']);

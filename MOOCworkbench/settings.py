@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'docs_manager',
     'coverage_manager',
     'cookiecutter_manager',
+    'pylint_manager',
 
     'bootstrapform',
     'django_tables2',

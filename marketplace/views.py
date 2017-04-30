@@ -7,6 +7,7 @@ from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
 from markdownx.utils import markdownify
 
+from MOOCworkbench.settings import DEBUG
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import ChosenExperimentSteps
 from git_manager.utils.repo_init import PackageGitRepoInit
@@ -15,7 +16,6 @@ from marketplace.forms import InternalPackageForm
 from marketplace.helpers.helper import create_tag_for_package_version
 from marketplace.helpers.helper import update_setup_py_with_new_version
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from marketplace.models import Category
 from user_manager.models import get_workbench_user
 
 
@@ -35,7 +35,7 @@ class PackageListView(ListView):
 
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
-    fields = ['package_name', 'description', 'project_page', 'category', 'language']
+    fields = ['name', 'description', 'project_page', 'category', 'language']
     template_name = 'marketplace/package_form.html'
 
     def form_valid(self, form):
@@ -58,18 +58,17 @@ class ExternalPackageDetailView(DetailView):
 
 class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
     model = InternalPackage
-    fields = ['package_name', 'description', 'category', 'language']
+    form_class = InternalPackageForm
     template_name = 'marketplace/package_form.html'
 
-    def get_form(self, form_class=None):
-        step = self.get_step()
-        category = Category.objects.get(name=step.step.name)
-        initial_data = {'language': 1, 'category': category.pk}
-        form = InternalPackageForm(initial=initial_data)
-        return form
+    def get_context_data(self, **kwargs):
+        context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
+        context['experiment_id'] = self.kwargs['experiment_id']
+        context['step_id'] = self.kwargs['step_id']
+        return context
 
     def form_valid(self, form):
-        step_folder = self.get_step().folder_name()
+        step_folder = self.get_step().location
         experiment = self.get_experiment()
         form.instance.owner = experiment.owner
 

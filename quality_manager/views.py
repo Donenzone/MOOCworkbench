@@ -25,7 +25,7 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
         active_step = self.experiment.get_active_step()
         context['what_now_list'] = what_now.what_to_do_now()
         context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
-        context['active_step_id'] = active_step.id
+        context['active_step_id'] = 0 if not active_step else active_step.id
 
         messages = {}
         for measurement in self._get_recent_measurements_for_all_types(active_step):

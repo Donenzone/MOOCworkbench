@@ -50,7 +50,7 @@ class GitRepoInit(object):
 class PackageGitRepoInit(GitRepoInit):
 
     def __init__(self, internal_package, experiment, step_folder):
-        github_helper_package = GitHubHelper(experiment.owner, internal_package.package_name, create=True)
+        github_helper_package = GitHubHelper(experiment.owner, internal_package.name, create=True)
         super().__init__(github_helper_package, type='pip')
         self.experiment = experiment
         self.internal_package = internal_package

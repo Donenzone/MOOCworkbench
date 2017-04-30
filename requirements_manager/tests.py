@@ -12,7 +12,7 @@ from git_manager.models import GitRepository
 from marketplace.models import InternalPackage
 from requirements_manager.models import Requirement
 from requirements_manager.views import build_requirements_file
-from requirements_manager.views import parse_requirements_file
+from requirements_manager.helper import parse_requirements_file
 from user_manager.models import WorkbenchUser
 
 
@@ -27,9 +27,11 @@ class RequirementsManagerTestCase(TestCase):
                                                      github_url='https://github')
         self.experiment = Experiment.objects.create(title='Experiment', description='test',
                                                     owner=self.workbench_user,
-                                                    git_repo=self.git_repo)
+                                                    git_repo=self.git_repo,
+                                                    language_id=1,
+                                                    template_id=2)
 
-        self.internal_package = InternalPackage.objects.create(package_name='Package',
+        self.internal_package = InternalPackage.objects.create(name='Package',
                                                                description='Package',
                                                                git_repo=self.git_repo,
                                                                language_id=1,

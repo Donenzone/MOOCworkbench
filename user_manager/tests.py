@@ -12,7 +12,7 @@ from git_manager.models import GitRepository
 from user_manager.models import WorkbenchUser
 
 
-class RequirementsManagerTestCase(TestCase):
+class UserManagerTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
@@ -22,7 +22,9 @@ class RequirementsManagerTestCase(TestCase):
                                                      github_url='https://github')
         self.experiment = Experiment.objects.create(title='Experiment', description='test',
                                                     owner=self.workbench_user,
-                                                    git_repo=self.git_repo)
+                                                    git_repo=self.git_repo,
+                                                    language_id=1,
+                                                    template_id=2)
 
         self.client = Client()
         self.client.login(username='test', password='test')

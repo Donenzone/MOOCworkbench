@@ -13,7 +13,9 @@ class RepoFileListMixin(object):
                                                             self.step(experiment).location)
 
         for git_file in content_files:
-            git_file.pylint_results = return_result_summary_for_file(experiment, git_file.path)
+            if hasattr(git_file, 'pylint_results'):
+                git_file.pylint_results = return_result_summary_for_file(experiment,
+                                                                         git_file.path)
         context['git_list'] = content_files
         return context
 

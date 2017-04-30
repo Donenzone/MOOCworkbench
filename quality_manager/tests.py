@@ -9,25 +9,37 @@ from django.shortcuts import reverse
 from django.core.management import call_command
 
 from user_manager.models import WorkbenchUser
-from experiments_manager.models import Experiment
+from experiments_manager.models import Experiment, ChosenExperimentSteps
 from git_manager.models import GitRepository
 
 
 class QualityManagerTestCase(TestCase):
     def setUp(self):
+        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
+        call_command('loaddata', 'fixtures/measures.json', verbosity=0)
+        call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
+        call_command('loaddata', 'fixtures/templates.json', verbosity=0)
+        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
+
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
-        self.experiment = Experiment.objects.create(title='Experiment', description='test', owner=self.workbench_user, git_repo=self.git_repo)
+        self.experiment = Experiment.objects.create(title='Experiment',
+                                                    description='test',
+                                                    owner=self.workbench_user,
+                                                    git_repo=self.git_repo,
+                                                    language_id=1,
+                                                    template_id=2)
+        self.chosen_experiment_step = ChosenExperimentSteps.objects.create(step_id=1,
+                                                experiment=self.experiment,
+                                                                      step_nr=1,
+                                                                      active=True,
+                                                                      location='/src/main/')
 
         self.client = Client()
         self.client.login(username='test', password='test')
-        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
-        call_command('loaddata', 'fixtures/measures.json', verbosity=0)
-        call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
-        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
 
     def test_dashboard_view(self):
         response = self.client.get(reverse('dashboard', kwargs={'experiment_id': self.experiment.id}))
@@ -60,7 +72,7 @@ class QualityManagerTestCase(TestCase):
     @patch('quality_manager.views.ci_quality_check')
     @patch('quality_manager.views.docs_coverage_check')
     def test_refresh_measurements(self, mock_vcs, mock_test, mock_req, mock_ci, mock_docs):
-        response = self.client.get(reverse('measurements_refresh', kwargs={'experiment_id': self.experiment.id}))
+        response = self.client.get(reverse('measurements_refresh', kwargs={'step_id': self.chosen_experiment_step.id}))
         self.assertEqual(response.status_code, 200)
 
 

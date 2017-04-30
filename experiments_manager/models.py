@@ -40,7 +40,9 @@ class Experiment(BasePackage):
         return ExperimentPackageTypeMixin.EXPERIMENT_TYPE
 
     def get_active_step(self):
-        return ChosenExperimentSteps.objects.get(experiment=self, active=True)
+        active_step = ChosenExperimentSteps.objects.filter(experiment=self, active=True)
+        if active_step:
+            return active_step[0]
 
 
 @receiver(post_save, sender=Experiment)

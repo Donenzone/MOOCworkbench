@@ -17,19 +17,26 @@ from helpers.helper import ExperimentPackageTypeMixin
 
 class CoverageManagerTestCase(TestCase):
     def setUp(self):
+        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
+        call_command('loaddata', 'fixtures/measures.json', verbosity=0)
+        call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
+        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
+        call_command('loaddata', 'fixtures/templates.json', verbosity=0)
+
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
-        self.experiment = Experiment.objects.create(title='Experiment', description='test', owner=self.workbench_user, git_repo=self.git_repo)
+        self.experiment = Experiment.objects.create(title='Experiment',
+                                                    description='test',
+                                                    owner=self.workbench_user,
+                                                    git_repo=self.git_repo,
+                                                    language_id=1,
+                                                    template_id=1)
 
         self.client = Client()
         self.client.login(username='test', password='test')
-        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
-        call_command('loaddata', 'fixtures/measures.json', verbosity=0)
-        call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
-        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
 
     def enable_travis_for_experiment(self):
         enable_travis = self.experiment.travis

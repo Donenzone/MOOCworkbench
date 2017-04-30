@@ -16,15 +16,23 @@ from git_manager.models import GitRepository
 
 class ExperimentTestCase(TestCase):
     def setUp(self):
+        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
+        call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
+        call_command('loaddata', 'fixtures/templates.json', verbosity=0)
+
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
-        self.experiment = Experiment.objects.create(title='Experiment', description='test', owner=self.workbench_user, git_repo=self.git_repo)
+        self.experiment = Experiment.objects.create(title='Experiment',
+                                                    description='test',
+                                                    owner=self.workbench_user,
+                                                    git_repo=self.git_repo,
+                                                    language_id=1,
+                                                    template_id=2)
         self.client = Client()
         self.client.login(username='test', password='test')
-        call_command('loaddata', 'fixtures/steps.json', verbosity=0)
 
     def test_index_not_signed_in(self):
         c = Client()
@@ -52,23 +60,22 @@ class ExperimentTestCase(TestCase):
         self.assertIsNotNone(response.context['form'])
         self.assertEqual(response.context['experiment_id'], 0)
 
-    @patch('experiments_manager.views.create_new_github_repository_local')
-    def test_create_new_experiment_post(self, mock_create_new_github_repo):
-        git_repo = GitRepository(name='Sandbox-Research', owner=self.workbench_user, github_url='https://github')
-        git_repo.save()
-        mock_create_new_github_repo.return_value = git_repo
+    #@patch('experiments_manager.views.init_git_repo_for_experiment')
+    #def test_create_new_experiment_post(self, mock_create_new_github_repo):
+    #    git_repo = GitRepository(name='Sandbox-Research', owner=self.workbench_user, github_url='https://github')
+    #    git_repo.save()
 
-        data = {'title': 'Sandbox Research', 'description': 'My first experiment', 'new_git_repo': True}
-        response = self.client.post(reverse('experiment_new'), data=data)
+    #    data = {'title': 'Sandbox Research', 'description': 'My first experiment', 'language': 1, 'template': 2}
+    #    response = self.client.post(reverse('experiment_new'), data=data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('experimentsteps_choose', kwargs={'experiment_id': 2}))
+    #    self.assertEqual(response.status_code, 302)
+    #    self.assertEqual(response.url, reverse('experimentsteps_choose', kwargs={'experiment_id': 2}))
 
     @patch('experiments_manager.views.get_user_repositories')
     def test_create_new_experiment_post_missing_title(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
-        data = {'description': 'My first experiment', 'new_git_repo': True}
+        data = {'description': 'My first experiment', 'language': 1, 'template': 2}
         response = self.client.post(reverse('experiment_new'), data=data)
 
         self.assertEqual(response.status_code, 200)
@@ -78,18 +85,17 @@ class ExperimentTestCase(TestCase):
     def test_create_new_experiment_post_missing_description(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
-        data = {'title': 'Sandbox Research', 'new_git_repo': True}
+        data = {'title': 'Sandbox Research', 'language': 1, 'template': 2}
         response = self.client.post(reverse('experiment_new'), data=data)
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-
     @patch('experiments_manager.views.get_user_repositories')
     def test_create_new_experiment_post_missing_title_and_desc(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
-        data = {'new_git_repo': True}
+        data = {'language': 1, 'template': 2}
         response = self.client.post(reverse('experiment_new'), data=data)
 
         self.assertEqual(response.status_code, 200)
@@ -112,26 +118,26 @@ class ExperimentTestCase(TestCase):
         self.assertEqual(response.context['experiment'].id, 1)
 
     def test_choose_experiment_steps_post(self):
-        data = {'steplist': '["1","2","3","4","5","6"]'}
+        data = {'steplist': '["1","2","3","4","5"]'}
         response = self.client.post(reverse('experimentsteps_choose', kwargs={'experiment_id': 1}), data=data)
         self.assertEqual(response.status_code, 200)
         chosen_experiment_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
-        self.assertEqual(chosen_experiment_steps.count(), 6)
+        self.assertEqual(chosen_experiment_steps.count(), 5)
 
     def test_choose_experiment_steps_double_post(self):
-        data = {'steplist': '["1","2","3","4","5","6"]'}
+        data = {'steplist': '["1","2","3","4","5"]'}
         response = self.client.post(reverse('experimentsteps_choose', kwargs={'experiment_id': 1}), data=data)
         self.assertEqual(response.status_code, 200)
         chosen_experiment_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
-        self.assertEqual(chosen_experiment_steps.count(), 6)
+        self.assertEqual(chosen_experiment_steps.count(), 5)
 
-        new_data = {'steplist': '["6","5","4","3","2"]'}
+        new_data = {'steplist': '["5","4","3","2"]'}
         response = self.client.post(reverse('experimentsteps_choose', kwargs={'experiment_id': 1}), data=new_data)
         self.assertEqual(response.status_code, 200)
         chosen_experiment_steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
-        first_step = ExperimentStep.objects.get(id=6)
+        first_step = ExperimentStep.objects.get(id=5)
         FIRST_STEP_NR = 1
-        self.assertEqual(chosen_experiment_steps.count(), 5)
+        self.assertEqual(chosen_experiment_steps.count(), 4)
         self.assertEqual(chosen_experiment_steps.get(step=first_step).step_nr, FIRST_STEP_NR)
 
     def test_choose_experiment_steps_post_1_step(self):
@@ -148,12 +154,12 @@ class ExperimentTestCase(TestCase):
         self.assertIsNotNone(response_json['message'])
 
     @patch('experiments_manager.views.GitHubHelper')
-    @patch('experiments_manager.views.GitHubHelper.list_files_in_repo')
+    @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
     @patch('experiments_manager.views.RepoFileListMixin._get_files_in_repository')
-    def test_experiment_detail_view(self, mock_github_helper, mock_github_helper_file_list, mock_get_files_in_repository):
+    def test_experiment_detail_view(self, mock_get_files_in_repository, mock_github_helper_file_list, mock_github_helper):
         self.test_choose_experiment_steps_post()
         mock_github_helper.return_value = None
-        mock_github_helper_file_list = ['file']
+        mock_github_helper_file_list.return_value = ['file']
         mock_get_files_in_repository.return_value = self.get_mock_files()
 
         response = self.client.get(reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'}))
@@ -187,7 +193,7 @@ class ExperimentTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def get_mock_files(self):
-        Foo = namedtuple('Foo', ['name', 'type'])
-        main = Foo(name='main.py', type='file')
-        test = Foo(name='tests.py', type='file')
+        Foo = namedtuple('Foo', ['name', 'path', 'type'])
+        main = Foo(name='main.py', path='/src/main.py', type='file')
+        test = Foo(name='tests.py', path='/sr/tests.py', type='file')
         return [main, test]

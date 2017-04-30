@@ -21,6 +21,7 @@ waliki[all]
 django-bootstrap-breadcrumbs
 travispy
 GitPython
+sqlalchemy
 coveralls
 sphinx
 django-autoslug

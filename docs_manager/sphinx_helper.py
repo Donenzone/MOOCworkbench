@@ -33,7 +33,8 @@ class SphinxHelper(object):
         self._make_first_html()
 
     def _quickstart_sphinx(self):
-        subprocess.call(['sphinx-quickstart', '-q', '-a', self.owner, '-v', '0.1', '-p', self.repo_name, self.path, '--ext-autodoc', '--ext-coverage'])
+        subprocess.call(['sphinx-quickstart', '-q', '-a', self.owner, '-v', '0.1', '-p', self.repo_name,
+                         self.path, '--ext-autodoc', '--ext-coverage'])
 
     def _gen_docs_per_folder(self):
         for folder in self.folders:

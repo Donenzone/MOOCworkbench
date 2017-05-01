@@ -57,7 +57,7 @@ def docs_generate(request, object_id, object_type):
     if exp_or_package.docs.enabled:
         github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
         git_helper = GitHelper(github_helper)
-        git_helper.pull_repository()
+        git_helper.pull()
         folders = exp_or_package.get_docs_folder()
         sphinx_helper = SphinxHelper(exp_or_package, folders, github_helper.github_repository.owner.login)
         sphinx_helper.add_sphinx_to_repo()

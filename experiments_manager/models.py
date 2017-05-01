@@ -34,7 +34,7 @@ class Experiment(BasePackage):
         return reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
 
     def get_docs_folder(self):
-        return [x.folder_name() for x in ChosenExperimentSteps.objects.filter(experiment=self).order_by('step_nr')]
+        return [x.location for x in ChosenExperimentSteps.objects.filter(experiment=self).order_by('step_nr')]
 
     def get_object_type(self):
         return ExperimentPackageTypeMixin.EXPERIMENT_TYPE
@@ -83,6 +83,10 @@ class ChosenExperimentSteps(models.Model):
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True)
     location = models.CharField(max_length=100, blank=True)
+    main_module = models.CharField(max_length=100, blank=True)
+
+    def location_slug(self):
+        return slugify(self.location)
 
 
 def delete_existing_chosen_steps(experiment):

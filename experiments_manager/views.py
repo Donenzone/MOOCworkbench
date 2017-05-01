@@ -107,6 +107,7 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
                     chosen_experiment_step.started_at = datetime.now()
                 cookiecutter_location = cookiecutter.folder_file_locations.get(step=step)
                 chosen_experiment_step.location = cookiecutter_location.location
+                chosen_experiment_step.main_module = cookiecutter_location.main_module
                 chosen_experiment_step.save()
                 counter += 1
             url = reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()})

@@ -1,11 +1,7 @@
-import os
-
-from experiments_manager.models import ChosenExperimentSteps
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.models import GitRepository
 from requirements_manager.helper import build_requirements_file
-from helpers.helper import replace_variable_in_file
 from helpers.helper import get_absolute_path
 from marketplace.helpers.helper import SetupPyVariables, build_setup_py
 
@@ -41,7 +37,6 @@ class GitRepoInit(object):
         if folder:
             contents = self.replace_folder_in_file(contents, folder)
         return contents
-
 
     class Meta:
         abstract = True

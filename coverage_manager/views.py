@@ -68,8 +68,8 @@ def coveralls_create(travis_instance):
 
 
 def get_experiment_from_request_post(request):
-    assert 'experiment_id' in request.POST
-    experiment_id = request.POST['experiment_id']
+    assert 'object_id' in request.POST
+    experiment_id = request.POST['object_id']
     return verify_and_get_experiment(request, experiment_id)
 
 

@@ -6,6 +6,7 @@ from experiments_manager.models import ExperimentStep
 
 class CookieCutterLocationToStepMapping(models.Model):
     location = models.CharField(max_length=100)
+    main_module = models.CharField(max_length=100)
     step = models.ForeignKey(to=ExperimentStep)
 
     def __str__(self):

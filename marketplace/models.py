@@ -71,6 +71,7 @@ class InternalPackage(Package):
     travis = models.ForeignKey(to=TravisInstance, null=True)
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
+    published = models.BooleanField(default=False)
 
     def get_absolute_url(self):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.pk})
@@ -125,6 +126,9 @@ class PackageVersion(TimeStampedModel):
 
     def __str__(self):
         return '{0} updated to version {1}'.format(self.package, self.version_nr)
+
+    class Meta:
+        unique_together = ('package', 'version_nr')
 
 
 @receiver(post_save, sender=PackageVersion)

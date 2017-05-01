@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from coverage_manager.models import CodeCoverage
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
@@ -43,6 +44,17 @@ def coveralls_disable(request):
         return JsonResponse({'disabled': True})
 
     return JsonResponse({'disabled': False})
+
+
+@login_required
+@csrf_exempt
+def coveralls_filecoverage(request):
+    experiment = get_experiment_from_request_post(request)
+    assert 'filename' in request.POST
+    filename = request.POST['filename']
+    github_helper = get_github_helper(request, experiment)
+    coverage_helper = CoverallsHelper(github_helper.owner, github_helper.repo_name)
+    return JsonResponse({'coverage': coverage_helper.get_file_coverage(filename)})
 
 
 @login_required

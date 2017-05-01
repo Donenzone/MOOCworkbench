@@ -18,6 +18,7 @@ from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from pylint_manager.helper import return_results_for_file
+from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm

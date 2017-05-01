@@ -32,7 +32,7 @@
             </td>
         </tr>
         <tr>
-            <td>Git repository</td>
+            <td>GitHub URL</td>
             <td><a href="{{ object.git_repo.github_url }}" target="_blank">View on GitHub</a></td>
         </tr>
         <tr>
@@ -67,7 +67,7 @@
               </div>
               <hr />
               {% endif %}
-              <table class="table table-striped">
+              <table class="table table-striped main-step-table">
                   <thead>
                     <tr>
                         <th>
@@ -75,6 +75,9 @@
                         </th>
                         <th>
                             Static code analysis
+                        </th>
+                        <th>
+                            Code coverage
                         </th>
                     </tr>
                   </thead>
@@ -103,6 +106,9 @@
                             {% if item.pylint_results.c %}
                                 <span class="label label-info">{{ item.pylint_results.c }} other issues</span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <span class="label label-info code-coverage" id="{{ item.slug }}" data-filename="{{ item.path }}"></span>
                         </td>
                     </tr>
                     {% endfor %}
@@ -220,16 +226,39 @@
       $("#requirements").load(url_dict['requirements']);
     });
 
+    $('.code-coverage').each(function(){
+        filename = $(this).attr('data-filename');
+        code_coverage_id = '#' + $(this).attr('id');
+
+        (function(code_coverage_id) {
+            $(code_coverage_id).html('Getting coverage data...');
+            $.post({
+                url: '{% url "coveralls_filecoverage" %}',
+                data: {
+                  'object_id': {{ experiment.id }},
+                  'object_type': '{{ object_type }}',
+                  'filename': filename
+                },
+                success: function(data) {
+                    $(code_coverage_id).html(data.coverage);
+                },
+                error: function() {
+                    $(code_coverage_id).html('No coverage data');
+                }
+            });
+        })(code_coverage_id);
+    });
+
     $('.step-panel .panel-title').click(function (event) {
       var step_id = $(this).attr('id');
-      var identifier = '#tbody-' + step_id
-      $(identifier).append('<tr><td>Loading files...</td><td></td></tr>')
+      var identifier = '#tbody-' + step_id;
+      $(identifier).append('<tr><td>Loading files...</td><td></td></tr>');
 
       $.ajax({
         url: '{% url "file_list_for_step" %}',
         data: {
-          experiment_id: {{ experiment.id }},
-          step_id: step_id,
+          'experiment_id': {{ experiment.id }},
+          'step_id': step_id
         },
         success: function(data) {
           $(identifier).empty();

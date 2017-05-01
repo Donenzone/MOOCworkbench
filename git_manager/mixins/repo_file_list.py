@@ -1,3 +1,5 @@
+from django.template.defaultfilters import slugify
+
 from experiments_manager.helper import verify_and_get_experiment
 from pylint_manager.helper import return_result_summary_for_file
 
@@ -16,6 +18,7 @@ class RepoFileListMixin(object):
             if hasattr(git_file, 'pylint_results'):
                 git_file.pylint_results = return_result_summary_for_file(experiment,
                                                                          git_file.path)
+            git_file.slug = slugify(git_file.name)
         context['git_list'] = content_files
         return context
 

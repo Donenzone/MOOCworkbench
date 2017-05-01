@@ -14,4 +14,8 @@ urlpatterns = [
     url(r'^subscribe/(?P<package_id>\d+)/$', login_required(PackageSubscriptionView.as_view()), name="package_subscribe"),
     url(r'^dashboard/(?P<pk>\d+)/$', login_required(InternalPackageDashboard.as_view()), name="internalpackage_dashboard"),
     url(r'^edit/(?P<pk>\d+)/$', login_required(InternalPackageUpdateView.as_view()), name="internalpackage_update"),
+    url(r'^install/(?P<pk>\d+)/$', internalpackage_install, name="internalpackage_install"),
+    url(r'^my-packages/$', login_required(InternalPackageListView.as_view()), name="internalpackage_list"),
+    url(r'^view-version/(?P<pk>\d+)/(?P<package_id>\d+)/$', login_required(PackageVersionDetailView.as_view()), name="packageversion_detail"),
+
 ]

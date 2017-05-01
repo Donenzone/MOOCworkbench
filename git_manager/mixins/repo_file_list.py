@@ -15,9 +15,8 @@ class RepoFileListMixin(object):
                                                             self.step(experiment).location)
 
         for git_file in content_files:
-            if hasattr(git_file, 'pylint_results'):
-                git_file.pylint_results = return_result_summary_for_file(experiment,
-                                                                         git_file.path)
+            git_file.pylint_results = return_result_summary_for_file(experiment,
+                                                                     git_file.path)
             git_file.slug = slugify(git_file.name)
         context['git_list'] = content_files
         return context

@@ -234,7 +234,8 @@
             $(code_coverage_id).html('Getting coverage data...');
             $.post({
                 url: '{% url "coveralls_filecoverage" %}',
-                data: {
+                data:
+                    {
                   'object_id': {{ experiment.id }},
                   'object_type': '{{ object_type }}',
                   'filename': filename

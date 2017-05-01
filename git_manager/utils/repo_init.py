@@ -30,7 +30,7 @@ class GitRepoInit(object):
         if part_of_step:
             path = '{0}{1}steps/{2}'.format(get_absolute_path(), self.template_type_folder, filename)
         else:
-            path = '{0}{1}{2}'.format(get_absolute_path(), self.template_type_folder, filename)
+            path = '{0}/{1}{2}'.format(get_absolute_path(), self.template_type_folder, filename)
         file_to_open = open(path, 'r')
 
         contents = file_to_open.read()
@@ -91,7 +91,7 @@ class PackageGitRepoInit(GitRepoInit):
         git_helper.filter_and_checkout_subfolder(self.step_folder)
         new_remote = self.github_helper.get_clone_url()
         git_helper.set_remote(new_remote)
-        git_helper.push_changes()
+        git_helper.push()
 
     def clone_new_module_repo(self):
         package_repo = GitHelper(self.github_helper)
@@ -101,7 +101,7 @@ class PackageGitRepoInit(GitRepoInit):
     def move_module_into_folder(self, git_helper):
         git_helper.move_repo_contents_to_folder(self.step_folder)
         git_helper.repo.index.commit('Moved module into own folder')
-        git_helper.push_changes()
+        git_helper.push()
 
     def create_setup_py(self):
         setup_py_template = self.get_file_contents('setup.py_template')
@@ -112,3 +112,5 @@ class PackageGitRepoInit(GitRepoInit):
         requirements_txt = build_requirements_file(self.experiment.pk, self.experiment.get_object_type())
         self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file', contents=requirements_txt)
 
+    def clean_up_github_folders(self):
+        pass

@@ -18,7 +18,7 @@ from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from pylint_manager.helper import return_results_for_file
-from coverage_manager.helpers.coveralls_helper import CoverallsHelper
+from pylint_manager.utils import run_pylint
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm
@@ -40,6 +40,8 @@ class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
         context['steps'] = get_steps(experiment)
         context['object_type'] = self.get_requirement_type(experiment)
         context['active_step_id'] = experiment.get_active_step().id
+
+        #run_pylint(experiment)
         return context
 
 
@@ -149,7 +151,7 @@ class FileViewGitRepository(ExperimentContextMixin, View):
 @login_required
 def index(request):
     owner = WorkbenchUser.objects.get(user=request.user)
-    experiments = Experiment.objects.filter(owner=owner)
+    experiments = Experiment.objects.filter(owner=owner).order_by('-created')
     table = ExperimentTable(experiments)
     return render(request, 'experiments_manager/experiments_table.html', {'table': table})
 

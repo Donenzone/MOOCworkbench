@@ -30,7 +30,7 @@ def init_git_repo_for_experiment(experiment, cookiecutter):
     clone_cookiecutter_template(cookiecutter, repo_dir, repo_name, experiment.owner, experiment.description)
 
     git_helper.commit('Cookiecutter template added')
-    #git_helper.push()
+    git_helper.push()
 
     requirements_file = github_helper.view_file('requirements.txt')
     parse_requirements_file(experiment, requirements_file)

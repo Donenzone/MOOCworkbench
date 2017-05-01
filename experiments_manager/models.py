@@ -20,6 +20,7 @@ class Experiment(BasePackage):
     description = models.TextField(blank=True)
     owner = models.ForeignKey(to=WorkbenchUser)
     template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
+    completed = models.BooleanField(default=False)
 
     git_repo = models.ForeignKey(to=GitRepository, null=True)
     travis = models.ForeignKey(to=TravisInstance, null=True)
@@ -43,6 +44,9 @@ class Experiment(BasePackage):
         active_step = ChosenExperimentSteps.objects.filter(experiment=self, active=True)
         if active_step:
             return active_step[0]
+
+    def __str__(self):
+        return self.title
 
 
 @receiver(post_save, sender=Experiment)

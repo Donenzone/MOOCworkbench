@@ -1,15 +1,16 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
+from django.contrib.auth.decorators import login_required
 from markdownx.utils import markdownify
 
-from MOOCworkbench.settings import DEBUG
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import ChosenExperimentSteps
+from experiments_manager.mixins import ActiveExperimentsList
 from git_manager.utils.repo_init import PackageGitRepoInit
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.forms import InternalPackageForm
@@ -17,6 +18,7 @@ from marketplace.helpers.helper import create_tag_for_package_version
 from marketplace.helpers.helper import update_setup_py_with_new_version
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from user_manager.models import get_workbench_user
+from requirements_manager.helper import add_internalpackage_to_experiment
 
 
 class MarketplaceIndex(View):
@@ -43,7 +45,7 @@ class ExternalPackageCreateView(CreateView):
         return super(ExternalPackageCreateView, self).form_valid(form)
 
 
-class ExternalPackageDetailView(DetailView):
+class ExternalPackageDetailView(ActiveExperimentsList, DetailView):
     model = ExternalPackage
 
     def get_context_data(self, **kwargs):
@@ -88,6 +90,14 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         return step
 
 
+class InternalPackageListView(ListView):
+    model = InternalPackage
+
+    def get_queryset(self):
+        qs = super(InternalPackageListView, self).get_queryset()
+        return qs.filter(owner__user_id=self.request.user.id)
+
+
 class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
     def get(self, request, pk):
         package = get_object_or_404(InternalPackage, pk=pk)
@@ -111,12 +121,13 @@ class InternalPackageUpdateView(UpdateView):
         return super(InternalPackageUpdateView, self).form_valid(form)
 
 
-class InternalPackageDetailView(DetailView):
+class InternalPackageDetailView(ActiveExperimentsList, DetailView):
     model = InternalPackage
 
     def get_context_data(self, **kwargs):
         context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
-        context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
+        package_id = self.kwargs['pk']
+        context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
         for resource in resources:
             resource.markdown = markdownify(resource.resource)
@@ -133,12 +144,21 @@ class InternalPackageVersionCreateView(CreateView):
         form.instance.package = package
         form.instance.added_by = get_workbench_user(self.request.user)
         response = super(InternalPackageVersionCreateView, self).form_valid(form)
-        create_tag_for_package_version(package.pk)
-        update_setup_py_with_new_version(package.pk)
+        create_tag_for_package_version(form.instance.id)
+        update_setup_py_with_new_version(form.instance.id)
         return response
 
     def get_success_url(self):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['package_id']})
+
+
+class PackageVersionDetailView(DetailView):
+    model = PackageVersion
+
+    def get_queryset(self):
+        qs = super(PackageVersionDetailView, self).get_queryset()
+        package_id = self.kwargs['package_id']
+        return qs.filter(package_id=package_id)
 
 
 class PackageVersionCreateView(CreateView):
@@ -177,5 +197,22 @@ class PackageSubscriptionView(View):
         else:
             package.subscribed_users.remove(workbench_user)
             package.save()
-        messages.add_message(request, messages.INFO, 'Subscription preferences changed')
+        messages.add_message(request, messages.SUCCESS, 'Subscription preferences changed')
         return HttpResponseRedirect(redirect_to=reverse('package_detail', kwargs={'pk': package_id}))
+
+
+@login_required
+def internalpackage_install(request, pk):
+    internal_package = InternalPackage.objects.get(pk=pk)
+    assert 'experiment_id' in request.POST
+    experiment_id = request.POST['experiment_id']
+    experiment = verify_and_get_experiment(request, experiment_id)
+    result = add_internalpackage_to_experiment(internal_package, experiment)
+    if result:
+        messages.add_message(request, messages.SUCCESS, 'Added package to your experiment')
+        return JsonResponse({'added': True})
+    else:
+        messages.add_message(request, messages.ERROR, 'Could not add package to your experiment')
+        return JsonResponse({'added': False})
+
+

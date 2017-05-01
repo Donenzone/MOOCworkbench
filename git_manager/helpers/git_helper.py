@@ -58,9 +58,14 @@ class GitHelper(object):
         origin.push()
 
     def filter_and_checkout_subfolder(self, folder_name):
+        if folder_name.startswith('/'):
+            folder_name = folder_name[1:]
         subprocess.call(['git', 'filter-branch', '--prune-empty', '--subdirectory-filter', folder_name, 'master'], cwd=self.repo_dir)
 
     def move_repo_contents_to_folder(self, folder_name):
+        if '/' in folder_name:
+            folder_name = folder_name.split('/')
+            folder_name = folder_name[-1]
         folder_path = '{0}/{1}'.format(self.repo_dir, folder_name)
         current_path = '{0}'.format(self.repo_dir)
         dir_list = os.listdir(current_path)

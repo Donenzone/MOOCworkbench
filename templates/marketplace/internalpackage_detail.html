@@ -5,22 +5,24 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb object.package_name "package_detail" object.id %}
+    {% breadcrumb object.name "package_detail" object.id %}
 {% endblock %}
 
 {% block content %}
 
     <div class="container">
         <div class="row">
-            <div class="col-md-9">
-                <h2>Package: {{ object.package_name }}</h2>
+            <div class="col-md-6">
+                <h2>Package: {{ object.name }}</h2>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 {% if not workbench_user in object.subscribed_users.all %}
                     <a href="{% url 'package_subscribe' object.pk %}" class="btn btn-default">Subscribe for updates</a>
                 {% else %}
-                    <a href="{% url 'package_subscribe' object.pk %}">Unsubscribe</a>
+                    <a href="{% url 'package_subscribe' object.pk %}" class="btn btn-default">Unsubscribe</a>
                 {% endif %}
+
+                <a href="#" class="btn btn-default" data-toggle="modal" data-target="#dependency-modal">Add Package To My Project</a>
             </div>
         </div>
         <p>
@@ -28,38 +30,39 @@
                 <a href="{% url 'internalpackage_dashboard' object.pk %}" class="btn btn-primary">Go To Package Dashboard</a>
             {% endif %}
         </p>
+
+        <p class="lead">{{ object.description }}</p>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <div class="panel panel-info">
                     <div class="panel-heading">General information</div>
                     <div class="panel-body">
                         <table class="table">
                             <tr>
-                                <td>Description</td>
-                                <td>{{ object.description }}
-                            </tr>
-                            <tr>
                                 <td>Created by</td>
-                                <td>{{ object.owner }}
+                                <td>{{ object.owner }}</td>
                             </tr>
                             <tr>
                                 <td>Added at</td>
-                                <td>{{ object.created }}
+                                <td>{{ object.created }}</td>
                             </tr>
                             <tr>
                                 <td>Category</td>
-                                <td>{{ object.category }}
+                                <td>{{ object.category }}</td>
                             </tr>
                             <tr>
                                 <td>Language</td>
-                                <td>{{ object.language }}
+                                <td>{{ object.language }}</td>
+                            </tr>
+                            <tr>
+                                <td>Documentation</td>
+                                <td>Read Package Documentation</td>
                             </tr>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">Version history</div>
                     <div class="panel-body">
@@ -71,7 +74,7 @@
                             {% for version in version_history %}
                                 <tr>
                                     <td>
-                                        {{ version.version_nr }}
+                                        <a href="#" class="version-btn" data-toggle="modal" data-target="#version-modal" data-url="{% url 'packageversion_detail' version.pk object.pk %}">{{ version.version_nr }}</a>
                                     </td>
                                     <td>
                                         {{ version.created }}
@@ -145,4 +148,68 @@
             {% endfor %}
         </div>
     </div>
+
+<!-- Modal -->
+<div class="modal fade" id="dependency-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Install and Use Package {{ object.name }}</h4>
+      </div>
+      <div class="modal-body">
+        Choose an experiment to install this package to:
+          {{ experiment_select_form|bootstrap }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="save-install-package">Install Package</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Modal -->
+<div class="modal fade" id="version-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">View version of package</h4>
+      </div>
+      <div class="modal-body">
+            <div id="version-information">Loading...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Install Package</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.version-btn').click(function() {
+                fetch_url = $(this).attr('data-url');
+                $("#version-information").load(fetch_url);
+            });
+
+            $('#save-install-package').click(function() {
+                var selected_val = $( "#id_experiments option:selected" ).val();
+                $.post({
+                    url: '{% url 'internalpackage_install' object.pk %}',
+                    data: {
+                        experiment_id: selected_val,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        if (data.added) {
+                            location.reload();
+                        }
+                    }
+                })
+            });
+        });
+    </script>
 {% endblock %}

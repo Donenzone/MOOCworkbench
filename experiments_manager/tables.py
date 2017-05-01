@@ -9,3 +9,4 @@ class ExperimentTable(tables.Table):
     class Meta:
         model = Experiment
         attrs = {'class': 'table'}
+        fields = ['completed', 'title', 'language', 'template', 'git_repo', 'created']

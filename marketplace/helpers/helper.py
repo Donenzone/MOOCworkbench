@@ -24,7 +24,7 @@ def update_setup_py_with_new_version(package_version_id):
 def build_setup_py(internal_package, setup_py_template, package_version=None):
     version = '0.1' if not package_version else package_version.version_nr
     var_list = []
-    var_list.append((SetupPyVariables.PACKAGE_NAME_VAR, internal_package.package_name))
+    var_list.append((SetupPyVariables.PACKAGE_NAME_VAR, internal_package.name))
     var_list.append((SetupPyVariables.VERSION_VAR, version))
     var_list.append((SetupPyVariables.AUTHOR_VAR, str(internal_package.owner.user)))
     var_list.append((SetupPyVariables.DESCRIPTION_VAR, internal_package.description))

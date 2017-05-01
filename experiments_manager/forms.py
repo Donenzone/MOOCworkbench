@@ -11,3 +11,13 @@ class ExperimentForm(forms.ModelForm):
     class Meta:
         model = Experiment
         fields = ('title', 'description', 'template')
+
+
+class ExperimentSelectForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        user_id = kwargs.pop('user_id', None)
+        super(ExperimentSelectForm, self).__init__(*args, **kwargs)
+
+        self.fields['experiments'].queryset = Experiment.objects.filter(owner__user_id=user_id)
+
+    experiments = forms.ModelChoiceField(queryset=Experiment.objects.filter(completed=False))

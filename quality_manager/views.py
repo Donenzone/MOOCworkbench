@@ -15,6 +15,7 @@ from quality_manager.tasks import test_quality_check
 from quality_manager.tasks import ci_quality_check
 from quality_manager.tasks import docs_coverage_check
 from helpers.helper_mixins import ExperimentPackageTypeMixin
+from experiments_manager.models import ChosenExperimentSteps
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -59,7 +60,8 @@ class NrOfCommitsView(MeasurementMixin, View):
 
 @login_required
 def refresh_measurements(request, step_id):
-    verify_and_get_experiment(request, step_id)
+    step = ChosenExperimentSteps.objects.get(pk=step_id)
+    verify_and_get_experiment(request, step.experiment_id)
     version_control_quality_check.delay(step_id)
     requirements_quality_check.delay(step_id)
     test_quality_check.delay(step_id)

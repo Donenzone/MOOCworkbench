@@ -8,7 +8,7 @@ def get_github_helper(request, exp_or_package):
 
 
 class TemplateHelper(object):
-    TEMPLATE_FOLDER = '/git_manager/codetemplates/'
+    TEMPLATE_FOLDER = '/codetemplates/'
 
 
 class CodeTemplateTypes(object):

@@ -17,7 +17,9 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+
 import notifications.urls
+from ajax_select import urls as ajax_select_urls
 
 import user_manager.views
 import git_manager.views

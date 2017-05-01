@@ -28,3 +28,4 @@ django-autoslug
 cookiecutter
 virtualenv
 pylint
+django-ajax-selects

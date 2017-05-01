@@ -30,6 +30,7 @@ def add_internalpackage_to_experiment(internal_package, experiment):
     new_requirement = Requirement()
     new_requirement.package_name = internal_package.name
     new_requirement.version = latest_version.version_nr
+    new_requirement.package = internal_package
     new_requirement.save()
 
     if not experiment.requirements.filter(package_name=new_requirement.package_name):

@@ -17,5 +17,5 @@ urlpatterns = [
     url(r'^install/(?P<pk>\d+)/$', internalpackage_install, name="internalpackage_install"),
     url(r'^my-packages/$', login_required(InternalPackageListView.as_view()), name="internalpackage_list"),
     url(r'^view-version/(?P<pk>\d+)/(?P<package_id>\d+)/$', login_required(PackageVersionDetailView.as_view()), name="packageversion_detail"),
-
+    url(r'^packages/autocomplete/$', package_autocomplete, name="package_autocomplete"),
 ]

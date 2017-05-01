@@ -31,4 +31,28 @@
 
   <p>Once you have added all the required dependencies, write your changes to your GitHub repository.</p>
   <a href="{% url 'requirements_write' object_id object_type %}" class="btn btn-primary">Update requirements in repository</a>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+             $( "#id_package_name" ).autocomplete({
+                  source: function (request, response) {
+                           //data :: JSON list defined
+                           $.post({
+                                 url: "{% url 'package_autocomplete' %}",
+                                 data: {query : request.term, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                                 success: function (data) {
+                                     response($.map(data.results, function (el) {
+                                         return {
+                                             label: el,
+                                             value: el
+                                         };
+                                     }));
+                                 }
+                             });
+                        },
+                  autoFocus: true
+                });
+        });
+    </script>
+
 {% endblock %}

@@ -1,3 +1,6 @@
+from markdownx.utils import markdownify
+from dal import autocomplete
+
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, JsonResponse
@@ -6,7 +9,6 @@ from django.shortcuts import render
 from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
-from markdownx.utils import markdownify
 
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import ChosenExperimentSteps
@@ -216,3 +218,12 @@ def internalpackage_install(request, pk):
         return JsonResponse({'added': False})
 
 
+@login_required
+def package_autocomplete(request):
+    if 'query' in request.POST:
+        query = request.POST['query']
+        packages = Package.objects.filter(name__icontains=query)
+    else:
+        packages = Package.objects.all()[:50]
+    result_list = [x.name for x in packages]
+    return JsonResponse({'results': result_list})

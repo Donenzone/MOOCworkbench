@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^feedback/', include('feedback.urls')),
     url(r'^git/$', git_manager.views.index, name="git_index"),
     url(r'^docs/', include('docs_manager.urls')),
+    url(r'^schema/', include('dataschema_manager.urls')),
 
     # Installed apps URLs
     url(r'^markdownx/', include('markdownx.urls')),

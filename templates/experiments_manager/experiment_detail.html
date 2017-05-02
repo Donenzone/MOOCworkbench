@@ -15,6 +15,7 @@
         <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
         <li><a data-toggle="tab" href="#readme" class="tab-btn" id="readme-click">Read Me</a></li>
         <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
+        <li><a data-toggle="tab" href="#schema" class="tab-btn" id="schema-click">Schema</a></li>
         <li><a data-toggle="tab" href="#dashboard" class="tab-btn" id="dashboard-click">Dashboard</a></li>
     </ul>
 
@@ -152,6 +153,11 @@
             <p>Loading...</p>
         </div>
 
+        <div id="schema" class="tab-pane fade">
+            <p>Loading...</p>
+        </div>
+
+
     </div>
 
     <script type='text/javascript'>
@@ -180,6 +186,7 @@
                 'dashboard': "{% url 'dashboard' object.id %}",
                 'requirements': "{% url 'requirements_list' object.id object_type %}",
                 'readme': "{% url 'readme_view' object.id %}",
+                'schema': "{% url 'dataschemafield_new' object.id %}"
             };
 
             $('#readme-click').click(function () {
@@ -190,6 +197,9 @@
             });
             $('#requirements-click').click(function () {
                 $("#requirements").load(url_dict['requirements']);
+            });
+            $('#schema-click').click(function () {
+                $("#schema").load(url_dict['schema']);
             });
 
             $('.code-coverage').each(function () {

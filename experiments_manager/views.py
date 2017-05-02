@@ -26,7 +26,7 @@ from .helper import verify_and_get_experiment
 from .helper import get_steps
 from .mixins import ActiveStepMixin
 from .mixins import ExperimentContextMixin
-from .utils import init_git_repo_for_experiment
+from .tasks import initialize_repository
 
 
 class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
@@ -48,7 +48,7 @@ class ExperimentCreateView(View):
         try:
             form = ExperimentForm()
             repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/experiment_edit_new.html", {'form': form,
+            return render(request, "experiments_manager/create/experiment_new.html", {'form': form,
                                                                                     'experiment_id': experiment_id,
                                                                                     'repository_list': repository_list})
         except ValueError as a:
@@ -62,11 +62,15 @@ class ExperimentCreateView(View):
             cookiecutter = form.cleaned_data['template']
             experiment.language = cookiecutter.language
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
-            init_git_repo_for_experiment(experiment, cookiecutter)
-            return redirect(to=reverse('experimentsteps_choose', kwargs={'experiment_id': experiment.id}))
+            initialize_repository.delay(experiment, cookiecutter)
+            return redirect(to=reverse('experiment_status_create'))
         else:
             repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/experiment_edit_new.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+            return render(request, "experiments_manager/create/experiment_new.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+
+
+def experiment_status_create(request):
+    return render(request, 'experiments_manager/create/experiment_status_create.html', {})
 
 
 class FileListForStep(RepoFileListMixin, View):

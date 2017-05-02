@@ -9,15 +9,21 @@
 
 
 {% block content %}
-  <h2>Add New Experiment: Step 1 of 2</h2>
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+             style="width: 0%;">
+            <span class="sr-only">0% Complete</span>
+        </div>
+    </div>
+  <h2>Create New Experiment</h2>
     <form action="{% url "experiment_edit" experiment_id %}" method="post">
         {% csrf_token %}
         {{ form|bootstrap }}
 
         <div class="form-group">
             <input type="submit" name="submit" class="btn btn-primary" value="Create Experiment and Choose Experiment Steps" />
+
         </div>
 
-        <a href="/experiments">Cancel</a>
     </form>
 {% endblock %}

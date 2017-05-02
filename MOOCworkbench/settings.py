@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'coverage_manager',
     'cookiecutter_manager',
     'pylint_manager',
+    'dataschema_manager',
 
     'bootstrapform',
     'django_tables2',

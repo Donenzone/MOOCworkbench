@@ -1,0 +1,46 @@
+{% load bootstrap %}
+
+<h3>Define your data schema</h3>
+<p class="lead">Define the data schema of your CSV files, by selecting which column in the CSVs correspond to which data type,
+such as a String, Number or DateTime.</p>
+
+<h4>Your Data Schema</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Data Type</td>
+            <td>PK</td>
+            <td>Req.</td>
+            <td>Title</td>
+            <td>Desc.</td>
+            <td>Unique?</td>
+            <td>Format</td>
+            <td>Minimum</td>
+            <td>Maximum</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for object in data_schema_list %}
+        <tr>
+            <td>{{ object.name }}</td>
+            <td>{{ object.datatype }}</td>
+            <td>{{ object.primary_key }}</td>
+            <td>{{ object.required }}</td>
+            <td>{{ object.title }}</td>
+            <td>{{ object.description }}</td>
+            <td>{{ object.unique }}</td>
+            <td>{{ object.format }}</td>
+            <td>{{ object.minimum }}</td>
+            <td>{{ object.maximum }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr />
+<h4>Add A Column</h4>
+<form action="{% url "dataschemafield_new" experiment_id %}" method="post">{% csrf_token %}
+    {{ form|bootstrap_inline }}
+    <input type="submit" class="btn btn-primary" value="Create New Field" />
+</form>
+

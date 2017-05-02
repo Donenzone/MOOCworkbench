@@ -3,7 +3,7 @@ from celery.decorators import task
 from cookiecutter_manager.models import CookieCutterTemplate
 
 from .models import Experiment
-from .helper import init_git_repo_for_experiment
+from .utils import init_git_repo_for_experiment
 
 
 @task

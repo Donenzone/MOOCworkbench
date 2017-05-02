@@ -1,10 +1,12 @@
 from celery.decorators import task
+
 from experiments_manager.models import ChosenExperimentSteps
 from quality_manager.measurements.requirements_measurement import RequirementsMeasurement
 from quality_manager.measurements.vcs_measurement import VersionControlUseMeasurement
 from quality_manager.measurements.test_measurement import TestMeasurement
 from quality_manager.measurements.ci_measurement import CiEnabledMeasurement
 from quality_manager.measurements.docs_measurement import DocsMeasurement
+from quality_manager.measurements.pylint_measurement import PylintMeasurement
 from git_manager.helpers.github_helper import GitHubHelper
 
 
@@ -48,3 +50,11 @@ def docs_coverage_check(step_id):
     docs_measure = DocsMeasurement(step)
     docs_measure.measure()
     docs_measure.save_and_get_result()
+
+
+@task
+def pylint_static_quality_check(step_id):
+    step = ChosenExperimentSteps.objects.get(id=step_id)
+    pylint_measure = PylintMeasurement(step)
+    pylint_measure.measure()
+    pylint_measure.save_and_get_result()

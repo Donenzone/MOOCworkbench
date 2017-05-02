@@ -5,17 +5,19 @@ from django.views import View
 from django.template.defaultfilters import slugify
 
 from experiments_manager.helper import verify_and_get_experiment
-from quality_manager.models import ExperimentMeasure
-from quality_manager.mixins import MeasurementMixin
-from quality_manager.helpers.what_now_helper import WhatNow
 from experiments_manager.mixins import ExperimentContextMixin
-from quality_manager.tasks import version_control_quality_check
-from quality_manager.tasks import requirements_quality_check
-from quality_manager.tasks import test_quality_check
-from quality_manager.tasks import ci_quality_check
-from quality_manager.tasks import docs_coverage_check
-from helpers.helper_mixins import ExperimentPackageTypeMixin
 from experiments_manager.models import ChosenExperimentSteps
+from helpers.helper_mixins import ExperimentPackageTypeMixin
+
+from .models import ExperimentMeasure
+from .mixins import MeasurementMixin
+from .helpers.what_now_helper import WhatNow
+from .tasks import version_control_quality_check
+from .tasks import requirements_quality_check
+from .tasks import test_quality_check
+from .tasks import ci_quality_check
+from .tasks import docs_coverage_check
+from .tasks import pylint_static_quality_check
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -67,5 +69,6 @@ def refresh_measurements(request, step_id):
     test_quality_check.delay(step_id)
     ci_quality_check.delay(step_id)
     docs_coverage_check.delay(step_id)
+    pylint_static_quality_check.delay(step_id)
 
     return JsonResponse({'refresh': True})

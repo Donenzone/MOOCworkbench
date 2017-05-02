@@ -76,7 +76,8 @@ class SphinxHelper(object):
         support.build()
 
     def update_coverage(self):
-        self._make_command('html', 'coverage')
+        build_path = '{0}_build/coverage/'.format(self.path)
+        subprocess.call(['sphinx-build', '-v', '-b', 'coverage', self.path, build_path])
 
     def get_coverage_data(self):
         coverage_pickle = '{0}{1}'.format(self.path, self.UNDOC_PICKLE_LOCATION)
@@ -94,7 +95,7 @@ class SphinxHelper(object):
                         classes = module_info[1]['classes']
                         total_undocumented_classes += len(classes)
         except IOError as e:
-            return "Coverage data not found: {0}".format(e)
+            raise "Coverage data not found: {0}".format(e)
         return coverage_list, total_undocumented_functions, total_undocumented_classes
 
     def _get_docs_dir(self):

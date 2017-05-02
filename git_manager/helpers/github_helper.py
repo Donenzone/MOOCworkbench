@@ -1,8 +1,10 @@
+import base64
+
 from github import Github
 from github.GithubException import GithubException
 from allauth.socialaccount.models import SocialToken
+
 from user_manager.models import WorkbenchUser
-import base64
 
 
 class GitHubHelper(object):
@@ -18,6 +20,7 @@ class GitHubHelper(object):
 
         if create:
             self.github_repository = self._create_new_repository()
+            self.repo_name = self.github_repository.name
         elif repo_name is not None:
             self.github_repository = self.github_user.get_repo(repo_name)
 

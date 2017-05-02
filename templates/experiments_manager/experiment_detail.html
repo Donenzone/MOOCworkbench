@@ -37,7 +37,7 @@
         </tr>
         <tr>
             <td>Created on</td>
-            <td>{{ object.added }}</td>
+            <td>{{ object.created }}</td>
         </tr>
         <tr>
             <td>Owner of project</td>
@@ -241,7 +241,11 @@
                   'filename': filename
                 },
                 success: function(data) {
-                    $(code_coverage_id).html(data.coverage);
+                    if (data.coverage != -1) {
+                        $(code_coverage_id).html(data.coverage + ' %');
+                    } else {
+                        $(code_coverage_id).html('No data')
+                    }
                 },
                 error: function() {
                     $(code_coverage_id).html('No coverage data');

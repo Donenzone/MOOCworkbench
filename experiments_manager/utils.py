@@ -10,9 +10,10 @@ from requirements_manager.helper import parse_requirements_file
 def init_git_repo_for_experiment(experiment, cookiecutter):
     github_helper = create_new_github_repository(experiment.title, experiment.owner.user)
     repo = github_helper.github_repository
+    repo_name = repo.name
 
     git_repo = GitRepository()
-    git_repo.name = repo.name
+    git_repo.name = repo_name
     git_repo.owner = experiment.owner
     git_repo.github_url = repo.html_url
 
@@ -25,7 +26,6 @@ def init_git_repo_for_experiment(experiment, cookiecutter):
     git_helper.clone_or_pull_repository()
 
     repo_dir = git_helper.repo_dir_of_user()
-    repo_name = github_helper.repo_name
 
     clone_cookiecutter_template(cookiecutter, repo_dir, repo_name, experiment.owner, experiment.description)
 

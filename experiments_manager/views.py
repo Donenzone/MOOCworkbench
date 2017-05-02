@@ -172,7 +172,16 @@ def complete_step_and_go_to_next(request, experiment_id):
         next_step.save()
         return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
     else:
-        return JsonResponse({'completed': True})
+        return redirect(to=reverse('experimentstep_scorecard', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+
+
+@login_required
+def experimentstep_scorecard(request, pk, slug):
+    experiment = verify_and_get_experiment(request, pk)
+    context = {}
+    context['completed_step'] = experiment.get_active_step()
+    context['experiment'] = experiment
+    return render(request, 'experiments_manager/experiment_scorecard.html', context)
 
 
 @login_required

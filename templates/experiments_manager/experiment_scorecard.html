@@ -1,0 +1,15 @@
+{% extends "experiments_manager/experiment_detail.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+
+{% block content %}
+
+    {% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb "Score card" "experimentstep_scorecard" experiment.pk experiment.slug %}
+    {% endblock %}
+
+    <h2>Score card for step {{ completed_step.step }}</h2>
+
+
+{% endblock %}

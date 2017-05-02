@@ -12,4 +12,7 @@ urlpatterns = [
     url(r'^(?P<pk>\d+)/(?P<slug>[-\w]+)$', login_required(experiments_manager.views.ExperimentDetailView.as_view()), name='experiment_detail'),
     url(r'^file/(?P<experiment_id>\d+)/$', login_required(experiments_manager.views.FileViewGitRepository.as_view()), name='file_detail'),
     url(r'^readme/(?P<experiment_id>\d+)/$', experiments_manager.views.readme_of_experiment, name='readme_view'),
+    url(r'^score-card/(?P<pk>\d+)/(?P<slug>[-\w]+)$', experiments_manager.views.experimentstep_scorecard,
+        name='experimentstep_scorecard'),
+
 ]

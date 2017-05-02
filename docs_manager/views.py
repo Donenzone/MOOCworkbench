@@ -46,7 +46,7 @@ def toggle_docs_status(request, object_id, object_type):
     if docs.enabled:
         github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
         git_helper = GitHelper(github_helper)
-        git_helper.clone_repository()
+        git_helper.clone_or_pull_repository()
 
     return redirect(exp_or_package.get_absolute_url())
 
@@ -57,7 +57,7 @@ def docs_generate(request, object_id, object_type):
     if exp_or_package.docs.enabled:
         github_helper = GitHubHelper(request.user, exp_or_package.git_repo.name)
         git_helper = GitHelper(github_helper)
-        git_helper.pull()
+        git_helper.clone_or_pull_repository()
         folders = exp_or_package.get_docs_folder()
         sphinx_helper = SphinxHelper(exp_or_package, folders, github_helper.github_repository.owner.login)
         sphinx_helper.add_sphinx_to_repo()

@@ -16,7 +16,7 @@ def run_pylint(experiment):
     active_step = experiment.get_active_step()
     github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
     git_helper = GitHelper(github_helper)
-    git_helper.clone_repository()
+    git_helper.clone_or_pull_repository()
 
     # virtualenv create
     repo_dir = git_helper.repo_dir

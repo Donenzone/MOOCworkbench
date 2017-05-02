@@ -22,7 +22,7 @@ def init_git_repo_for_experiment(experiment, cookiecutter):
         experiment.save()
 
     git_helper = GitHelper(github_helper)
-    git_helper.clone_repository()
+    git_helper.clone_or_pull_repository()
 
     repo_dir = git_helper.repo_dir_of_user()
     repo_name = github_helper.repo_name

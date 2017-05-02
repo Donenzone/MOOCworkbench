@@ -82,7 +82,7 @@ class PackageGitRepoInit(GitRepoInit):
         github_helper_experiment = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)
         git_helper = GitHelper(github_helper_experiment)
         try:
-            git_helper.clone_repository()
+            git_helper.clone_or_pull_repository()
         except Exception as e:
             print(e)
         return git_helper
@@ -95,7 +95,7 @@ class PackageGitRepoInit(GitRepoInit):
 
     def clone_new_module_repo(self):
         package_repo = GitHelper(self.github_helper)
-        package_repo.clone_repository()
+        package_repo.clone_or_pull_repository()
         return package_repo
 
     def move_module_into_folder(self, git_helper):

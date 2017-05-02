@@ -128,8 +128,7 @@
                             <div class="panel-footer">
                                 {% if step.active %}
                                     <p>
-                                        <a href="#" class="btn btn-success" data-toggle="modal"
-                                           data-target="#step-modal">Complete and go to next step</a>
+                                        <a href="{% url "experimentstep_scorecard" object.id object.slug %}" class="btn btn-success" ">Complete and go to next step</a>
                                     </p>
                                 {% endif %}
                             </div>
@@ -154,33 +153,6 @@
         </div>
 
     </div>
-
-    <div class="modal fade" id="step-modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Complete step and go to next</h4>
-                </div>
-                <div class="modal-body">
-                    <p>You are about to complete this step and move on to the next.</p>
-                    <p>Before you do, consider creating a package to give back to the community. By creating a package,
-                        your code can be reused
-                        by others and improved upon. Creating a package is easy, but it does require some extra work to
-                        make it suitable for the community.</p>
-                </div>
-                <div class="modal-footer">
-                    <p>
-                        <a href="{% url 'complete_step_and_go_to_next' object.id %}" class="btn btn-default"
-                           data-dismiss="modal">Do not create a package</a>
-                    </p>
-                    <p>
-                        <a href="{% url 'internalpackage_create' object.id active_step_id %}" class="btn btn-primary">Yes,
-                            create a package from the code in this step and publish it on the Marketplace</a>
-                    </p>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
 
     <script type='text/javascript'>
 

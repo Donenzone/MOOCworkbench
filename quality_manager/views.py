@@ -10,7 +10,7 @@ from experiments_manager.models import ChosenExperimentSteps
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 from .models import ExperimentMeasure
-from .mixins import MeasurementMixin
+from .mixins import MeasurementMixin, get_recent_measurements_for_type
 from .helpers.what_now_helper import WhatNow
 from .tasks import version_control_quality_check
 from .tasks import requirements_quality_check
@@ -48,7 +48,7 @@ class NrOfCommitsView(MeasurementMixin, View):
     def get(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
         experiment_measure = ExperimentMeasure.objects.get(name='Version control use')
-        measurement = self.get_recent_measurements_for_type(experiment.get_active_step(),
+        measurement = get_recent_measurements_for_type(experiment.get_active_step(),
                                                             experiment_measure)
 
         raw_values = []

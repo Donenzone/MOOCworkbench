@@ -54,3 +54,9 @@ class ExperimentMeasureResult(TimeStampedModel):
         if self.result:
             return message_dict[self.result]
         return 'Result missing'
+
+    def get_class(self):
+        style_classes = {ExperimentMeasureResult.LOW: 'danger',
+                ExperimentMeasureResult.MEDIUM: 'warning',
+                ExperimentMeasureResult.HIGH: 'success'}
+        return style_classes[self.result]

@@ -15,10 +15,9 @@ from docs_manager.mixins import DocsMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import RepoFileListMixin
 from git_manager.views import get_user_repositories
-from quality_manager.mixins import MeasurementMixin
+from quality_manager.mixins import MeasurementMixin, get_most_recent_measurement
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from pylint_manager.helper import return_results_for_file
-from pylint_manager.utils import run_pylint
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm
@@ -41,7 +40,6 @@ class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
         context['object_type'] = self.get_requirement_type(experiment)
         context['active_step_id'] = experiment.get_active_step().id
 
-        #run_pylint(experiment)
         return context
 
 
@@ -178,9 +176,29 @@ def complete_step_and_go_to_next(request, experiment_id):
 @login_required
 def experimentstep_scorecard(request, pk, slug):
     experiment = verify_and_get_experiment(request, pk)
+    completed_step = experiment.get_active_step()
     context = {}
-    context['completed_step'] = experiment.get_active_step()
+    context['completed_step'] = completed_step
     context['experiment'] = experiment
+
+    testing_results = get_most_recent_measurement(completed_step, 'Testing')
+    context['testing'] = testing_results
+
+    docs_results = get_most_recent_measurement(completed_step, 'Documentation')
+    context['docs'] = docs_results
+
+    ci_results = get_most_recent_measurement(completed_step, 'Use of CI')
+    context['ci'] = ci_results
+
+    vcs_results = get_most_recent_measurement(completed_step, 'Version control use')
+    context['vcs'] = vcs_results
+
+    dependency_results = get_most_recent_measurement(completed_step, 'Dependencies defined')
+    context['dependency'] = dependency_results
+
+    pylint_results = get_most_recent_measurement(completed_step, 'Pylint static code analysis')
+    context['pylint'] = pylint_results
+
     return render(request, 'experiments_manager/experiment_scorecard.html', context)
 
 

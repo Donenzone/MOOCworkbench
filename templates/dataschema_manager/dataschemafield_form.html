@@ -26,13 +26,13 @@ such as a String, Number or DateTime.</p>
             <td>{{ object.name }}</td>
             <td>{{ object.datatype }}</td>
             <td>{{ object.primary_key }}</td>
-            <td>{{ object.required }}</td>
+            <td>{{ object.constraints.required }}</td>
             <td>{{ object.title }}</td>
             <td>{{ object.description }}</td>
-            <td>{{ object.unique }}</td>
-            <td>{{ object.format }}</td>
-            <td>{{ object.minimum }}</td>
-            <td>{{ object.maximum }}</td>
+            <td>{{ object.constraints.unique }}</td>
+            <td>{{ object.constraints.format }}</td>
+            <td>{{ object.constraints.minimum }}</td>
+            <td>{{ object.constraints.maximum }}</td>
         </tr>
         {% endfor %}
     </tbody>

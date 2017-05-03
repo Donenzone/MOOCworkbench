@@ -30,3 +30,4 @@ virtualenv
 pylint
 django-ajax-selects
 sphinx_click
+tableschema

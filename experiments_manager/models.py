@@ -13,7 +13,7 @@ from marketplace.models import BasePackage
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
 from pylint_manager.models import PylintScan
-from dataschema_manager.models import DataSchemaField
+from dataschema_manager.models import DataSchema
 
 
 class Experiment(BasePackage):
@@ -28,7 +28,7 @@ class Experiment(BasePackage):
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
     pylint = models.ForeignKey(to=PylintScan, null=True)
-    schema = models.ManyToManyField(to=DataSchemaField)
+    schema = models.ManyToManyField(to=DataSchema)
 
     def slug(self):
         return slugify(self.title)

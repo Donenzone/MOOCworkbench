@@ -1,5 +1,4 @@
 from markdownx.utils import markdownify
-from dal import autocomplete
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse

@@ -54,16 +54,19 @@ class DataSchemaFieldCreateView(DataSchemaFieldListMixin, CreateView):
 
 
 def dataschema_edit(request, pk):
+    dataschema = DataSchemaField.objects.get(pk=pk)
+    constraints = dataschema.constraints
     if request.POST:
-        dataschema = DataSchemaField()
-        constraints = DataSchemaConstraints()
         edit_form = DataSchemaFieldForm(request.POST, instance=dataschema)
         constraint_form = DataSchemaConstraintForm(request.POST, instance=constraints)
-        if edit_form.is_valid():
+        if edit_form.is_valid() and constraint_form.is_valid():
             constraints.save()
             dataschema.constraint = constraints
             dataschema.save()
+        else:
+            return render(request, 'dataschema_manager/dataschemafield_edit.html',
+                          {'form': edit_form, 'constraint_form': constraint_form})
     else:
-        edit_form = DataSchemaFieldForm()
-        constraint_form = DataSchemaConstraintForm()
+        edit_form = DataSchemaFieldForm(instance=dataschema)
+        constraint_form = DataSchemaConstraintForm(instance=constraints)
         return render(request, 'dataschema_manager/dataschemafield_edit.html', {'form': edit_form, 'constraint_form': constraint_form})

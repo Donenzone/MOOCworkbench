@@ -1,6 +1,6 @@
 from django.shortcuts import reverse, redirect
 from django.views.generic.list import ListView
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -52,6 +52,11 @@ class RequirementCreateView(ExperimentPackageTypeMixin, CreateView):
         elif self.kwargs['object_type']  == self.PACKAGE_TYPE:
             success_url = reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['object_id']})
         return success_url
+
+
+class RequirementUpdateView(ExperimentPackageTypeMixin, UpdateView):
+    model = Requirement
+    fields = ['package_name', 'version']
 
 
 @login_required

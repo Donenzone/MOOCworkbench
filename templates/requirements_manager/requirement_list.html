@@ -1,57 +1,105 @@
 {% load bootstrap %}
 
 {% block content %}
-  <h4>Add New Dependency</h4>
-  <form class="form-inline" id="add-new-requirement" method="post" action="{% url 'requirement_add' object_id object_type %}">
-      {% csrf_token %}
-      {{ requirements_form|bootstrap_inline }}
-      <div class="form-group">
-        <div class="col-sm-10 col-sm-offset-2">
-          <button type="submit" class="btn btn-primary">Add New Requirement</button>
-        </div>
-      </div>
-  </form>
-  <h4>Dependencies In Your Project</h4>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Package name</th>
-        <th>Version</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for req in object_list %}
-        <tr>
-          <td><a href="#">{{ req.package_name }}</a></td>
-          <td>{% if req.version %}{{ req.version }}{% endif %}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <h4>Dependencies in your project</h4>
 
-  <p>Once you have added all the required dependencies, write your changes to your GitHub repository.</p>
-  <a href="{% url 'requirements_write' object_id object_type %}" class="btn btn-primary">Update requirements in repository</a>
+    <form style="display:none;" class="form-inline" id="add-new-requirement" method="post"
+          action="{% url 'requirement_add' object_id object_type %}">
+        {% csrf_token %}
+        {{ requirements_form|bootstrap_inline }}
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">Add New Requirement</button>
+            </div>
+        </div>
+    </form>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Package name</th>
+            <th>Version</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for req in object_list %}
+            <tr>
+                <td><a href="#">{{ req.package_name }}</a></td>
+                <td>{% if req.version %}{{ req.version }}{% endif %}</td>
+                <td>
+                    <a href="#" style="display:none;" data-url="{% url "requirement_edit" object_id object_type req.pk %}"
+                       class="edit-dependency-link" data-target="#edit-dependency-modal" data-toggle="modal"><span
+                            class="glyphicon glyphicon-pencil"></span></a>
+                    <a href="#" style="display:none;" class="edit-dependency-link"><span
+                            class="glyphicon glyphicon-trash"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p>
+        <button class="btn btn-primary" id="enable-edit" data-edit-mode="false">Edit Dependencies</button>
+    </p>
+
+    <div class="modal fade" id="edit-dependency-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Edit Dependency</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="dependency-form">Loading...</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     <script type="text/javascript">
-        $(document).ready(function() {
-             $( "#id_package_name" ).autocomplete({
-                  source: function (request, response) {
-                           //data :: JSON list defined
-                           $.post({
-                                 url: "{% url 'package_autocomplete' %}",
-                                 data: {query : request.term, csrfmiddlewaretoken: '{{ csrf_token }}'},
-                                 success: function (data) {
-                                     response($.map(data.results, function (el) {
-                                         return {
-                                             label: el,
-                                             value: el
-                                         };
-                                     }));
-                                 }
-                             });
-                        },
-                  autoFocus: true
-                });
+        $(document).ready(function () {
+            $('#enable-edit').click(function () {
+                edit_mode = $(this).attr('data-edit-mode');
+                if (edit_mode === 'true') {
+                    $('.edit-dependency-link').hide();
+                    $('#add-new-requirement').hide();
+                    $(this).text('Edit Dependencies');
+                    $(this).attr('data-edit-mode', false);
+                } else {
+                    $('.edit-dependency-link').show();
+                    $('#add-new-requirement').show();
+                    $(this).text('Stop Editing and Save to GitHub');
+                    $(this).attr('data-edit-mode', true);
+                }
+            });
+
+            $('.edit-dependency-link').click(function() {
+                var editUrl = $(this).attr('data-url');
+                $('#dependency-form').load(editUrl);
+            })
+
+            $("#id_package_name").autocomplete({
+                source: function (request, response) {
+                    //data :: JSON list defined
+                    $.post({
+                        url: "{% url 'package_autocomplete' %}",
+                        data: {query: request.term, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        success: function (data) {
+                            response($.map(data.results, function (el) {
+                                return {
+                                    label: el,
+                                    value: el
+                                };
+                            }));
+                        }
+                    });
+                },
+                autoFocus: true
+            });
         });
     </script>
 

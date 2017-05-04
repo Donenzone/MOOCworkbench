@@ -5,7 +5,17 @@ import tableschema
 
 from git_manager.helpers.github_helper import GitHubHelper
 
-from .models import DataSchemaField
+from .models import DataSchemaField, DataSchema
+
+
+def get_data_schema(experiment):
+    data_schema = DataSchema.objects.filter(name='main')
+    if not data_schema:
+        data_schema = DataSchema.objects.create(name='main')
+        experiment.schema.add(data_schema)
+        experiment.save()
+        return data_schema
+    return data_schema[0]
 
 
 def get_schema_file(experiment):

@@ -33,8 +33,11 @@ class Experiment(BasePackage):
     def slug(self):
         return slugify(self.title)
 
-    def get_absolute_url(self):
-        return reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
+    def get_absolute_url(self, tab=None):
+        absolute_url = reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
+        if tab:
+            absolute_url = '{0}#{1}'.format(absolute_url, tab)
+        return absolute_url
 
     def get_docs_folder(self):
         return [x.location for x in ChosenExperimentSteps.objects.filter(experiment=self).order_by('step_nr')]

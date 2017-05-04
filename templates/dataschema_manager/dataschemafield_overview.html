@@ -4,7 +4,12 @@
 <p class="lead">Define the data schema of your CSV files, by selecting which column in the CSVs correspond to which data type,
 such as a String, Number or DateTime.</p>
 
+
 <h4>Your Data Schema</h4>
+<p>
+    <button class="btn btn-primary" id="enable-edit" data-edit-mode="false">Edit Data Schema</button>
+</p>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -34,20 +39,14 @@ such as a String, Number or DateTime.</p>
             <td>{{ object.constraints.format }}</td>
             <td>{{ object.constraints.minimum }}</td>
             <td>{{ object.constraints.maximum }}</td>
-            <td><a href="#" class="edit-field-link" data-url="{% url "dataschemafield_edit" object.id %}" data-toggle="modal"
+            <td><a href="#" class="edit-field-link" style="display:none;" data-url="{% url "dataschemafield_edit" object.id experiment_id %}" data-toggle="modal"
                                            data-target="#edit-field-modal"><span class="glyphicon glyphicon-pencil"></span></a></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<a href="#" data-url="{% url "dataschemafield_new" experiment_id %}" data-toggle="modal" class="btn btn-primary"
-                                           data-target="#new-modal"><span class="glyphicon glyphicon-plus"></span> Add new field</a>
-<hr />
-<h4>Add A Column</h4>
-<form action="{% url "dataschemafield_new" experiment_id %}" method="post">{% csrf_token %}
-    {{ form|bootstrap_inline }}
-    <input type="submit" class="btn btn-primary" value="Create New Field" />
-</form>
+<a href="#" style="display:none;" data-toggle="modal" class="add-field btn btn-default"
+                                           data-target="#add-field-modal"><span class="glyphicon glyphicon-plus"></span> Add new field</a>
 
 <div class="modal fade" id="edit-field-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -66,11 +65,47 @@ such as a String, Number or DateTime.</p>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div class="modal fade" id="add-field-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Data Schema Field</h4>
+      </div>
+      <div class="modal-body">
+        <form action="{% url "dataschemafield_new" experiment_id %}" method="post">{% csrf_token %}
+            {{ form|bootstrap_inline }}
+            {{ constraint_form|bootstrap_inline }}
+            <input type="submit" class="btn btn-primary" value="Create New Field" />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script type="text/javascript">
     $(document).ready(function() {
         $('.edit-field-link').click(function() {
             var editUrl = $(this).attr('data-url');
             $('.edit-field').load(editUrl);
         });
+
+        $('#enable-edit').click(function() {
+            edit_mode = $(this).attr('data-edit-mode');
+            if (edit_mode === 'true') {
+                $('.edit-field-link').hide();
+                $('.add-field').hide();
+                $(this).text('Edit Data Schema');
+                $(this).attr('data-edit-mode', false);
+            } else {
+                $('.edit-field-link').show();
+                $('.add-field').show();
+                $(this).text('Stop Editing and Save to GitHub');
+                $(this).attr('data-edit-mode', true);
+            }
+        })
     });
 </script>

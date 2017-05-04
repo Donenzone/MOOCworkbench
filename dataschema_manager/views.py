@@ -1,61 +1,57 @@
-from django.shortcuts import render
-from django.views.generic import CreateView, UpdateView
+from django.shortcuts import render, redirect
+from django.views.generic import View
 from django.db import transaction
-from django.forms import inlineformset_factory
-from django.forms import formset_factory
+from django.contrib.auth.decorators import login_required
 
 from experiments_manager.helper import verify_and_get_experiment
 
-from .models import DataSchemaField, DataSchemaConstraints, DataSchema
+from .models import DataSchemaField
 from .forms import DataSchemaFieldForm, DataSchemaConstraintForm
-from .mixins import DataSchemaFieldListMixin
+from .utils import get_data_schema
 
 
-class DataSchemaFieldCreateView(DataSchemaFieldListMixin, CreateView):
-    model = DataSchemaField
-    form_class = DataSchemaFieldForm
-    template_name = 'dataschema_manager/dataschemafield_overview.html'
-
-    def form_valid(self, form):
-        experiment = verify_and_get_experiment(self.request, self.kwargs['experiment_id'])
-        data_schema_constraint = self.create_data_schema_constraints(form)
-        data_schema = self.get_data_schema(experiment)
-        with transaction.atomic():
-            form.instance.constraints = data_schema_constraint
-            response = super(DataSchemaFieldCreateView, self).form_valid(form)
-            data_schema.fields.add(form.instance)
-            data_schema.save()
-        return response
-
-    def create_data_schema_constraints(self, form):
-        data_schema_constraints = DataSchemaConstraints()
-        data_schema_constraints.unique = form.cleaned_data['unique']
-        data_schema_constraints.format = form.cleaned_data['format']
-        data_schema_constraints.required = form.cleaned_data['required']
-        if form.cleaned_data['min_length']:
-            data_schema_constraints.min_length = int(form.cleaned_data['min_length'])
-        if form.cleaned_data['max_length']:
-            data_schema_constraints.max_length = int(form.cleaned_data['max_length'])
-        if form.cleaned_data['maximum']:
-            data_schema_constraints.minimum = str(form.cleaned_data['minimum'])
-        if form.cleaned_data['maximum']:
-            data_schema_constraints.maximum = str(form.cleaned_data['maximum'])
-        data_schema_constraints.save()
-        return data_schema_constraints
-
-    def get_data_schema(self, experiment):
-        data_schema = DataSchema.objects.filter(name='main')
-        if not data_schema:
-            data_schema = DataSchema.objects.create(name='main')
-            experiment.schema.add(data_schema)
-            experiment.save()
-            return data_schema
-        return data_schema[0]
+@login_required
+def dataschema_overview(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    context = {}
+    data_schema = experiment.schema.first()
+    context['data_schema_list'] = data_schema.fields.all()
+    context['experiment_id'] = experiment.id
+    context['form'] = DataSchemaFieldForm()
+    context['constraint_form'] = DataSchemaConstraintForm()
+    return render(request, 'dataschema_manager/dataschemafield_overview.html', context)
 
 
-def dataschema_edit(request, pk):
+@login_required
+def dataschema_new(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    context = {}
+    if request.POST:
+        edit_form = DataSchemaFieldForm(request.POST)
+        constraint_form = DataSchemaConstraintForm(request.POST)
+        if edit_form.is_valid() and constraint_form.is_valid():
+            with transaction.atomic():
+                constraint_form.save()
+                edit_form.instance.constraints = constraint_form.instance
+                edit_form.save()
+                data_schema = get_data_schema(experiment)
+                data_schema.fields.add(edit_form.instance)
+                data_schema.save()
+            return redirect(to=experiment.get_absolute_url('schema'))
+        else:
+            context['form'] = edit_form
+            context['constraint_form'] = constraint_form
+            return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
+
+
+@login_required
+def dataschema_edit(request, pk, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
     dataschema = DataSchemaField.objects.get(pk=pk)
     constraints = dataschema.constraints
+    context = {}
+    context['schema_id'] = dataschema.pk
+    context['experiment_id'] = experiment.id
     if request.POST:
         edit_form = DataSchemaFieldForm(request.POST, instance=dataschema)
         constraint_form = DataSchemaConstraintForm(request.POST, instance=constraints)
@@ -63,10 +59,17 @@ def dataschema_edit(request, pk):
             constraints.save()
             dataschema.constraint = constraints
             dataschema.save()
+            return redirect(to=experiment.get_absolute_url('schema'))
         else:
-            return render(request, 'dataschema_manager/dataschemafield_edit.html',
-                          {'form': edit_form, 'constraint_form': constraint_form})
+            context['form'] = edit_form
+            context['constraint_form'] = constraint_form
+            return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
     else:
-        edit_form = DataSchemaFieldForm(instance=dataschema)
-        constraint_form = DataSchemaConstraintForm(instance=constraints)
-        return render(request, 'dataschema_manager/dataschemafield_edit.html', {'form': edit_form, 'constraint_form': constraint_form})
+        context['form'] = DataSchemaFieldForm(instance=dataschema)
+        context['constraint_form'] = DataSchemaConstraintForm(instance=constraints)
+        return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
+
+
+@login_required
+def dataschema_to_github(request, pk, experiment_id):
+    pass

@@ -3,13 +3,14 @@ from django.db import models
 
 class DataSchemaConstraints(models.Model):
     unique = models.BooleanField(default=False, help_text="Values in this row have to be unique")
-    format = models.CharField(max_length=100, null=True, help_text="Define a format (only for Date/Time/DateTime)")
-    minimum = models.CharField(null=True, max_length=100,
+    format = models.CharField(max_length=100, null=True, blank=True,
+                              help_text="Define a format (only for Date/Time/DateTime)")
+    minimum = models.CharField(null=True, blank=True, max_length=100,
                                help_text="(optional) Define a minimum value (only for Number/Date/Time/DateTime) ")
-    maximum = models.CharField(null=True, max_length=100, help_text="(optional) Define a maximum value")
+    maximum = models.CharField(null=True, blank=True, max_length=100, help_text="(optional) Define a maximum value")
     required = models.BooleanField(default=False, help_text="Field is required")
-    min_length = models.IntegerField(null=True, verbose_name='minLength')
-    max_length = models.IntegerField(null=True, verbose_name='maxLength')
+    min_length = models.IntegerField(null=True, blank=True, verbose_name='minLength')
+    max_length = models.IntegerField(null=True, blank=True, verbose_name='maxLength')
 
     def to_dict(self):
         constraint_dict = {}

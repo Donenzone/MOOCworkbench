@@ -1,7 +1,7 @@
 {% load bootstrap %}
 
-<form method="post" action="">
-        {% csrf_token %}
-        {{ form|bootstrap }}
-        <input type="submit" class="btn btn-primary" value="Save Changes" />
-</form>
+<form method="post" action="{% url 'requirement_edit' object_id object_type pk %}">
+      {% csrf_token %}
+      {{ form|bootstrap }}
+    <input type="submit" class="btn btn-primary" value="Save Changes" />
+  </form>

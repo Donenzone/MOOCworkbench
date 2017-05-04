@@ -58,6 +58,13 @@ class RequirementUpdateView(ExperimentPackageTypeMixin, UpdateView):
     model = Requirement
     fields = ['package_name', 'version']
 
+    def get_context_data(self, **kwargs):
+        context = super(RequirementUpdateView, self).get_context_data(**kwargs)
+        context['object_id']= self.kwargs['object_id']
+        context['object_type'] = self.kwargs['object_type']
+        context['pk'] = self.kwargs['pk']
+        return context
+
 
 @login_required
 def remove_experiment_requirement(request, object_id, object_type):

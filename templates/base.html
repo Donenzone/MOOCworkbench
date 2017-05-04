@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <title>MOOC workbench</title>
     <script type="text/javascript" src="{{ STATIC_URL }}jquery/dist/jquery.min.js"></script>
-    {% bootstrap_css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-theme-bootswatch-flatly/css/bootstrap.min.css" />
     {% bootstrap_javascript %}
     <link rel="stylesheet" href="{{ STATIC_URL }}django_tables2/themes/paleblue/css/screen.css" />
@@ -87,7 +86,9 @@
 
     <div class="container">
       {% render_breadcrumbs "django_bootstrap_breadcrumbs/bootstrap3.html" %}
-      {% block content %}{% endblock %}
+      {% block content %}
+
+      {% endblock %}
     </div>
 
     <footer class="footer">

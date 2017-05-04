@@ -129,7 +129,8 @@
                             <div class="panel-footer">
                                 {% if step.active %}
                                     <p>
-                                        <a href="{% url "experimentstep_scorecard" object.id object.slug %}" class="btn btn-success" ">Complete and go to next step</a>
+                                        <a href="{% url "experimentstep_scorecard" object.id object.slug %}"
+                                           class="btn btn-success" ">Complete and go to next step</a>
                                     </p>
                                 {% endif %}
                             </div>
@@ -137,7 +138,8 @@
                     </div>
                 {% endfor %}
             </div>
-            <p class="lead"><a href="{{ object.git_repo.github_url }}" target="_blank">View your project on GitHub</a>
+            <p class="lead">
+                <a href="{{ object.git_repo.github_url }}" target="_blank">View your project on GitHub</a>
             </p>
         </div>
 
@@ -156,7 +158,6 @@
         <div id="schema" class="tab-pane fade">
             <p>Loading...</p>
         </div>
-
 
     </div>
 
@@ -250,4 +251,5 @@
             });
         });
     </script>
+
 {% endblock %}

@@ -1,17 +1,20 @@
 from django.shortcuts import render
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.db import transaction
+from django.forms import inlineformset_factory
+from django.forms import formset_factory
 
 from experiments_manager.helper import verify_and_get_experiment
 
 from .models import DataSchemaField, DataSchemaConstraints, DataSchema
-from .forms import DataSchemaFieldForm
+from .forms import DataSchemaFieldForm, DataSchemaConstraintForm
 from .mixins import DataSchemaFieldListMixin
 
 
 class DataSchemaFieldCreateView(DataSchemaFieldListMixin, CreateView):
     model = DataSchemaField
     form_class = DataSchemaFieldForm
+    template_name = 'dataschema_manager/dataschemafield_overview.html'
 
     def form_valid(self, form):
         experiment = verify_and_get_experiment(self.request, self.kwargs['experiment_id'])
@@ -49,3 +52,18 @@ class DataSchemaFieldCreateView(DataSchemaFieldListMixin, CreateView):
             return data_schema
         return data_schema[0]
 
+
+def dataschema_edit(request, pk):
+    if request.POST:
+        dataschema = DataSchemaField()
+        constraints = DataSchemaConstraints()
+        edit_form = DataSchemaFieldForm(request.POST, instance=dataschema)
+        constraint_form = DataSchemaConstraintForm(request.POST, instance=constraints)
+        if edit_form.is_valid():
+            constraints.save()
+            dataschema.constraint = constraints
+            dataschema.save()
+    else:
+        edit_form = DataSchemaFieldForm()
+        constraint_form = DataSchemaConstraintForm()
+        return render(request, 'dataschema_manager/dataschemafield_edit.html', {'form': edit_form, 'constraint_form': constraint_form})

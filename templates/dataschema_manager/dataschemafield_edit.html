@@ -1,0 +1,6 @@
+{% load bootstrap %}
+<form action="" method="post">{% csrf_token %}
+    {{ form|bootstrap_inline }}
+    {{ constraint_form|bootstrap_inline }}
+    <input type="submit" class="btn btn-primary" value="Save Changes" />
+</form>

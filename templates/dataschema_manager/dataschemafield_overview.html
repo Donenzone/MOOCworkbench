@@ -1,0 +1,76 @@
+{% load bootstrap %}
+
+<h3>Define your data schema</h3>
+<p class="lead">Define the data schema of your CSV files, by selecting which column in the CSVs correspond to which data type,
+such as a String, Number or DateTime.</p>
+
+<h4>Your Data Schema</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Data Type</td>
+            <td>PK</td>
+            <td>Req.</td>
+            <td>Title</td>
+            <td>Desc.</td>
+            <td>Unique?</td>
+            <td>Format</td>
+            <td>Minimum</td>
+            <td>Maximum</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for object in data_schema_list %}
+        <tr>
+            <td>{{ object.name }}</td>
+            <td>{{ object.datatype }}</td>
+            <td>{{ object.primary_key }}</td>
+            <td>{{ object.constraints.required }}</td>
+            <td>{{ object.title }}</td>
+            <td>{{ object.description }}</td>
+            <td>{{ object.constraints.unique }}</td>
+            <td>{{ object.constraints.format }}</td>
+            <td>{{ object.constraints.minimum }}</td>
+            <td>{{ object.constraints.maximum }}</td>
+            <td><a href="#" class="edit-field-link" data-url="{% url "dataschemafield_edit" object.id %}" data-toggle="modal"
+                                           data-target="#edit-field-modal"><span class="glyphicon glyphicon-pencil"></span></a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="#" data-url="{% url "dataschemafield_new" experiment_id %}" data-toggle="modal" class="btn btn-primary"
+                                           data-target="#new-modal"><span class="glyphicon glyphicon-plus"></span> Add new field</a>
+<hr />
+<h4>Add A Column</h4>
+<form action="{% url "dataschemafield_new" experiment_id %}" method="post">{% csrf_token %}
+    {{ form|bootstrap_inline }}
+    <input type="submit" class="btn btn-primary" value="Create New Field" />
+</form>
+
+<div class="modal fade" id="edit-field-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Edit Data Schema Field</h4>
+      </div>
+      <div class="modal-body">
+        <div class="edit-field">Loading...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.edit-field-link').click(function() {
+            var editUrl = $(this).attr('data-url');
+            $('.edit-field').load(editUrl);
+        });
+    });
+</script>

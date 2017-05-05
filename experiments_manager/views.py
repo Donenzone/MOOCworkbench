@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-import ast
 
 from django.views.generic.detail import DetailView
 from markdown2 import Markdown
@@ -39,7 +38,6 @@ class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
         context['steps'] = get_steps(experiment)
         context['object_type'] = self.get_requirement_type(experiment)
         context['active_step_id'] = experiment.get_active_step().id
-
         return context
 
 

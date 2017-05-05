@@ -47,5 +47,3 @@ def validate_schema(json_table_schema):
         return True
     except tableschema.exceptions.SchemaValidationError as exception:
         return exception
-
-

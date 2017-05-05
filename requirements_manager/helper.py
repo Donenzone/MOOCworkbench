@@ -38,3 +38,10 @@ def add_internalpackage_to_experiment(internal_package, experiment):
         experiment.save()
         return True
     return False
+
+
+def build_requirements_file(exp_or_package):
+    requirements_txt = ''
+    for requirement in exp_or_package.requirements.all():
+        requirements_txt += '{0}\n'.format(str(requirement))
+    return requirements_txt

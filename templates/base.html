@@ -66,6 +66,10 @@
     {% breadcrumb "Index" "/" %}
 {% endblock %}
 
+    <div class="container" id="channel-message" style="display:none;">
+        <div class="alert" id="inner-message"></div>
+    </div>
+
   {% if messages %}
     <div class="container">
       {% for message in messages %}
@@ -96,6 +100,21 @@
         <p class="text-muted" style="margin:20px 0;"><a href="https://github.com/jlmdegoede/MOOCworkbench" target="_blank">MOOC Workbench</a> | <a href="https://github.com/Donenzone/MOOCworkbench/issues/new" target="_blank">Report a bug by opening an issue on GitHub</a> | <a href="{% url 'feedback_create' %}">Leave general feedback</a></p>
       </div>
     </footer>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            socket = new WebSocket("ws://" + window.location.host + "/");
+            if (socket.readyState == WebSocket.OPEN) {
+                socket.onopen();
+            }
+            socket.onmessage = function(e) {
+                dictionary = JSON.parse(e.data);
+                $('#inner-message').removeClass();
+                $('#inner-message').addClass('alert alert-' + dictionary.priority).text(dictionary.contents);
+                $('#channel-message').show();
+            }
+        });
+    </script>
 
   </body>
 </html>

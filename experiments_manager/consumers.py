@@ -1,23 +1,21 @@
+import json
+
+from channels.auth import channel_session_user_from_http
 from channels import Group
-from json import dumps
 
 
-class Content:
-    def __init__(self, reply_channel):
-        self.reply_channel = reply_channel
-
-    def send(self, json):
-        Group(self.reply_channel).send({
-            'text': dumps(json)
-        })
-
-    def get_reply_channel(self):
-        return self.reply_channel
+@channel_session_user_from_http
+def ws_connect(message):
+    user = message.user.username
+    Group(user).add(message.reply_channel)
+    Group(user).send({'text': json.dumps({'connected': True})})
 
 
-def connect_worker_output(message):
-    Group('worker').add(message.reply_channel)
+def send_message_to_group(user, message):
+    Group(user).send({
+        "text": json.dumps(message)
+    })
 
 
-def disconnect_worker_output(message):
-    Group('worker').discard(message.reply_channel)
+def send_message(user, priority, contents):
+    send_message_to_group(user, {'priority': priority, 'contents': contents})

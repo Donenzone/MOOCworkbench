@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.views.generic import View
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
 
 from experiments_manager.helper import verify_and_get_experiment
+from experiments_manager.consumers import send_message
 
 from .models import DataSchemaField
 from .forms import DataSchemaFieldForm, DataSchemaConstraintForm
 from .utils import get_data_schema
+from .tasks import task_write_data_schema
 
 
 @login_required
@@ -71,5 +74,9 @@ def dataschema_edit(request, pk, experiment_id):
 
 
 @login_required
-def dataschema_to_github(request, pk, experiment_id):
-    pass
+def dataschema_write(request, experiment_id):
+    verify_and_get_experiment(request, experiment_id)
+    task_write_data_schema.delay(experiment_id)
+    send_message(request.user.username, 'info', 'Task started to update data schema...')
+    return JsonResponse({'success': True})
+

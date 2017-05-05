@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^(?P<object_id>\d+)/(?P<object_type>\w+)/save/$', login_required(RequirementCreateView.as_view()), name="requirement_add"),
     url(r'^(?P<object_id>\d+)/(?P<object_type>\w+)/edit/(?P<pk>\d+)$', login_required(RequirementUpdateView.as_view()),
         name="requirement_edit"),
-    url(r'^(?P<object_id>\d+)/(?P<object_type>\w+)/delete/$', remove_experiment_requirement, name="requirement_delete"),
+    url(r'^(?P<object_id>\d+)/(?P<object_type>\w+)/delete/$', remove_experiment_requirement,
+        name="requirement_delete"),
 ]

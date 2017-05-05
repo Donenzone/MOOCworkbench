@@ -39,7 +39,7 @@ urlpatterns = [
     url(r'^coverage/', include('coverage_manager.urls')),
     url(r'^metrics/', include('quality_manager.urls')),
     url(r'^feedback/', include('feedback.urls')),
-    url(r'^git/$', git_manager.views.index, name="git_index"),
+    url(r'^github/', include('git_manager.urls')),
     url(r'^docs/', include('docs_manager.urls')),
     url(r'^schema/', include('dataschema_manager.urls')),
 

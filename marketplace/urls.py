@@ -1,6 +1,7 @@
 from django.conf.urls import url
-from marketplace.views import *
 from django.contrib.auth.decorators import login_required
+
+from marketplace.views import *
 
 urlpatterns = [
     url(r'^$', login_required(MarketplaceIndex.as_view()), name="marketplace_index"),

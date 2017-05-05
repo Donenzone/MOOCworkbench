@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 from os.path import dirname, abspath, basename, normpath, join
-from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG
+from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG, GITHUB_WEBHOOK_KEY
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.abspath(

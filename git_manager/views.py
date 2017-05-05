@@ -16,11 +16,6 @@ from ipaddress import ip_address, ip_network
 from .helpers.github_helper import GitHubHelper
 
 
-@login_required
-def index(request):
-    return render(request, 'index.html')
-
-
 def get_user_repositories(user):
     github_helper = GitHubHelper(user)
     github_api = github_helper.github_object

@@ -1,5 +1,8 @@
 import base64
 
+from django.conf import settings
+from django.shortcuts import reverse
+
 from github import Github
 from github.GithubException import GithubException
 from allauth.socialaccount.models import SocialToken
@@ -19,7 +22,7 @@ class GitHubHelper(object):
             self.repo_name = repo_name
 
         if create:
-            self.github_repository = self._create_new_repository()
+            self.github_repository = self._create_repository()
             self.repo_name = self.github_repository.name
         elif repo_name is not None:
             self.github_repository = self.github_user.get_repo(repo_name)
@@ -67,8 +70,30 @@ class GitHubHelper(object):
     def create_release(self, tag_name, name, body, pre_release):
         self.github_repository.create_git_release(tag_name, name, body, prerelease=pre_release)
 
+    def _create_webhook(self):
+        webhook_url = reverse('webhook_receive')
+        config_dict = {'url': webhook_url}
+        config_dict['content_type'] = 'json'
+        config_dict['secret'] = settings.GITHUB_WEBHOOK_KEY
+        self.github_repository.create_hook('web', config_dict)
+
+    def _check_webhook_exists(self):
+        webhook_url = reverse('webhook_receive')
+        hooks = self.github_repository.get_hooks()
+        exists = False
+        for hook in hooks:
+            if 'url' in hook.config \
+                    and webhook_url in hook.config['url']:
+                exists = True
+        return exists
+
     def _get_repo_file_name(self, file_name, folder=''):
         return '/{0}/{1}'.format(folder, file_name) if folder else '/{0}'.format(file_name)
+
+    def _create_repository(self):
+        self._create_new_repository()
+        self._create_webhook()
+        assert self._check_webhook_exists() == True
 
     def _create_new_repository(self):
         return self.github_user.create_repo(self.repo_name)

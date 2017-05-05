@@ -60,7 +60,8 @@ class ExperimentCreateView(View):
             cookiecutter = form.cleaned_data['template']
             experiment.language = cookiecutter.language
             experiment.owner = WorkbenchUser.objects.get(user=request.user)
-            initialize_repository.delay(experiment, cookiecutter)
+            experiment.save()
+            initialize_repository.delay(experiment.id, cookiecutter.id)
             return redirect(to=reverse('experiment_status_create'))
         else:
             repository_list = get_user_repositories(request.user)
@@ -92,7 +93,7 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
     def get(self, request, experiment_id):
         context = super(ChooseExperimentSteps, self).get(request, experiment_id)
         context['steps'] = ExperimentStep.objects.all()
-        return render(request, "experiments_manager/experimentsteps_choose.html", context)
+        return render(request, "experiments_manager/create/experimentsteps_choose.html", context)
 
     def post(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)

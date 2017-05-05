@@ -23,18 +23,34 @@
 
 
     <h3>Tasks</h3>
-    <p class="lead"><span id="status-1" class="glyphicon glyphicon-option-horizontal"></span> Worker available to create your experiment</p>
+    <p class="lead"><span id="status-1" class="glyphicon glyphicon-minus"></span> Worker available to create your experiment</p>
 
-    <p class="lead"><span id="status-2" class="glyphicon glyphicon-option-horizontal"></span> Creating new GitHub repository</p>
+    <p class="lead"><span id="status-2" class="glyphicon glyphicon-minus"></span> Creating new GitHub repository</p>
 
-    <p class="lead"><span id="status-3" class="glyphicon glyphicon-option-horizontal"></span> Initializing template with your code</p>
+    <p class="lead"><span id="status-3" class="glyphicon glyphicon-minus"></span> Initializing template with your code</p>
 
-    <p class="lead"><span id="status-4" class="glyphicon glyphicon-option-horizontal"></span> Cloning repository and pushing template</p>
+    <p class="lead"><span id="status-4" class="glyphicon glyphicon-minus"></span> Cloning repository and pushing template</p>
 
-    <p class="lead"><span id="status-5" class="glyphicon glyphicon-option-horizontal"></span> Adding initial dependencies</p>
+    <p class="lead"><span id="status-5" class="glyphicon glyphicon-minus"></span> Adding initial dependencies</p>
 
-    <p class="lead"><span id="status-6" class="glyphicon glyphicon-option-horizontal"></span> Cleaning up...</p>
+    <p class="lead"><span id="status-6" class="glyphicon glyphicon-minus"></span> Cleaning up...</p>
 
-    <a href="#" class="btn btn-success">Continue</a>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            socket = new WebSocket("ws://" + window.location.host + "/");
+            socket.onmessage = function(e) {
+                dictionary = JSON.parse(e.data);
+                for(i = 1; i <= dictionary.progress_nr; i++) {
+                    var selector = '#status-' + i;
+                    $(selector).removeClass();
+                    $(selector).addClass('glyphicon glyphicon-ok')
+                }
+
+                if (dictionary.completed) {
+                    window.location.replace(dictionary.redirect_url)
+                }
+            }
+        });
+    </script>
 
 {% endblock %}

@@ -22,5 +22,4 @@ def get_user_repositories(user):
 
 def create_new_github_repository(title, user):
     github_helper = GitHubHelper(user, title, create=True)
-
     return github_helper

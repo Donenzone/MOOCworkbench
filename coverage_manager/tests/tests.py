@@ -49,7 +49,7 @@ class CoverageManagerTestCase(TestCase):
         Try to enable code coverage without having an enabled travis instance.
         :return: 
         """
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         json_response = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
@@ -68,7 +68,7 @@ class CoverageManagerTestCase(TestCase):
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
 
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
@@ -87,7 +87,7 @@ class CoverageManagerTestCase(TestCase):
         mock_coverage_check.return_value = False
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
 
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
@@ -107,7 +107,7 @@ class CoverageManagerTestCase(TestCase):
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
 
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
         code_coverage.refresh_from_db()
@@ -127,7 +127,7 @@ class CoverageManagerTestCase(TestCase):
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
 
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         self.client.post(reverse('coveralls_enable'), data=coverage_data)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
         self.assertEqual(code_coverage.badge_url, 'http://test.test')
@@ -143,7 +143,7 @@ class CoverageManagerTestCase(TestCase):
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
         self.assertTrue(code_coverage.enabled)
 
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         self.client.post(reverse('coveralls_disable'), data=coverage_data)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
         self.assertFalse(code_coverage.enabled)
@@ -154,7 +154,7 @@ class CoverageManagerTestCase(TestCase):
         :return: 
         """
         self.enable_travis_for_experiment()
-        coverage_data = {'experiment_id': 1}
+        coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_disable'), data=coverage_data)
         json_response = json.loads(response.content)
         self.assertFalse(json_response['disabled'])

@@ -16,8 +16,8 @@ from git_manager.models import GitRepository
 class SphinxHelperTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        clone_url = 'https://github.com/jlmdegoede/Sandbox-Research-5.git'
-        cls.repo_dir = 'github_repositories/jlmdegoede/Sandbox-Research-5/'
+        clone_url = 'https://github.com/jlmdegoede/Sandbox-Experiment.git'
+        cls.repo_dir = 'github_repositories/jlmdegoede/Sandbox-Experiment/'
         Repo.clone_from(clone_url, cls.repo_dir)
 
     def setUp(self):

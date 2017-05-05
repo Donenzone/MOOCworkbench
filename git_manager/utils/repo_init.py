@@ -1,7 +1,7 @@
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.models import GitRepository
-from requirements_manager.helper import build_requirements_file
+from requirements_manager.helper import build_requirements_file_object_type_id
 from helpers.helper import get_absolute_path
 from marketplace.helpers.helper import SetupPyVariables, build_setup_py
 
@@ -109,7 +109,7 @@ class PackageGitRepoInit(GitRepoInit):
         self._create_new_file_in_repo('setup.py', commit_message='Added setup.py file', contents=setup_py)
 
     def copy_requirements_txt(self):
-        requirements_txt = build_requirements_file(self.experiment.pk, self.experiment.get_object_type())
+        requirements_txt = build_requirements_file_object_type_id(self.experiment.pk, self.experiment.get_object_type())
         self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file', contents=requirements_txt)
 
     def clean_up_github_folders(self):

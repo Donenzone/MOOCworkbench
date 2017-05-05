@@ -2,18 +2,21 @@ import hmac
 from hashlib import sha1
 import json
 
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
-from django.views.decorators.http import require_POST
-from django.utils.encoding import force_bytes
-
 import requests
 from ipaddress import ip_address, ip_network
 
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.encoding import force_bytes
+
+from requirements_manager.tasks import task_update_requirements
+from dataschema_manager.tasks import task_read_data_schema
+from pylint_manager.tasks import task_run_pylint
+
 from .helpers.github_helper import GitHubHelper
+from .tasks import task_process_git_push
 
 
 def get_user_repositories(user):
@@ -30,6 +33,7 @@ def get_user_repositories(user):
 def create_new_github_repository(title, user):
     github_helper = GitHubHelper(user, title, create=True)
     return github_helper
+
 
 # source: https://gist.github.com/vitorfs/145a8b8f0865cb65ee915e0c846fc303
 @require_POST
@@ -68,9 +72,19 @@ def webhook_receive(request):
     elif event == 'push':
         # Deploy some code for example
         event = json.loads(request.body)
-        print(event['repository'])
-        print(event['repository']['name'])
+        repo_name = event['repository']['name']
+        sha_hash_list = []
+        for commit in event['commits']:
+            sha_hash_list.append(commit['sha'])
+        run_post_push_tasks(repo_name, sha_hash_list)
         return HttpResponse('success')
 
     # In case we receive an event that's not ping or push
     return HttpResponse(status=204)
+
+
+def run_post_push_tasks(repository_name, sha_list):
+    task_update_requirements.delay(repository_name)
+    task_read_data_schema.delay(repository_name)
+    task_process_git_push.delay(repository_name, sha_list)
+    task_run_pylint(repository_name)

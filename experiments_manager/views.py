@@ -17,6 +17,8 @@ from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin, get_most_recent_measurement
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from pylint_manager.helper import return_results_for_file
+from requirements_manager.tasks import task_update_requirements
+from dataschema_manager.tasks import task_read_data_schema
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm
@@ -38,6 +40,9 @@ class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
         context['steps'] = get_steps(experiment)
         context['object_type'] = self.get_requirement_type(experiment)
         context['active_step_id'] = experiment.get_active_step().id
+
+        task_update_requirements.delay(experiment.git_repo.name)
+        task_read_data_schema.delay(experiment.git_repo.name)
         return context
 
 

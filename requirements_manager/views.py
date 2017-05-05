@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction
 
-from git_manager.helpers.github_helper import GitHubHelper
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from helpers.helper import get_package_or_experiment
 from experiments_manager.consumers import send_message
+from experiments_manager.helper import MessageStatus
 
 from .forms import RequirementForm
 from .models import Requirement
@@ -81,7 +81,7 @@ def remove_experiment_requirement(request, object_id, object_type):
 def write_requirements_file(request, object_id, object_type):
     get_package_or_experiment(request, object_type, object_id)
     task_write_requirements_file.delay(object_id, object_type)
-    send_message(request.user.username, 'info', 'Task started to update dependencies...')
+    send_message(request.user.username, MessageStatus.INFO, 'Task started to update dependencies...')
     return JsonResponse({'success': True})
 
 

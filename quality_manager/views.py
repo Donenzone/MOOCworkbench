@@ -12,12 +12,12 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 from .models import ExperimentMeasure
 from .mixins import MeasurementMixin, get_recent_measurements_for_type
 from .helpers.what_now_helper import WhatNow
-from .tasks import version_control_quality_check
-from .tasks import requirements_quality_check
-from .tasks import test_quality_check
-from .tasks import ci_quality_check
-from .tasks import docs_coverage_check
-from .tasks import pylint_static_quality_check
+from .tasks import task_version_control_quality_check
+from .tasks import task_requirements_quality_check
+from .tasks import task_test_quality_check
+from .tasks import task_ci_quality_check
+from .tasks import task_docs_coverage_check
+from .tasks import task_pylint_static_quality_check
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -64,11 +64,11 @@ class NrOfCommitsView(MeasurementMixin, View):
 def refresh_measurements(request, step_id):
     step = ChosenExperimentSteps.objects.get(pk=step_id)
     verify_and_get_experiment(request, step.experiment_id)
-    version_control_quality_check.delay(step_id)
-    requirements_quality_check.delay(step_id)
-    test_quality_check.delay(step_id)
-    ci_quality_check.delay(step_id)
-    docs_coverage_check.delay(step_id)
-    pylint_static_quality_check.delay(step_id)
+    task_version_control_quality_check.delay(step_id)
+    task_requirements_quality_check.delay(step_id)
+    task_test_quality_check.delay(step_id)
+    task_ci_quality_check.delay(step_id)
+    task_docs_coverage_check.delay(step_id)
+    task_pylint_static_quality_check.delay(step_id)
 
     return JsonResponse({'refresh': True})

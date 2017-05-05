@@ -114,7 +114,7 @@ class ExperimentTestCase(TestCase):
     def test_choose_experiment_steps_get(self):
         response = self.client.get(reverse('experimentsteps_choose', kwargs={'experiment_id': 1}))
         self.assertIsNotNone(response.context['steps'])
-        self.assertEqual(len(response.context['steps']), 6)
+        self.assertEqual(len(response.context['steps']), 5)
         self.assertEqual(response.context['experiment'].id, 1)
 
     def test_choose_experiment_steps_post(self):
@@ -156,8 +156,10 @@ class ExperimentTestCase(TestCase):
     @patch('experiments_manager.views.GitHubHelper')
     @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
     @patch('experiments_manager.views.RepoFileListMixin._get_files_in_repository')
-    def test_experiment_detail_view(self, mock_get_files_in_repository, mock_github_helper_file_list, mock_github_helper):
+    @patch('experiments_manager.views.RepoFileListMixin.get_context_data')
+    def test_experiment_detail_view(self, mock_context_data, mock_get_files_in_repository, mock_github_helper_file_list, mock_github_helper):
         self.test_choose_experiment_steps_post()
+        mock_context_data.return_value = {'git_list': self.get_mock_files()}
         mock_github_helper.return_value = None
         mock_github_helper_file_list.return_value = ['file']
         mock_get_files_in_repository.return_value = self.get_mock_files()

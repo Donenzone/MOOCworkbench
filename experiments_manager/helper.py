@@ -10,3 +10,10 @@ def verify_and_get_experiment(request, experiment_id):
 
 def get_steps(experiment):
     return ChosenExperimentSteps.objects.filter(experiment=experiment).order_by('step_nr')
+
+
+class MessageStatus(object):
+    SUCCESS = 'success'
+    INFO = 'info'
+    WARNING = 'warning'
+    ERROR = 'danger'

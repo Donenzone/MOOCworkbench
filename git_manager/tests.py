@@ -57,8 +57,10 @@ class GitManagerTestCases(TestCase):
         self.assertIsNotNone(github_helper)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
-    def test_init_github_helper_create(self, mock_github):
+    @patch('git_manager.helpers.github_helper.GitHubHelper._check_webhook_exists')
+    def test_init_github_helper_create(self, mock_web_hook, mock_github):
         mock_github.return_value = GithubMock()
+        mock_web_hook.return_value = True
         github_helper = GitHubHelper(self.user, 'test', create=True)
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.github_repository.repo_name, 'newly_created_repo')
@@ -133,6 +135,7 @@ class GithubMockRepo(object):
         self.repo_name = repo_name
         self.owner = GithubMockOwner(owner)
         self.clone_url = 'https://clone-url'
+        self.name = 'test'
 
     def get_contents(self, folder):
         if folder == '/test1':
@@ -143,6 +146,8 @@ class GithubMockRepo(object):
         encoded = base64.b64decode('Test File')
         return encoded
 
+    def create_hook(self, name, dict):
+        return True
 
 class GithubMockOwner(object):
     def __init__(self, login):

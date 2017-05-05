@@ -5,7 +5,7 @@ from helpers.helper import get_package_or_experiment_without_request
 from .models import Requirement
 
 
-def build_requirements_file(object_id, object_type):
+def build_requirements_file_object_type_id(object_id, object_type):
     exp_or_package = get_package_or_experiment_without_request(object_type, object_id)
     requirements_txt = ''
     for requirement in exp_or_package.requirements.all():
@@ -23,6 +23,13 @@ def parse_requirements_file(exp_or_package, requirements_file):
 
         exp_or_package.requirements.add(requirement)
         exp_or_package.save()
+
+
+def delete_existing_requirements(exp_or_package):
+    for req in exp_or_package.requirements.all():
+        exp_or_package.requirements.remove(req)
+        exp_or_package.save()
+        req.delete()
 
 
 def add_internalpackage_to_experiment(internal_package, experiment):

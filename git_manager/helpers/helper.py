@@ -1,5 +1,7 @@
-from git_manager.helpers.github_helper import GitHubHelper
 from helpers.helper import get_absolute_path
+
+from .github_helper import GitHubHelper
+from ..models import GitRepository
 
 
 def get_github_helper(request, exp_or_package):
@@ -28,4 +30,10 @@ def get_file_from_code_template(type, file_name, folder=None):
     return contents
 
 
+def get_experiment_from_repo_name(repo_name):
+    git_repo = GitRepository.objects.filter(name=repo_name)
+    if git_repo:
+        git_repo = git_repo[0]
+        experiment = git_repo.experiment_set.first()
+        return experiment
 

@@ -48,6 +48,7 @@ class ExternalPackageCreateView(CreateView):
 
 class ExternalPackageDetailView(ActiveExperimentsList, DetailView):
     model = ExternalPackage
+    template_name = 'marketplace/package_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)

@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'waliki.togetherjs',    # optional
 
     'django_bootstrap_breadcrumbs',
+    'actstream',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {

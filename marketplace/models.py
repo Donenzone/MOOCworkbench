@@ -1,14 +1,16 @@
 import xmlrpc.client
 
 from autoslug import AutoSlugField
+from markdownx.models import MarkdownxField
+from model_utils.models import TimeStampedModel
+from notifications.signals import notify
+from actstream import action
+
 from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
-from markdownx.models import MarkdownxField
-from model_utils.models import TimeStampedModel
-from notifications.signals import notify
 
 from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
@@ -132,12 +134,14 @@ class PackageVersion(TimeStampedModel):
 
 
 @receiver(post_save, sender=PackageVersion)
-def send_notification(sender, instance, created, **kwargs):
+def send_notification_and_action(sender, instance, created, **kwargs):
     if created:
         subscribed_users = instance.package.subscribed_users.all()
         message = 'Package {0} is updated to {1}'.format(instance.package, instance.version_nr)
         for user in subscribed_users:
             notify.send(user, recipient=user.user, verb=message)
+        print("Sending action")
+        action.send(instance.package, verb='was updated to', target=instance)
 
 
 def update_all_versions():

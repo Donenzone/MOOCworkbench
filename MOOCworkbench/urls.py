@@ -49,4 +49,5 @@ urlpatterns = [
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^wiki/', include('waliki.urls')),
+    url('^activity/', include('actstream.urls')),
 ]

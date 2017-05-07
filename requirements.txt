@@ -32,3 +32,5 @@ django-ajax-selects
 sphinx_click
 tableschema
 ipaddress
+pypiserver
+django-activity-stream

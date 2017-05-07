@@ -1,40 +1,12 @@
 {% extends "base.html" %}
+{% load activity_tags %}
 
 
 {% block content %}
   <div class="row">
     <div class="col-md-12">
         <h2>Welcome to the MOOC workbench</h2>
-        <p>Thanks for helping test this workbench. In order to get you started, we've created some tasks for testing important functionality in this version</p>
-        <hr />
-        {% if active_task %}
-          <h3>Active Task</h3>
-          <div class="col-md-4">
-            <div class="panel panel-primary">
-              <div class="panel-heading">{{ active_task.name }}</div>
-              <div class="panel-body">{{ active_task.description|linebreaks }}</div>
-              <div class="panel-footer"><a href="{% url 'task_active' active_task.id %}">Complete this task</a></div>
-            </div>
-          </div>
-        {% else %}
-          <h3>Current Available Tasks</h3>
-            {% for task in tasks %}
-            <div class="col-md-4">
-              <div class="panel panel-default">
-                <div class="panel-heading">{{ task.name }}</div>
-                <div class="panel-body">{{ task.description|linebreaks }}</div>
-                <div class="panel-footer"><a href="{% url 'task_active' task.id %}">Start this task now</a></div>
-              </div>
-            </div>
-            {% endfor %}
-          {% endif %}
-          <p class="col-md-12"><a href="{% url 'task_list' %}" class="btn btn-primary">Go to my task overview</a></p>
-    </div>
-  </div>
-          <hr />
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Recent Experiments</h2>
+            <h3>Your Recent Experiments</h3>
             <ul>
             {% for experiment in experiments %}
                 <li><a href="{% url "experiment_detail" experiment.id experiment.slug %}">{{ experiment.title }}</a></li>
@@ -43,6 +15,6 @@
             <p>
               <a href="{% url "experiment_new" %}" class="btn btn-primary">Create new experiment</a>
             </p>
-        </div>
     </div>
+  </div>
 {% endblock %}

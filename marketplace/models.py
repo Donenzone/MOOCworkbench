@@ -107,12 +107,23 @@ def add_package_config(sender, instance, created, **kwargs):
         package_version = PackageVersion(package=instance, version_nr='0.1', changelog='Initial version', added_by=instance.owner, url='')
         package_version.save()
 
+        action.send(instance.owner, verb='created the package', target=instance)
+
 
 class PackageResource(TimeStampedModel):
     package = models.ForeignKey(to=Package)
     resource = MarkdownxField()
     url = models.URLField(null=True)
     added_by = models.ForeignKey(to=WorkbenchUser)
+
+    def __str__(self):
+        return "Resource by {0}".format(self.added_by)
+
+
+@receiver(post_save, sender=PackageResource)
+def send_action_package_resource(sender, instance, created, **kwargs):
+    if created:
+        action.send(instance, verb='was added to', target=instance.package)
 
 
 class PackageVersion(TimeStampedModel):
@@ -140,7 +151,6 @@ def send_notification_and_action(sender, instance, created, **kwargs):
         message = 'Package {0} is updated to {1}'.format(instance.package, instance.version_nr)
         for user in subscribed_users:
             notify.send(user, recipient=user.user, verb=message)
-        print("Sending action")
         action.send(instance.package, verb='was updated to', target=instance)
 
 

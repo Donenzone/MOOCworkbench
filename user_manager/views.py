@@ -1,3 +1,5 @@
+from actstream.models import model_stream
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -6,18 +8,24 @@ from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-from user_manager.models import get_workbench_user, WorkbenchUser
-from user_manager.forms import WorkbenchUserForm, UserLoginForm
-from user_manager.forms import RegisterForm
+from marketplace.models import InternalPackage, PackageVersion, PackageResource
+
+
+from .models import get_workbench_user, WorkbenchUser
+from .forms import WorkbenchUserForm, UserLoginForm
+from .forms import RegisterForm
 
 
 @login_required
 def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user)[:5]
-
+    activity_stream = list(model_stream(PackageVersion))
+    activity_stream += list(model_stream(InternalPackage))
+    activity_stream += list(model_stream(PackageResource))
     return render(request, 'index.html', {'experiments': experiments,
-                                          'tasks': get_available_tasks(workbench_user)})
+                                          'tasks': get_available_tasks(workbench_user),
+                                          'activity': activity_stream})
 
 
 def sign_in(request):

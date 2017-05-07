@@ -6,6 +6,7 @@ class MarketplaceConfig(AppConfig):
 
     def ready(self):
         from actstream import registry
+        registry.register(self.get_model('Package'))
         registry.register(self.get_model('InternalPackage'))
         registry.register(self.get_model('ExternalPackage'))
         registry.register(self.get_model('PackageResource'))

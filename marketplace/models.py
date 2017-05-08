@@ -67,6 +67,15 @@ class Package(BasePackage):
 class ExternalPackage(Package):
     project_page = models.URLField()
 
+    def __str__(self):
+        return self.name
+
+
+@receiver(post_save, sender=ExternalPackage)
+def send_package_action(sender, instance, created, **kwargs):
+    if created:
+        action.send(instance.owner, verb='created the package', target=instance)
+
 
 class InternalPackage(Package):
     git_repo = models.ForeignKey(to=GitRepository)

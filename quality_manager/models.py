@@ -1,4 +1,9 @@
+from actstream import action
+
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from experiments_manager.models import ChosenExperimentSteps
 from model_utils.models import TimeStampedModel
 
@@ -60,3 +65,12 @@ class ExperimentMeasureResult(TimeStampedModel):
                 ExperimentMeasureResult.MEDIUM: 'warning',
                 ExperimentMeasureResult.HIGH: 'success'}
         return style_classes[self.result]
+
+    def __str__(self):
+        return "Workbench scan of {0}".format(self.measurement.name)
+
+
+@receiver(post_save, sender=ExperimentMeasureResult)
+def add_experiment_config(sender, instance, created, **kwargs):
+    if created:
+        action.send(instance, verb='was completed', action_object=instance.step.experiment.owner)

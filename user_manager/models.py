@@ -1,8 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-# Create your models here.
 
 
 class WorkbenchUser(models.Model):
@@ -32,3 +31,7 @@ def create_workbench_user(sender, instance, created, **kwargs):
 class SSHKeys(models.Model):
     ssh_key = models.CharField(max_length=1000, null=True)
     workbench_user = models.ManyToManyField(to=WorkbenchUser)
+
+
+def get_researcher_group():
+    return Group.objects.get(name='Researcher')

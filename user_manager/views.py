@@ -1,4 +1,4 @@
-from actstream.models import model_stream
+from actstream.models import model_stream, action_object_stream
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,7 +8,7 @@ from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-from marketplace.models import InternalPackage, PackageVersion, PackageResource
+from marketplace.models import ExternalPackage, InternalPackage, PackageVersion, PackageResource
 
 
 from .models import get_workbench_user, WorkbenchUser
@@ -20,9 +20,11 @@ from .forms import RegisterForm
 def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user)[:5]
-    activity_stream = list(model_stream(PackageVersion))
-    activity_stream += list(model_stream(InternalPackage))
-    activity_stream += list(model_stream(PackageResource))
+    activity_stream = list(model_stream(PackageVersion)[:5])
+    activity_stream += list(model_stream(ExternalPackage)[:5])
+    activity_stream += list(model_stream(InternalPackage)[:5])
+    activity_stream += list(model_stream(PackageResource)[:5])
+    activity_stream += list(action_object_stream(workbench_user)[:5])
     return render(request, 'index.html', {'experiments': experiments,
                                           'tasks': get_available_tasks(workbench_user),
                                           'activity': activity_stream})

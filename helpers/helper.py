@@ -1,3 +1,5 @@
+from django.contrib.auth.models import Group
+
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import Experiment
 from marketplace.models import InternalPackage

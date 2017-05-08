@@ -7,6 +7,7 @@ class UsermanagerConfig(AppConfig):
     def ready(self):
         from actstream import registry
         registry.register(self.get_model('WorkbenchUser'))
-        from django.contrib.auth.models import User
+        from django.contrib.auth.models import User, Group
         registry.register(User)
+        registry.register(Group)
 

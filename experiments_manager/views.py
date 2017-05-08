@@ -17,7 +17,6 @@ from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin, get_most_recent_measurement
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from pylint_manager.helper import return_results_for_file
-from requirements_manager.tasks import task_update_requirements
 from dataschema_manager.tasks import task_read_data_schema
 
 from .tables import ExperimentTable
@@ -184,6 +183,7 @@ def experimentstep_scorecard(request, pk, slug):
     experiment = verify_and_get_experiment(request, pk)
     completed_step = experiment.get_active_step()
     context = {}
+
     context['completed_step'] = completed_step
     context['experiment'] = experiment
 

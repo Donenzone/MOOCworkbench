@@ -5,7 +5,13 @@ from django.forms import TextInput, Textarea
 from .models import DataSchemaField, DataSchemaConstraints
 
 
+class JsonTableSchemaNameField(forms.CharField):
+    def to_python(self, value):
+        return value.lower()
+
+
 class DataSchemaFieldForm(ModelForm):
+    name = JsonTableSchemaNameField(max_length=100)
 
     class Meta:
         model = DataSchemaField

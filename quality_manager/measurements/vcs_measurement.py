@@ -1,8 +1,7 @@
-from quality_manager.measurements.measurement import MeasurementAbstraction
-from git_manager.helpers.github_helper import GitHubHelper
-from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure, RawMeasureResult
 from datetime import datetime, timedelta
-from statistics import mean, median
+
+from quality_manager.measurements.measurement import MeasurementAbstraction
+from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure, RawMeasureResult
 
 
 class VersionControlUseMeasurement(MeasurementAbstraction):

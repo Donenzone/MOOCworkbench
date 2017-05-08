@@ -1,5 +1,8 @@
 from django.db import models
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class DataSchemaConstraints(models.Model):
     unique = models.BooleanField(default=False, help_text="Values in this row have to be unique")
@@ -67,6 +70,15 @@ class DataSchemaField(models.Model):
         if self.constraints:
             obj_dict['constraints'] = self.constraints.to_dict()
         return obj_dict
+
+
+@receiver(post_save, sender=DataSchemaField)
+def add_constraints_object(sender, instance, created, **kwargs):
+    if created:
+        new_constraints = DataSchemaConstraints()
+        new_constraints.save()
+        instance.constraints = new_constraints
+        instance.save()
 
 
 class DataSchema(models.Model):

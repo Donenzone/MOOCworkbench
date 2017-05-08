@@ -7,6 +7,8 @@ from git_manager.helpers.github_helper import GitHubHelper
 
 from .models import DataSchemaField, DataSchema
 
+SCHEMA_FILE_LOCATION = 'schema/schema.json'
+
 
 def get_data_schema(experiment):
     data_schema = DataSchema.objects.filter(name='main')
@@ -20,9 +22,9 @@ def get_data_schema(experiment):
 
 def get_schema_file(experiment):
     github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
-    schema_file_location = 'schema/schema.json'
-    schema = github_helper.view_file(schema_file_location)
-    result = parse_json_table_schema(schema)
+    schema = github_helper.view_file(SCHEMA_FILE_LOCATION)
+    json_schema = json.loads(schema)
+    result = parse_json_table_schema(json_schema)
     data_schema = experiment.schema.first()
     data_schema.fields.add(*result)
     data_schema.save()

@@ -21,7 +21,7 @@ def send_message(user, priority, contents):
     send_message_to_group(user, {'priority': priority, 'contents': contents})
 
 
-def send_experiment_creation_status_update(user, progress_nr, completed=False, redirect_url=None):
+def send_exp_package_creation_status_update(user, progress_nr, completed=False, redirect_url=None):
     message_dict = {}
     message_dict['completed'] = completed
     message_dict['progress_nr'] = progress_nr

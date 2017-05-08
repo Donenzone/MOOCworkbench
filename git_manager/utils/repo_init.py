@@ -1,9 +1,13 @@
-from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.helpers.git_helper import GitHelper
-from git_manager.models import GitRepository
+import shutil
+
 from requirements_manager.helper import build_requirements_file_object_type_id
 from helpers.helper import get_absolute_path
 from marketplace.helpers.helper import SetupPyVariables, build_setup_py
+from experiments_manager.consumers import send_exp_package_creation_status_update
+
+from ..helpers.github_helper import GitHubHelper
+from ..helpers.git_helper import GitHelper
+from ..models import GitRepository
 
 
 class GitRepoInit(object):
@@ -44,12 +48,13 @@ class GitRepoInit(object):
 
 class PackageGitRepoInit(GitRepoInit):
 
-    def __init__(self, internal_package, experiment, step_folder):
+    def __init__(self, internal_package, experiment, step_folder, username):
         github_helper_package = GitHubHelper(experiment.owner, internal_package.name, create=True)
         super().__init__(github_helper_package, type='pip')
         self.experiment = experiment
         self.internal_package = internal_package
         self.step_folder = step_folder
+        self.username = username
 
     def init_repo_boilerplate(self):
         # create git repository in DB
@@ -58,14 +63,22 @@ class PackageGitRepoInit(GitRepoInit):
         git_helper = self.clone_basis_for_module_and_return_git_helper()
         # take code from module and commit it to new repo
         self.move_code_from_base_to_new(git_helper)
+        send_exp_package_creation_status_update(self.username, 2)
 
         # clone the new repository
         module_git_helper = self.clone_new_module_repo()
+        send_exp_package_creation_status_update(self.username, 3)
         self.move_module_into_folder(module_git_helper)
+        send_exp_package_creation_status_update(self.username, 4)
 
         self.create_setup_py()
         self.create_travis_file()
         self.create_readme_file()
+        send_exp_package_creation_status_update(self.username, 5)
+
+        self.clean_up_github_folders(git_helper)
+        self.clean_up_github_folders(module_git_helper)
+        send_exp_package_creation_status_update(self.username, 6)
 
         return git_repo_obj
 
@@ -112,5 +125,5 @@ class PackageGitRepoInit(GitRepoInit):
         requirements_txt = build_requirements_file_object_type_id(self.experiment.pk, self.experiment.get_object_type())
         self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file', contents=requirements_txt)
 
-    def clean_up_github_folders(self):
-        pass
+    def clean_up_github_folders(self, git_helper):
+        shutil.rmtree(git_helper.repo_dir)

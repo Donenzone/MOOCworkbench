@@ -87,4 +87,5 @@ def run_post_push_tasks(repository_name, sha_list):
     task_update_requirements.delay(repository_name)
     task_read_data_schema.delay(repository_name)
     task_process_git_push.delay(repository_name, sha_list)
-    task_run_pylint(repository_name)
+    task_run_pylint.delay(repository_name)
+

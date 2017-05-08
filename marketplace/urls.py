@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^list/$', login_required(PackageListView.as_view()), name="package_list"),
     url(r'^new/$', login_required(ExternalPackageCreateView.as_view(success_url='/marketplace')), name="package_new"),
     url(r'^new-internal-package/(?P<experiment_id>\d+)/(?P<step_id>\d+)$', login_required(InternalPackageCreateView.as_view()), name="internalpackage_create"),
+    url(r'^new/status$', package_status_create, name="package_status_create"),
     url(r'^view/(?P<pk>\d+)/$', login_required(PackageDetailView.as_view()), name="package_detail"),
     url(r'^(?P<package_id>\d+)/version/new/$', login_required(PackageVersionCreateView.as_view()), name="packageversion_new"),
     url(r'^(?P<package_id>\d+)/internal/version/new/$', login_required(InternalPackageVersionCreateView.as_view()), name="internalpackageversion_new"),

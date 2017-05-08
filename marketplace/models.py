@@ -82,7 +82,7 @@ def send_package_action(sender, instance, created, **kwargs):
 
 
 class InternalPackage(Package):
-    git_repo = models.ForeignKey(to=GitRepository)
+    git_repo = models.ForeignKey(to=GitRepository, null=True)
     travis = models.ForeignKey(to=TravisInstance, null=True)
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)

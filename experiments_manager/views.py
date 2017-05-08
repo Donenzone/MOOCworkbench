@@ -70,6 +70,7 @@ class ExperimentCreateView(View):
             return render(request, "experiments_manager/create/experiment_new.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
 
 
+@login_required
 def experiment_status_create(request):
     return render(request, 'experiments_manager/create/experiment_status_create.html', {})
 

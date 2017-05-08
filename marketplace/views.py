@@ -10,14 +10,15 @@ from django.contrib.auth.decorators import login_required
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.mixins import ActiveExperimentsList
-from git_manager.utils.repo_init import PackageGitRepoInit
 from helpers.helper_mixins import ExperimentPackageTypeMixin
-from marketplace.forms import InternalPackageForm
-from marketplace.helpers.helper import create_tag_for_package_version
-from marketplace.helpers.helper import update_setup_py_with_new_version
-from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from user_manager.models import get_workbench_user
 from requirements_manager.helper import add_internalpackage_to_experiment
+
+from .forms import InternalPackageForm
+from .helpers.helper import create_tag_for_package_version
+from .helpers.helper import update_setup_py_with_new_version
+from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
+from .tasks import task_create_package_from_experiment
 
 
 class MarketplaceIndex(View):
@@ -37,7 +38,7 @@ class PackageListView(ListView):
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
     fields = ['name', 'description', 'project_page', 'category', 'language']
-    template_name = 'marketplace/package_form.html'
+    template_name = 'marketplace/package_create/package_form.html'
 
     def form_valid(self, form):
         form.instance.owner = get_workbench_user(self.request.user)
@@ -47,7 +48,8 @@ class ExternalPackageCreateView(CreateView):
 class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
     model = InternalPackage
     form_class = InternalPackageForm
-    template_name = 'marketplace/package_form.html'
+    template_name = 'marketplace/package_create/package_form.html'
+    success_url = '/marketplace/new/status'
 
     def get_context_data(self, **kwargs):
         context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
@@ -59,11 +61,9 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         step_folder = self.get_step().location
         experiment = self.get_experiment()
         form.instance.owner = experiment.owner
-
-        # save new internal package
-        package_repo = PackageGitRepoInit(form.instance, experiment, step_folder)
-        form.instance.git_repo = package_repo.init_repo_boilerplate()
-        return super(InternalPackageCreateView, self).form_valid(form)
+        response = super(InternalPackageCreateView, self).form_valid(form)
+        task_create_package_from_experiment.delay(form.instance.pk, experiment.pk, step_folder)
+        return response
 
     def get_experiment(self):
         experiment_id = self.kwargs['experiment_id']
@@ -74,6 +74,11 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         step_id = self.kwargs['step_id']
         step = ChosenExperimentSteps.objects.get(pk=step_id)
         return step
+
+
+@login_required
+def package_status_create(request):
+    return render(request, 'marketplace/package_create/package_status_create.html', {})
 
 
 class InternalPackageListView(ListView):

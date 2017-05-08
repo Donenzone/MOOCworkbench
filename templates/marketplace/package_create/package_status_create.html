@@ -1,0 +1,56 @@
+{% extends "marketplace/marketplace_index.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap3 %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Create New Package" "package_new" %}
+{% endblock %}
+
+
+{% block content %}
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+             style="width: 25%;">
+            <span class="sr-only">25% Complete</span>
+        </div>
+    </div>
+
+    <hr />
+
+    <h2>Create New Package</h2>
+    <p class="lead">Please wait while the workbench is creating your new package...</p>
+
+
+    <h3>Tasks</h3>
+    <p class="lead"><span id="status-1" class="glyphicon glyphicon-minus"></span> Worker available to create your package</p>
+
+    <p class="lead"><span id="status-2" class="glyphicon glyphicon-minus"></span> Creating new GitHub repository</p>
+
+    <p class="lead"><span id="status-3" class="glyphicon glyphicon-minus"></span> Moving code from experiment to package</p>
+
+    <p class="lead"><span id="status-4" class="glyphicon glyphicon-minus"></span> Cloning new repository</p>
+
+    <p class="lead"><span id="status-5" class="glyphicon glyphicon-minus"></span> Adding initial files</p>
+
+    <p class="lead"><span id="status-6" class="glyphicon glyphicon-minus"></span> Cleaning up...</p>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            socket = new WebSocket("ws://" + window.location.host + "/");
+            socket.onmessage = function(e) {
+                dictionary = JSON.parse(e.data);
+                for(i = 1; i <= dictionary.progress_nr; i++) {
+                    var selector = '#status-' + i;
+                    $(selector).removeClass();
+                    $(selector).addClass('glyphicon glyphicon-ok')
+                }
+
+                if (dictionary.completed) {
+                    window.location.replace(dictionary.redirect_url)
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

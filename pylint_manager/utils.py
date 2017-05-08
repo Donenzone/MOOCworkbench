@@ -2,6 +2,7 @@ import virtualenv
 import os
 import subprocess
 import json
+import shutil
 
 from django.db.models import Q
 
@@ -66,12 +67,13 @@ def find_python_files_in_dir(dir_to_scan):
 
 
 def parse_pylint_results(pylint_results, pylint_scan_result_object):
-    json_pylint = json.loads(pylint_results[0])
-    for pylint in json_pylint:
-        result = PylintResult()
-        result.for_result = pylint_scan_result_object
-        result.pylint_type = pylint['type'][0]
-        result.message = pylint['message']
-        result.line_nr = pylint['line']
-        result.file_path = pylint['path']
-        result.save()
+    if pylint_results:
+        json_pylint = json.loads(pylint_results[0])
+        for pylint in json_pylint:
+            result = PylintResult()
+            result.for_result = pylint_scan_result_object
+            result.pylint_type = pylint['type'][0]
+            result.message = pylint['message']
+            result.line_nr = pylint['line']
+            result.file_path = pylint['path']
+            result.save()

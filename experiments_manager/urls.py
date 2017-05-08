@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', experiments_manager.views.index, name="experiments_index"),
     url(r'^new$', login_required(experiments_manager.views.ExperimentCreateView.as_view()), name="experiment_new"),
     url(r'^new/status$', experiments_manager.views.experiment_status_create, name="experiment_status_create"),
+    url(r'^new/enable-builds/(?P<pk>\d+)', experiments_manager.views.experiment_first_time, name="experiment_first_time"),
     url(r'^steps/(?P<experiment_id>\d+)$', experiments_manager.views.ChooseExperimentSteps.as_view(), name="experimentsteps_choose"),
     url(r'^step/files$', experiments_manager.views.FileListForStep.as_view(), name="file_list_for_step"),
     url(r'^next-step/(?P<experiment_id>\d+)$', experiments_manager.views.complete_step_and_go_to_next, name="complete_step_and_go_to_next"),

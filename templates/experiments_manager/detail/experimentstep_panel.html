@@ -1,0 +1,50 @@
+<div {% if step.active %}data-intro='This is the first step, data gathering and processing'{% endif %}
+     class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
+    <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
+        <h4 id="{{ step.id }}" class="panel-title {% if step.active %}active{% endif %}">
+            <a role="button" data-toggle="collapse" data-parent="#accordion"
+               href="#collapse{{ forloop.counter }}" {% if step.active %}
+               aria-expanded="true" {% else %} aria-expanded="false" {% endif %}
+               aria-controls="collapse{{ forloopcounter }}">
+                {{ step.step }} {% if step.completed %}(completed){% endif %}
+            </a>
+        </h4>
+    </div>
+    <div id="collapse{{ forloop.counter }}"
+         class="panel-collapse collapse {% if step.active %}in{% endif %}" role="tabpanel"
+         aria-labelledby="heading{{ forloop.counter }}">
+        <div class="panel-body">
+            {% if docs.enabled %}
+                <div class="row">
+                    <div class="col-md-12">
+                    {% include "experiments_manager/detail/experimentstep_docs.html" %}
+                    </div>
+                </div>
+                <hr/>
+            {% endif %}
+            {% include "experiments_manager/detail/experimentstep_panel_files.html" %}
+            <hr/>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    {% include "experiments_manager/detail/experimentstep_recommendations.html" %}
+                </div>
+                <div class="col-sm-6"
+                     {% if step.active %}data-intro='During your work, the Workbench checks several aspects. You can see how you are doing here.'{% endif %}>
+                    {% include "experiments_manager/detail/experimentstep_qualitymessages.html" %}
+                </div>
+            </div>
+            <p></p>
+        </div>
+        <div class="panel-footer">
+            {% if step.active %}
+                <p>
+                    <a href="{% url "experimentstep_scorecard" object.id object.slug %}"
+                       class="btn btn-success"
+                       data-intro="Once you have completed the work in this step, click here to move on to the next step.">Complete
+                        and go to next step</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>

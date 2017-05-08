@@ -1,0 +1,53 @@
+{% extends "experiments_manager/experiments_table.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap3 %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Create New Experiment" "experiment_new" %}
+{% endblock %}
+
+
+{% block content %}
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+             style="width: 75%;">
+            <span class="sr-only">75% Complete</span>
+        </div>
+    </div>
+
+    <hr />
+
+    <h2>Create New Experiment</h2>
+    <p class="lead">Your First Steps</p>
+
+
+    <h3>1. Enable Automatic Builds</h3>
+    <div class="row">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">Continuous integration</div>
+                      <div class="panel-body" id="ci">
+                        <p>{% include "build_manager/build_status.html" %}</p>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+    <h3>2. Set-up Your Experiment Locally</h3>
+    <ol>
+        <li>Clone your new experiment with the following command: <pre>git clone git@github.com:{{ username }}/{{ reposlug }}.git</pre></li>
+        <li>Set up a new virtual environment for your project: <pre>virtualenv -p python3 ~/.venv{{ reposlug|lower }}</pre></li>
+        <li>Activate your virtual environment: <pre>source ~/.venv{{ reposlug|lower }}/bin/activate</pre></li>
+        <li>Make your new repository folder active: <pre>cd {{ reposlug }}</pre></li>
+        <li>Install the intial requirements: <pre>pip3 install -r requirements.txt</pre></li>
+        <li>Check if the tests run: <pre>python3 test_runner.py</pre></li>
+    </ol>
+
+    </div>
+
+    <a href="{% url "experiment_detail" object_id object.slug %}?first_time=1" class="btn btn-success">Continue</a>
+
+{% endblock %}

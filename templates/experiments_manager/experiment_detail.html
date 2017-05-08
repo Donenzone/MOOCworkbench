@@ -25,116 +25,9 @@
             <h3>General information</h3>
             <p class="lead"> {{ object.description }}</p>
 
-            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" data-intro='Here you can see the progress of your experiment, divided in steps'>
                 {% for step in steps %}
-                    <div class="step-panel panel {% if step.active %}panel-success{% elif step.completed %}panel-primary{% else %}panel-default{% endif %}">
-                        <div class="panel-heading" role="tab" id="heading{{ forloop.counter }}">
-                            <h4 id="{{ step.id }}" class="panel-title {% if step.active %}active{% endif %}">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                   href="#collapse{{ forloop.counter }}" {% if step.active %}
-                                   aria-expanded="true" {% else %} aria-expanded="false" {% endif %}
-                                   aria-controls="collapse{{ forloopcounter }}">
-                                    {{ step.step }} {% if step.completed %}(completed){% endif %}
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapse{{ forloop.counter }}"
-                             class="panel-collapse collapse {% if step.active %}in{% endif %}" role="tabpanel"
-                             aria-labelledby="heading{{ forloop.counter }}">
-                            <div class="panel-body">
-                                {% if docs.enabled %}
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h4>Read the docs</h4>
-                                            <a href="{% url "docs_view" experiment.id object_type step.main_module %}">Read
-                                                the docs for this step</a>
-                                        </div>
-                                    </div>
-                                    <hr/>
-                                {% endif %}
-                                <table class="table table-striped main-step-table">
-                                    <thead>
-                                    <tr>
-                                        <th>
-                                            File/Folder name
-                                        </th>
-                                        <th>
-                                            Static code analysis
-                                        </th>
-                                        <th>
-                                            Code coverage
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="tbody-{{ step.id }}">
-                                    {% if step.active %}
-                                        {% for item in git_list %}
-                                            <tr class="clickable-row">
-                                                <td>
-                                                    {% if item.type == 'dir' %}
-                                                        <a href="/experiment/folder/{{ object.id }}?folder_name={{ item.path }}"
-                                                           class="base-url">{{ item.name }}</a>
-
-                                                    {% else %}
-                                                        <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}"
-                                                           class="base-url">{{ item.name }}</a>
-
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    {% if item.pylint_results.e %}
-                                                        <span class="label label-danger">{{ item.pylint_results.e }} errors</span>
-                                                    {% endif %}
-
-                                                    {% if item.pylint_results.w %}
-                                                        <span class="label label-warning">{{ item.pylint_results.w }} warnings</span>
-                                                    {% endif %}
-
-                                                    {% if item.pylint_results.c %}
-                                                        <span class="label label-info">{{ item.pylint_results.c }} other issues</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <span class="label label-info code-coverage" id="{{ item.slug }}"
-                                                          data-filename="{{ item.path }}"></span>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    {% endif %}
-                                    </tbody>
-                                </table>
-
-                                <hr/>
-
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <h4>Recommended packages in this step</h4>
-                                        <ul>
-                                            <li>There aren't any recommended packages yet. Check back later!</li>
-                                        </ul>
-                                        <p><a href="{% url 'marketplace_index' %}" class="btn btn-default">View more packages</a></p>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <h4>How am I doing?</h4>
-                                        <ul>
-                                            {% for message in measurements %}
-                                                <li>{{ message }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <p></p>
-                            </div>
-                            <div class="panel-footer">
-                                {% if step.active %}
-                                    <p>
-                                        <a href="{% url "experimentstep_scorecard" object.id object.slug %}"
-                                           class="btn btn-success">Complete and go to next step</a>
-                                    </p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                    {% include "experiments_manager/detail/experimentstep_panel.html" %}
                 {% endfor %}
             </div>
             <p class="lead">
@@ -163,6 +56,10 @@
     <script type='text/javascript'>
 
         $(document).ready(function () {
+            introJs().setOption('doneLabel', 'Next page').start().oncomplete(function() {
+              window.location.href = '#schema';
+            });
+
             $(".clickable-row").click(function () {
                 window.location = $(this).find('.base-url').attr('href');
             });
@@ -172,7 +69,9 @@
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 var target = $(e.target).attr("href");
-                jQuery(target + '-click')[0].click();
+                if (target !== '#index') {
+                    jQuery(target + '-click')[0].click();
+                }
             });
 
             $('.nav-tabs a').click(function (e) {

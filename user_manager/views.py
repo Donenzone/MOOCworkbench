@@ -3,13 +3,12 @@ from actstream.models import model_stream, action_object_stream
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
 from marketplace.models import ExternalPackage, InternalPackage, PackageVersion, PackageResource
-
 
 from .models import get_workbench_user, WorkbenchUser
 from .forms import WorkbenchUserForm, UserLoginForm

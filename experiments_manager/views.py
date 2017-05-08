@@ -51,7 +51,7 @@ class ExperimentCreateView(View):
                                                                                     'experiment_id': experiment_id,
                                                                                     'repository_list': repository_list})
         except ValueError as a:
-            messages.add_message(request, messages.INFO, 'Before creating an experiment, please sign in with GitHub')
+            messages.add_message(request, messages.INFO, 'Before creating an experiment, please connect with GitHub')
             return redirect(to=reverse('view_my_profile'))
 
     def post(self, request, experiment_id=0):
@@ -72,6 +72,19 @@ class ExperimentCreateView(View):
 @login_required
 def experiment_status_create(request):
     return render(request, 'experiments_manager/create/experiment_status_create.html', {})
+
+
+@login_required
+def experiment_first_time(request, pk):
+    experiment = verify_and_get_experiment(request, pk)
+    context = {}
+    context['object'] = experiment
+    context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
+    context['object_id'] = experiment.pk
+    context['configured'] = experiment.travis.enabled
+    context['username'] = experiment.git_repo.owner
+    context['reposlug'] = experiment.git_repo.name
+    return render(request, 'experiments_manager/create/experiment_enable_builds.html', context)
 
 
 class FileListForStep(RepoFileListMixin, View):

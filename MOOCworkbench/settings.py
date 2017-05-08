@@ -65,7 +65,6 @@ INSTALLED_APPS = [
     'bootstrapform',
     'django_tables2',
     'markdownx',
-    'django_comments',
     'notifications',
 
     'allauth',

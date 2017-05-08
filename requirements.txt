@@ -12,7 +12,6 @@ pycryptodome
 asgi_redis
 markdown2
 django-markdownx
-django-contrib-comments
 django-notifications-hq
 django-allauth
 requirements-parser

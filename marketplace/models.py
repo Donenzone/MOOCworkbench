@@ -5,6 +5,7 @@ from markdownx.models import MarkdownxField
 from model_utils.models import TimeStampedModel
 from notifications.signals import notify
 from actstream import action
+from markdownx.utils import markdownify
 
 from django.urls import reverse
 from django.db import models
@@ -62,6 +63,9 @@ class Package(BasePackage):
         if package_version:
             return package_version[0]
         return None
+
+    def get_absolute_url(self):
+        return reverse('package_detail', kwargs={"pk": self.pk})
 
 
 class ExternalPackage(Package):
@@ -125,8 +129,15 @@ class PackageResource(TimeStampedModel):
     url = models.URLField(null=True)
     added_by = models.ForeignKey(to=WorkbenchUser)
 
+    @property
+    def markdown(self):
+        return markdownify(self.resource)
+
     def __str__(self):
         return "Resource by {0}".format(self.added_by)
+
+    def get_absolute_url(self):
+        return self.package.get_absolute_url()
 
 
 @receiver(post_save, sender=PackageResource)

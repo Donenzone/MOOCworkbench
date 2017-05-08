@@ -8,8 +8,7 @@ urlpatterns = [
     url(r'^list/$', login_required(PackageListView.as_view()), name="package_list"),
     url(r'^new/$', login_required(ExternalPackageCreateView.as_view(success_url='/marketplace')), name="package_new"),
     url(r'^new-internal-package/(?P<experiment_id>\d+)/(?P<step_id>\d+)$', login_required(InternalPackageCreateView.as_view()), name="internalpackage_create"),
-    url(r'^view/(?P<pk>\d+)/$', login_required(InternalPackageDetailView.as_view()), name="package_detail"),
-    url(r'^view/external/(?P<pk>\d+)/$', login_required(ExternalPackageDetailView.as_view()), name="externalpackage_detail"),
+    url(r'^view/(?P<pk>\d+)/$', login_required(PackageDetailView.as_view()), name="package_detail"),
     url(r'^(?P<package_id>\d+)/version/new/$', login_required(PackageVersionCreateView.as_view()), name="packageversion_new"),
     url(r'^(?P<package_id>\d+)/internal/version/new/$', login_required(InternalPackageVersionCreateView.as_view()), name="internalpackageversion_new"),
     url(r'^(?P<package_id>\d+)/resource/new/$', login_required(PackageResourceCreateView.as_view()), name="packageresource_new"),
@@ -20,4 +19,5 @@ urlpatterns = [
     url(r'^my-packages/$', login_required(InternalPackageListView.as_view()), name="internalpackage_list"),
     url(r'^view-version/(?P<pk>\d+)/(?P<package_id>\d+)/$', login_required(PackageVersionDetailView.as_view()), name="packageversion_detail"),
     url(r'^packages/autocomplete/$', package_autocomplete, name="package_autocomplete"),
+    url(r'^resources/list/(?P<pk>\d+)/$', login_required(PackageResourceListView.as_view()), name="packageresource_list"),
 ]

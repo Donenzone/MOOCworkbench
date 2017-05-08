@@ -1,5 +1,3 @@
-from markdownx.utils import markdownify
-
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, JsonResponse
@@ -44,20 +42,6 @@ class ExternalPackageCreateView(CreateView):
     def form_valid(self, form):
         form.instance.owner = get_workbench_user(self.request.user)
         return super(ExternalPackageCreateView, self).form_valid(form)
-
-
-class ExternalPackageDetailView(ActiveExperimentsList, DetailView):
-    model = ExternalPackage
-    template_name = 'marketplace/package_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
-        context['version_history'] = PackageVersion.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        for resource in resources:
-            resource.markdown = markdownify(resource.resource)
-        context['resources'] = resources
-        return context
 
 
 class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
@@ -123,17 +107,19 @@ class InternalPackageUpdateView(UpdateView):
         return super(InternalPackageUpdateView, self).form_valid(form)
 
 
-class InternalPackageDetailView(ActiveExperimentsList, DetailView):
-    model = InternalPackage
+class PackageDetailView(ActiveExperimentsList, DetailView):
+    model = Package
 
     def get_context_data(self, **kwargs):
-        context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
+        context = super(PackageDetailView, self).get_context_data(**kwargs)
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        for resource in resources:
-            resource.markdown = markdownify(resource.resource)
         context['resources'] = resources
+        if InternalPackage.objects.filter(pk=self.object.pk):
+            context['is_internal'] = True
+        else:
+            context['is_internal'] = False
         return context
 
 
@@ -186,6 +172,20 @@ class PackageResourceCreateView(CreateView):
         form.instance.package = package
         form.instance.added_by = get_workbench_user(self.request.user)
         return super(PackageResourceCreateView, self).form_valid(form)
+
+
+class PackageResourceListView(ListView):
+    model = PackageResource
+    paginate_by = 10
+
+    def get_queryset(self):
+        package_id = self.kwargs['pk']
+        return PackageResource.objects.filter(package__id=package_id)
+
+    def get_context_data(self, **kwargs):
+        context = super(PackageResourceListView, self).get_context_data(**kwargs)
+        context['object'] = Package.objects.get(pk=self.kwargs['pk'])
+        return context
 
 
 class PackageSubscriptionView(View):

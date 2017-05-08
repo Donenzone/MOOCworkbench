@@ -4,22 +4,28 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-12">
-            <h2>Welcome to the MOOC workbench</h2>
+        <div class="col-md-9">
+            <h2>Welcome to the MOOC Workbench</h2>
             <h3>Activity Feed</h3>
             {% for action in activity %}
                 <p class="lead">{{ action }}</p>
             {% endfor %}
-            <h3>Your Recent Experiments</h3>
-            <ul>
-                {% for experiment in experiments %}
-                    <li><a href="{% url "experiment_detail" experiment.id experiment.slug %}">{{ experiment.title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-            <p>
-                <a href="{% url "experiment_new" %}" class="btn btn-primary">Create new experiment</a>
-            </p>
+        </div>
+        <div class="col-md-3">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Your Recent Experiments</div>
+                <div class="panel-body">
+
+                    {% for experiment in experiments %}
+                        <p class="lead"><a
+                                href="{% url "experiment_detail" experiment.id experiment.slug %}">{{ experiment.title }}</a>
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <a href="{% url 'experiment_new' %}" class='btn btn-primary'>Create New Experiment</a>
         </div>
     </div>
 {% endblock %}

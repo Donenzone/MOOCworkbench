@@ -10,55 +10,65 @@
 
 
 {% block content %}
-  <h2>MOOC marketplace</h2>
-  <p class="lead">
-      Find useful packages for your research, track packages for new versions and find resources for your favorite packages.
-  </p>
+    <h2>Packages</h2>
+    <p class="lead">
+        Find useful packages for your research, track packages for new versions and find resources for your favorite
+        packages.
+    </p>
 
-    <a href="{% url "internalpackage_list" %}" class="btn btn-primary">View your packages</a>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 rounded">
+                <div class="panel panel-default">
+                    <div class="panel-heading">New internal packages</div>
+                    <div class="panel-body">
+                        {% for package in new_internal_packages %}
+                            <p class="lead"><b><a href="{% url 'package_detail' package.pk %}"
+                                      class="text-primary">{{ package.name }}</a></b></p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-  <div class="container">
-    <div class="row">
-    <div class="col-md-3 rounded" style="height:400px;margin-bottom:30px;">
-      <h3>New packages from other researchers</h3>
-        <ul>
-          {% for package in new_internal_packages %}
-            <li><b><a href="{% url 'package_detail' package.pk %}" class="text-primary">{{ package.name }}</a></b></li>
-          {% endfor %}
-        </ul>
+            <div class="col-md-6 rounded">
+                <div class="panel panel-default">
+                    <div class="panel-heading">New external packages</div>
+                    <div class="panel-body">
+                        {% for package in new_packages %}
+                            <p class="lead"><b><a href="{% url 'package_detail' package.pk %}"
+                                      class="text-primary">{{ package.name }}</a></b></p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 rounded">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Package Updates</div>
+                    <div class="panel-body">
+                        {% for package_version in recent_updates %}
+                            <p class="lead"><b><a
+                                    href="{% url 'package_detail' package_version.package.pk %}">{{ package_version }}</a></b>
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 rounded">
+                <div class="panel panel-default">
+                    <div class="panel-heading">New resources</div>
+                    <div class="panel-body">
+                        {% for resource in recent_resources %}
+                            <p class="lead"><b><a href="{% url 'package_detail' resource.package.pk %}">{{ resource.added_by }}</a></b>
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <a href="{% url 'package_new' %}" class='btn btn-primary'>Create New External Package</a>
+        <a href="{% url "internalpackage_list" %}" class="btn btn-default">View your packages</a>
+
     </div>
-
-    <div class="col-md-3 rounded" style="height:400px;margin-bottom:30px;">
-      <h3>New external packages</h3>
-        <ul>
-          {% for package in new_packages %}
-            <li><b><a href="{% url 'package_detail' package.pk %}" class="text-primary">{{ package.name }}</a></b></li>
-          {% endfor %}
-        </ul>
-  </div>
-
-    <div class="col-md-3 rounded" style="height:400px">
-      <h3>Updated packages</h3>
-        <ul>
-          {% for package_version in recent_updates %}
-            <li><b><a href="{% url 'package_detail' package_version.package.pk %}">{{ package_version }}</a></b></li>
-          {% endfor %}
-        </ul>
-  </div>
-
-    <div class="col-md-3 rounded" style="height:400px">
-      <h3>New resources</h3>
-        <ul>
-          {% for resource in recent_resources %}
-            <li><b><a href="{% url 'package_detail' resource.package.pk %}">{{ resource.added_by }}</a></b></li>
-          {% endfor %}
-        </ul>
-  </div>
-</div>
-
-  <h3>Submit your package</h3>
-    <p class="lead">Do you have a favorite package that is missing? Please add and share it!</p>
-    <a href="{% url 'package_new' %}" class='btn btn-primary'>Create New Package</a>
-
-</div>
 {% endblock %}

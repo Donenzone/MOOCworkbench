@@ -11,7 +11,9 @@
 
 {% block content %}
         {% render_table table %}
+        <p>
+            <a href="{% url 'experiment_new' %}" class='btn btn-primary'>Create New Experiment</a>
+        </p>
 
-        <a href="{% url 'experiment_new' %}" class='btn btn-primary'>Create new experiment</a>
 
 {% endblock %}

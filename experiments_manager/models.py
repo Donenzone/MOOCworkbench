@@ -17,7 +17,7 @@ from dataschema_manager.models import DataSchema
 
 
 class Experiment(BasePackage):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(to=WorkbenchUser)
     template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')

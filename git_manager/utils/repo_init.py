@@ -46,27 +46,31 @@ class PackageGitRepoInit(GitRepoInit):
         # clone the new repository
         module_git_helper = self.clone_new_module_repo()
         send_exp_package_creation_status_update(self.username, 3)
-        self.move_module_into_folder(module_git_helper)
+        # move files of subtree to own package folder
+        self.move_module_into_folder(module_git_helper, self.github_helper.repo_name)
         send_exp_package_creation_status_update(self.username, 4)
 
-        self.create_cookiecutter_boilerplate(self.github_helper, module_git_helper)
+        # init the cookiecutter package template
+        self.create_cookiecutter_boilerplate(module_git_helper)
         send_exp_package_creation_status_update(self.username, 5)
 
+        # remove the temp repo folders in github_repositories/
         self.clean_up_github_folders(git_helper)
         self.clean_up_github_folders(module_git_helper)
         send_exp_package_creation_status_update(self.username, 6)
 
         return git_repo_obj
 
-    def create_cookiecutter_boilerplate(self, github_helper, git_helper):
+    def create_cookiecutter_boilerplate(self, git_helper):
         template_to_clone = CookieCutterTemplate.objects.filter(meant_for=CookieCutterTemplate.PACKAGE).first()
         project_dict = {'project_name': self.internal_package.name,
-                        'app_name': github_helper.repo_name,
-                        'username': self.username,
+                        'app_name': self.github_helper.repo_name,
+                        'full_name': self.username,
                         'email': self.experiment.owner.user.email,
-                        'github_username': github_helper.owner,
+                        'github_username': self.github_helper.owner,
                         'project_short_description': self.internal_package.description}
         clone_cookiecutter_template_with_dict(template_to_clone, git_helper.repo_dir_of_user(), project_dict)
+        git_helper.repo.git.add('.')
         git_helper.repo.index.commit('Pip package template added')
         git_helper.push()
 
@@ -99,14 +103,15 @@ class PackageGitRepoInit(GitRepoInit):
         package_repo.clone_or_pull_repository()
         return package_repo
 
-    def move_module_into_folder(self, git_helper):
-        git_helper.move_repo_contents_to_folder(self.step_folder)
+    def move_module_into_folder(self, git_helper, package_name):
+        git_helper.move_repo_contents_to_folder(package_name)
         git_helper.repo.index.commit('Moved module into own folder')
         git_helper.push()
 
     def copy_requirements_txt(self):
         requirements_txt = build_requirements_file_object_type_id(self.experiment.pk, self.experiment.get_object_type())
-        self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file', contents=requirements_txt)
+        self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file',
+                                      contents=requirements_txt)
 
     def clean_up_github_folders(self, git_helper):
         shutil.rmtree(git_helper.repo_dir)

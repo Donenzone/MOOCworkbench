@@ -17,7 +17,6 @@ from git_manager.views import get_user_repositories
 from quality_manager.mixins import MeasurementMixin, get_most_recent_measurement
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from pylint_manager.helper import return_results_for_file
-from dataschema_manager.tasks import task_read_data_schema
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm

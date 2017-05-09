@@ -24,11 +24,20 @@
                 <a href="#" class="btn btn-default" data-toggle="modal" data-target="#dependency-modal">Add Package To My Project</a>
             </div>
         </div>
-        <p>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
+            <li><a href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="schema-click">Resources</a></li>
+            <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
+            <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Versions</a></li>
             {% if request.user == object.owner.user and is_internal %}
-                <a href="{% url 'internalpackage_dashboard' object.pk %}" class="btn btn-primary">Go To Package Dashboard</a>
+                <li><a  href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="dashboard-click">Dashboard</a></li>
             {% endif %}
-        </p>
+        </ul>
+
+
+        {% if readme %}
+            {{ readme|safe }}
+        {% endif %}
 
         <p class="lead">{{ object.description }}</p>
         <div class="row">

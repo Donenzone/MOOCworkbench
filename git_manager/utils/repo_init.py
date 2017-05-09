@@ -1,7 +1,5 @@
 import shutil
 
-from requirements_manager.helper import build_requirements_file_object_type_id
-from helpers.helper import get_absolute_path
 from cookiecutter_manager.helpers.helper_cookiecutter import clone_cookiecutter_template_with_dict
 from cookiecutter_manager.models import CookieCutterTemplate
 from experiments_manager.consumers import send_exp_package_creation_status_update
@@ -107,11 +105,6 @@ class PackageGitRepoInit(GitRepoInit):
         git_helper.move_repo_contents_to_folder(package_name)
         git_helper.repo.index.commit('Moved module into own folder')
         git_helper.push()
-
-    def copy_requirements_txt(self):
-        requirements_txt = build_requirements_file_object_type_id(self.experiment.pk, self.experiment.get_object_type())
-        self._create_new_file_in_repo('requirements.txt', commit_message='Added requirements.txt file',
-                                      contents=requirements_txt)
 
     def clean_up_github_folders(self, git_helper):
         shutil.rmtree(git_helper.repo_dir)

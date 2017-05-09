@@ -1,0 +1,19 @@
+{% extends 'marketplace/marketplace_index.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb object.name "package_detail" object.id %}
+{% endblock %}
+
+{% block content %}
+
+  <h3>Publishing package</h3>
+    <p class="lead">In order to publish the package, ensure that the following aspects are taken care of:</p>
+    <ul>
+        <li>Documentation: ensure that it is clear how someone can use your package in their project</li>
+        <li>Ensure you have defined the required dependencies for your package</li>
+        <li>Write a short Getting started guide for new users, with small examples how to use the package</li>
+    </ul>
+{% endblock %}

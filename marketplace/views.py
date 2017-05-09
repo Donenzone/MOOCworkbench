@@ -1,3 +1,5 @@
+from markdown2 import Markdown
+
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, JsonResponse
@@ -13,6 +15,7 @@ from experiments_manager.mixins import ActiveExperimentsList
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from user_manager.models import get_workbench_user
 from requirements_manager.helper import add_internalpackage_to_experiment
+from git_manager.helpers.github_helper import GitHubHelper
 
 from .forms import InternalPackageForm
 from .helpers.helper import create_tag_for_package_version
@@ -97,7 +100,7 @@ class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
         context['object'] = package
         context['object_type'] = self.get_requirement_type(package)
         context['edit_form'] = InternalPackageForm(instance=package)
-        return render(request, 'marketplace/internalpackage_dashboard.html', context)
+        return render(request, 'marketplace/package_detail/internalpackage_dashboard.html', context)
 
 
 class InternalPackageUpdateView(UpdateView):
@@ -114,6 +117,7 @@ class InternalPackageUpdateView(UpdateView):
 
 class PackageDetailView(ActiveExperimentsList, DetailView):
     model = Package
+    template_name = 'marketplace/package_detail/package_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(PackageDetailView, self).get_context_data(**kwargs)
@@ -123,9 +127,18 @@ class PackageDetailView(ActiveExperimentsList, DetailView):
         context['resources'] = resources
         if InternalPackage.objects.filter(pk=self.object.pk):
             context['is_internal'] = True
+            context['readme'] = self.readme_file_of_package()
         else:
             context['is_internal'] = False
         return context
+
+    def readme_file_of_package(self):
+        internalpackage = InternalPackage.objects.get(id=self.kwargs['pk'])
+        github_helper = GitHubHelper(self.request.user, internalpackage.git_repo.name)
+        readme = github_helper.view_file('README.md')
+        md = Markdown()
+        content_file = md.convert(readme)
+        return content_file
 
 
 class InternalPackageVersionCreateView(CreateView):

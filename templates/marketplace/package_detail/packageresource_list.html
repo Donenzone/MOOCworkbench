@@ -1,4 +1,4 @@
-{% extends 'marketplace/package_detail.html' %}
+{% extends 'marketplace/package_detail/package_detail.html' %}
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
@@ -8,6 +8,15 @@
 
 {% block content %}
   <h2>Package Resources</h2>
+<ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
+        <li><a href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="schema-click">Resources</a></li>
+        <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
+        <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Versions</a></li>
+        {% if request.user == object.owner.user and is_internal %}
+            <li><a  href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="dashboard-click">Dashboard</a></li>
+        {% endif %}
+    </ul>
   {% for resource in object_list %}
             <div class="panel panel-primary">
                 <div class="panel-heading">Resource by {{ resource.added_by }}</div>

@@ -2,7 +2,8 @@ import shutil
 
 from requirements_manager.helper import build_requirements_file_object_type_id
 from helpers.helper import get_absolute_path
-from marketplace.helpers.helper import SetupPyVariables, build_setup_py
+from cookiecutter_manager.helpers.helper_cookiecutter import clone_cookiecutter_template_with_dict
+from cookiecutter_manager.models import CookieCutterTemplate
 from experiments_manager.consumers import send_exp_package_creation_status_update
 
 from ..helpers.github_helper import GitHubHelper
@@ -15,32 +16,9 @@ class GitRepoInit(object):
 
     def __init__(self, github_helper, type):
         self.github_helper = github_helper
-        self.template_type_folder = '{0}{1}/'.format(self.TEMPLATE_FOLDER, type)
-
-    def create_travis_file(self):
-        self._create_new_file_in_repo('.travis.yml', 'Added Travis CI config',
-                                      contents=self.get_file_contents('.travis.yml'))
-
-    def create_readme_file(self):
-        self._create_new_file_in_repo('README.md', 'Added README file', contents=self.get_file_contents('README.md'))
 
     def _create_new_file_in_repo(self, file_name, commit_message, folder='', contents=''):
         self.github_helper.add_file_to_repository(file_name, commit_message, contents=contents, folder=folder)
-
-    def replace_folder_in_file(self, contents, folder):
-        return contents.replace('{0}', folder)
-
-    def get_file_contents(self, filename, part_of_step=False, folder=None):
-        if part_of_step:
-            path = '{0}{1}steps/{2}'.format(get_absolute_path(), self.template_type_folder, filename)
-        else:
-            path = '{0}/{1}{2}'.format(get_absolute_path(), self.template_type_folder, filename)
-        file_to_open = open(path, 'r')
-
-        contents = file_to_open.read()
-        if folder:
-            contents = self.replace_folder_in_file(contents, folder)
-        return contents
 
     class Meta:
         abstract = True
@@ -71,9 +49,7 @@ class PackageGitRepoInit(GitRepoInit):
         self.move_module_into_folder(module_git_helper)
         send_exp_package_creation_status_update(self.username, 4)
 
-        self.create_setup_py()
-        self.create_travis_file()
-        self.create_readme_file()
+        self.create_cookiecutter_boilerplate(self.github_helper, module_git_helper)
         send_exp_package_creation_status_update(self.username, 5)
 
         self.clean_up_github_folders(git_helper)
@@ -81,6 +57,18 @@ class PackageGitRepoInit(GitRepoInit):
         send_exp_package_creation_status_update(self.username, 6)
 
         return git_repo_obj
+
+    def create_cookiecutter_boilerplate(self, github_helper, git_helper):
+        template_to_clone = CookieCutterTemplate.objects.filter(meant_for=CookieCutterTemplate.PACKAGE).first()
+        project_dict = {'project_name': self.internal_package.name,
+                        'app_name': github_helper.repo_name,
+                        'username': self.username,
+                        'email': self.experiment.owner.user.email,
+                        'github_username': github_helper.owner,
+                        'project_short_description': self.internal_package.description}
+        clone_cookiecutter_template_with_dict(template_to_clone, git_helper.repo_dir_of_user(), project_dict)
+        git_helper.repo.index.commit('Pip package template added')
+        git_helper.push()
 
     def create_git_db_object(self):
         repo = self.github_helper.github_repository
@@ -115,11 +103,6 @@ class PackageGitRepoInit(GitRepoInit):
         git_helper.move_repo_contents_to_folder(self.step_folder)
         git_helper.repo.index.commit('Moved module into own folder')
         git_helper.push()
-
-    def create_setup_py(self):
-        setup_py_template = self.get_file_contents('setup.py_template')
-        setup_py = build_setup_py(self.internal_package, setup_py_template)
-        self._create_new_file_in_repo('setup.py', commit_message='Added setup.py file', contents=setup_py)
 
     def copy_requirements_txt(self):
         requirements_txt = build_requirements_file_object_type_id(self.experiment.pk, self.experiment.get_object_type())

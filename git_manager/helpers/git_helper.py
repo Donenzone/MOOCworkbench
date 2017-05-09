@@ -4,10 +4,10 @@ import shutil
 
 from git import Repo
 
-REPO_DIR = 'github_repositories/'
-
 
 class GitHelper(object):
+
+    BASE_REPO_DIR = 'github_repositories/'
 
     def __init__(self, github_helper):
         self.github_helper = github_helper
@@ -17,12 +17,12 @@ class GitHelper(object):
 
     @property
     def repo_dir(self):
-        return '{0}{1}/{2}'.format(REPO_DIR,
+        return '{0}{1}/{2}'.format(self.BASE_REPO_DIR,
                                    self.github_helper.github_repository.owner.login,
                                    self.github_helper.github_repository.name)
 
     def repo_dir_of_user(self):
-        return '{0}{1}'.format(REPO_DIR,
+        return '{0}{1}'.format(self.BASE_REPO_DIR,
                                self.github_helper.github_repository.owner.login)
 
     def clone_or_pull_repository(self):

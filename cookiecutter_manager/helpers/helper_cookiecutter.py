@@ -11,3 +11,11 @@ def clone_cookiecutter_template(cookiecutter_template, repo_dir, project_name, a
                  extra_context=extra_context,
                  output_dir=repo_dir,
                  overwrite_if_exists=True)
+
+
+def clone_cookiecutter_template_with_dict(cookiecutter_template, repo_dir, project_vars):
+    cookiecutter(cookiecutter_template.location,
+                 no_input=True,
+                 extra_context=project_vars,
+                 output_dir=repo_dir,
+                 overwrite_if_exists=True)

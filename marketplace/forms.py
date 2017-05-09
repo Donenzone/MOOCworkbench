@@ -7,7 +7,7 @@ from marketplace.models import InternalPackage
 class InternalPackageForm(ModelForm):
     class Meta:
         model = InternalPackage
-        fields = ['name', 'description', 'category', 'language', 'published']
+        fields = ['name', 'description', 'category', 'language']
 
         widgets = {
             'name': TextInput(attrs={'placeholder': 'Package name'}),

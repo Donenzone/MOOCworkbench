@@ -76,13 +76,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.gitlab',
 
-    'waliki',
-    'waliki.git',           # optional but recommended
-    'waliki.attachments',   # optional but recommended
-    'waliki.pdf',           # optional
-    'waliki.slides',        # optional
-    'waliki.togetherjs',    # optional
-
     'django_bootstrap_breadcrumbs',
     'actstream',
 ]

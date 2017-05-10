@@ -31,6 +31,7 @@ from .tasks import initialize_repository
 class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
                            MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
+    template_name = "experiments_manager/detail/experiment_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
@@ -38,6 +39,7 @@ class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
         context['steps'] = get_steps(experiment)
         context['object_type'] = self.get_requirement_type(experiment)
         context['active_step_id'] = experiment.get_active_step().id
+        context['index_active'] = True
         return context
 
 
@@ -227,4 +229,4 @@ def readme_of_experiment(request, experiment_id):
     content_file = github_helper.view_file('README.md')
     md = Markdown()
     content_file = md.convert(content_file)
-    return render(request, 'experiments_manager/experiment_readme.html', {'readme': content_file})
+    return render(request, 'experiments_manager/detail/experiment_readme.html', {'readme': content_file, 'object': experiment, 'readme_active': True})

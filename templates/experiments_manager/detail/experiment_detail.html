@@ -4,25 +4,17 @@
 
 {% block content %}
 
-
     {% block breadcrumbs %}
         {{ block.super }}
         {% breadcrumb experiment.title "experiment_detail" experiment.pk experiment.slug %}
     {% endblock %}
 
-    <h2>{{ object.title }}</h2>
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-        <li><a data-toggle="tab" href="#readme" class="tab-btn" id="readme-click">Read Me</a></li>
-        <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
-        <li><a data-toggle="tab" href="#schema" class="tab-btn" id="schema-click">Schema</a></li>
-        <li><a data-toggle="tab" href="#dashboard" class="tab-btn" id="dashboard-click">Dashboard</a></li>
-    </ul>
+    {% include "experiments_manager/detail/experiment_detail_tabs.html" %}
 
     <div class="tab-content">
 
         <div id="index" class="tab-pane fade in active">
-            <h3>General information</h3>
+            <p></p>
             <p class="lead"> {{ object.description }}</p>
 
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" data-intro='Here you can see the progress of your experiment, divided in steps'>
@@ -34,23 +26,6 @@
                 <a href="{{ object.git_repo.github_url }}" target="_blank">View your project on GitHub</a>
             </p>
         </div>
-
-        <div id="dashboard" class="tab-pane fade">
-            <p>Loading...</p>
-        </div>
-
-        <div id="requirements" class="tab-pane fade">
-            <p>Loading...</p>
-        </div>
-
-        <div id="readme" class="tab-pane fade">
-            <p>Loading...</p>
-        </div>
-
-        <div id="schema" class="tab-pane fade">
-            <p>Loading...</p>
-        </div>
-
     </div>
 
     <script type='text/javascript'>
@@ -62,43 +37,6 @@
 
             $(".clickable-row").click(function () {
                 window.location = $(this).find('.base-url').attr('href');
-            });
-
-            var hash = window.location.hash;
-            hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                var target = $(e.target).attr("href");
-                if (target !== '#index') {
-                    jQuery(target + '-click')[0].click();
-                }
-            });
-
-            $('.nav-tabs a').click(function (e) {
-                $(this).tab('show');
-                var scrollmem = $('body').scrollTop() || $('html').scrollTop();
-                window.location.hash = this.hash;
-                $('html,body').scrollTop(scrollmem);
-            });
-
-            url_dict = {
-                'dashboard': "{% url 'dashboard' object.id %}",
-                'requirements': "{% url 'requirements_list' object.id object_type %}",
-                'readme': "{% url 'readme_view' object.id %}",
-                'schema': "{% url 'dataschema_overview' object.id %}"
-            };
-
-            $('#readme-click').click(function () {
-                $("#readme").load(url_dict['readme']);
-            });
-            $('#dashboard-click').click(function () {
-                $("#dashboard").load(url_dict['dashboard']);
-            });
-            $('#requirements-click').click(function () {
-                $("#requirements").load(url_dict['requirements']);
-            });
-            $('#schema-click').click(function () {
-                $("#schema").load(url_dict['schema']);
             });
 
             $('.code-coverage').each(function () {

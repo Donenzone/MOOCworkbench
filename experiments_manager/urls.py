@@ -30,6 +30,8 @@ urlpatterns = [
         name="experiment_dashboard"),
 url(r'^issues/(?P<experiment_id>\d+)/$', experiments_manager.views.experiment_issues,
         name="experiment_issues"),
+url(r'^single-issues/(?P<experiment_id>\d+)/(?P<issue_nr>\d+)$', experiments_manager.views.experiment_single_issue,
+        name="experiment_single_issue"),
     url(r'^score-card/(?P<pk>\d+)/(?P<slug>[-\w]+)$', experiments_manager.views.experimentstep_scorecard,
         name='experimentstep_scorecard'),
 

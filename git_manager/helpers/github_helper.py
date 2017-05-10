@@ -78,6 +78,9 @@ class GitHubHelper(object):
     def get_issues(self):
         return self.github_repository.get_issues()
 
+    def get_single_issue(self, issue_nr):
+        return self.github_repository.get_issue(issue_nr)
+
     def _create_webhook(self):
         webhook_url = reverse('webhook_receive')
         config_dict = {'url': webhook_url}

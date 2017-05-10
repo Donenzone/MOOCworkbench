@@ -239,7 +239,12 @@ def experiment_issues(request, experiment_id):
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
     context = {'object': experiment, 'object_type': experiment.get_object_type(), 'issues_active': True}
     context['issues'] = github_helper.get_issues()
-    print(context['issues'])
-    for issue in context['issues']:
-        print(issue)
     return render(request, 'experiments_manager/experiment_detail/experiment_issues.html', context)
+
+
+@login_required
+def experiment_single_issue(request, experiment_id, issue_nr):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+    issue = github_helper.get_single_issue(int(issue_nr))
+    return JsonResponse({'contents': issue.body, 'title': issue.title})

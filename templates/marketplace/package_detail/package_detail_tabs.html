@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-md-6">
+        <h2>Package: {{ object.name }}</h2>
+    </div>
+    <div class="col-md-6">
+        {% if not workbench_user in object.subscribed_users.all %}
+            <a href="{% url 'package_subscribe' object_id %}" class="btn btn-default">Subscribe for updates</a>
+        {% else %}
+            <a href="{% url 'package_subscribe' object_id %}" class="btn btn-default">Unsubscribe</a>
+        {% endif %}
+
+        <a href="#" class="btn btn-default" data-toggle="modal" data-target="#dependency-modal">Add Package To My Project</a>
+    </div>
+</div>
+
+<ul class="nav nav-tabs">
+    <li class="{% if index_active %}active{% endif %}"><a href="{% url "package_detail" object_id %}">Index</a></li>
+    <li class="{% if resources_active %}active{% endif %}"><a href="{% url 'packageresource_list' object_id %}" class="tab-btn" id="schema-click">Resources</a></li>
+    {% if is_internal %}
+        <li class="{% if dependencies_active %}active{% endif %}"><a href="{% url "package_dependencies" object_id object_type %}" class="tab-btn">Dependencies</a></li>
+    {% endif %}
+    <li class="{% if versions_active %}active{% endif %}"><a href="{% url "packageversion_list" object_id %}" class="tab-btn">Versions</a></li>
+    {% if request.user == object.owner.user and is_internal %}
+        <li class="{% if dashboard_active %}active{% endif %}"><a href="{% url 'internalpackage_dashboard' object_id %}" class="tab-btn">Dashboard</a></li>
+    {% endif %}
+</ul>
+    <p>
+    </p>

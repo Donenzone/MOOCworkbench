@@ -1,0 +1,58 @@
+{% extends 'marketplace/package_detail/package_detail.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Package Resources" "packageresource_list" %}
+{% endblock %}
+
+
+{% block content %}
+
+    {% include "marketplace/package_detail/package_detail_tabs.html" %}
+    <div class="col-md-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">Version history</div>
+            <div class="panel-body">
+                <table class="table">
+                    <tr>
+                        <th>Version nr</th>
+                        <th>Date added</th>
+                    </tr>
+                    {% for version in object_list %}
+                        <tr>
+                            <td>
+                                <a href="#" class="version-btn" data-toggle="modal" data-target="#version-modal" data-url="{% url 'packageversion_detail' version.pk object.pk %}">{{ version.version_nr }}</a>
+                            </td>
+                            <td>
+                                {{ version.created }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                {% if is_internal %}
+                    <a href="{% url 'internalpackageversion_new' object.pk %}" class="btn btn-default">Add New Version</a>
+                {% else %}
+                    <a href="{% url 'packageversion_new' object.pk %}" class="btn btn-default">Add New Version</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% block pagination %}
+        {% if is_paginated %}
+            <div class="pagination">
+          <span class="page-links">
+              {% if page_obj.has_previous %}
+                  <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+              {% endif %}
+              <span class="page-current">
+                  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+              </span>
+              {% if page_obj.has_next %}
+                  <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+              {% endif %}
+          </span>
+            </div>
+        {% endif %}
+    {% endblock %}
+{% endblock %}

@@ -7,29 +7,34 @@
 
 
 {% block content %}
-  <h2>Package Resources</h2>
-<ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#index">Index</a></li>
-        <li><a href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="schema-click">Resources</a></li>
-        <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
-        <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Versions</a></li>
-        {% if request.user == object.owner.user and is_internal %}
-            <li><a  href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="dashboard-click">Dashboard</a></li>
-        {% endif %}
-    </ul>
-  {% for resource in object_list %}
-            <div class="panel panel-primary">
-                <div class="panel-heading">Resource by {{ resource.added_by }}</div>
-                <div class="panel-body">
-                    <p>{{ resource.markdown|safe|truncatechars:55 }}</p>
-                </div>
-                <div class="panel-footer">Resource URL: <a href="{{ resource.url }}">{{ resource.url }}</a></div>
-            </div>
-        {% endfor %}
 
-  {% block pagination %}
-  {% if is_paginated %}
-      <div class="pagination">
+    {% include "marketplace/package_detail/package_detail_tabs.html" %}
+
+    {% for resource in resources %}
+        <div class="panel panel-default">
+            <div class="panel-heading">Resource by {{ resource.added_by }}</div>
+            <div class="panel-body">
+                <p>{{ resource.markdown|safe|truncatechars:55 }}</p>
+            </div>
+            <div class="panel-footer">Resource URL: <a href="{{ resource.url }}">{{ resource.url }}</a></div>
+        </div>
+    {% endfor %}
+
+    <p class="lead">Found a useful blog, website or other information that you wish to share with others?</p>
+    <p><a href="{% url 'packageresource_new' object.pk %}" class="btn btn-default">Add New Resource</a></p>
+    {% for resource in object_list %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">Resource by {{ resource.added_by }}</div>
+            <div class="panel-body">
+                <p>{{ resource.markdown|safe|truncatechars:55 }}</p>
+            </div>
+            <div class="panel-footer">Resource URL: <a href="{{ resource.url }}">{{ resource.url }}</a></div>
+        </div>
+    {% endfor %}
+
+    {% block pagination %}
+        {% if is_paginated %}
+            <div class="pagination">
           <span class="page-links">
               {% if page_obj.has_previous %}
                   <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
@@ -41,7 +46,7 @@
                   <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
               {% endif %}
           </span>
-      </div>
-  {% endif %}
-{% endblock %}
+            </div>
+        {% endif %}
+    {% endblock %}
 {% endblock %}

@@ -9,13 +9,15 @@ from helpers.helper import get_package_or_experiment
 from experiments_manager.consumers import send_message
 from experiments_manager.helper import MessageStatus
 
+from marketplace.mixins import IsInternalPackageMixin
+
 from .forms import RequirementForm
 from .models import Requirement
 from .mixins import RequirementSuccessUrlMixin
 from .tasks import task_write_requirements_file
 
 
-class RequirementListView(ExperimentPackageTypeMixin, ListView):
+class RequirementListView(IsInternalPackageMixin, ExperimentPackageTypeMixin, ListView):
     model = Requirement
 
     def get_queryset(self):
@@ -25,8 +27,10 @@ class RequirementListView(ExperimentPackageTypeMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(RequirementListView, self).get_context_data(**kwargs)
         context['requirements_form'] = RequirementForm()
+        context['object'] = get_package_or_experiment(self.request, self.kwargs['object_type'], self.kwargs['pk'])
         context['object_id'] = self.kwargs['pk']
         context['object_type'] = self.kwargs['object_type']
+        context['dependencies_active'] = True
         return context
 
 
@@ -37,9 +41,7 @@ class RequirementCreateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMix
 
     def form_valid(self, form):
         response = super(RequirementCreateView, self).form_valid(form)
-        object_type = self.kwargs['object_type']
-        object_id = self.kwargs['object_id']
-        exp_or_package = get_package_or_experiment(self.request, object_type, object_id)
+        exp_or_package = self.get_exp_or_package()
         self.add_req_to_object(form.instance, exp_or_package)
         return response
 
@@ -47,6 +49,15 @@ class RequirementCreateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMix
         obj.requirements.add(req)
         obj.save()
 
+    def get_exp_or_package(self):
+        object_type = self.kwargs['object_type']
+        object_id = self.kwargs['object_id']
+        exp_or_package = get_package_or_experiment(self.request, object_type, object_id)
+        return exp_or_package
+
+    def get_success_url(self):
+        exp_or_package = self.get_exp_or_package()
+        return exp_or_package.success_url_dict()['dependencies']
 
 class RequirementUpdateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMixin, UpdateView):
     model = Requirement

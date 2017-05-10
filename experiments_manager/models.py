@@ -53,6 +53,11 @@ class Experiment(BasePackage):
     def __str__(self):
         return self.title
 
+    def success_url_dict(self):
+        return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}),
+                'resources': '',
+                'versions': ''}
+
 
 @receiver(post_save, sender=Experiment)
 def add_experiment_config(sender, instance, created, **kwargs):

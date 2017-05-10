@@ -1,6 +1,8 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
+from requirements_manager.views import RequirementListView
+
 from marketplace.views import *
 
 urlpatterns = [
@@ -21,4 +23,6 @@ urlpatterns = [
     url(r'^view-version/(?P<pk>\d+)/(?P<package_id>\d+)/$', login_required(PackageVersionDetailView.as_view()), name="packageversion_detail"),
     url(r'^packages/autocomplete/$', package_autocomplete, name="package_autocomplete"),
     url(r'^resources/list/(?P<pk>\d+)/$', login_required(PackageResourceListView.as_view()), name="packageresource_list"),
+    url(r'^dependencies/(?P<pk>\d+)/(?P<object_type>\w+)/$', login_required(RequirementListView.as_view(template_name='marketplace/package_detail/package_dependencies.html')), name="package_dependencies"),
+    url(r'^versions/(?P<pk>\d+)/$', login_required(PackageVersionListView.as_view()), name="packageversion_list"),
 ]

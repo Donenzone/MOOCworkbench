@@ -22,6 +22,7 @@ from .helpers.helper import create_tag_for_package_version
 from .helpers.helper import update_setup_py_with_new_version
 from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from .tasks import task_create_package_from_experiment
+from .mixins import IsInternalPackageMixin, ObjectTypeIdMixin
 
 
 class MarketplaceIndex(View):
@@ -33,11 +34,6 @@ class MarketplaceIndex(View):
         context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:5]
         return render(request, 'marketplace/marketplace_index.html', context=context)
 
-
-class PackageListView(ListView):
-    model = Package
-
-
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
     fields = ['name', 'description', 'project_page', 'category', 'language']
@@ -46,6 +42,11 @@ class ExternalPackageCreateView(CreateView):
     def form_valid(self, form):
         form.instance.owner = get_workbench_user(self.request.user)
         return super(ExternalPackageCreateView, self).form_valid(form)
+
+
+class InternalPackageBaseView(ObjectTypeIdMixin, IsInternalPackageMixin):
+    class Meta:
+        abstract = True
 
 
 class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
@@ -79,11 +80,6 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         return step
 
 
-@login_required
-def package_status_create(request):
-    return render(request, 'marketplace/package_create/package_status_create.html', {})
-
-
 class InternalPackageListView(ListView):
     model = InternalPackage
 
@@ -98,8 +94,11 @@ class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
         context = {}
         context['docs'] = package.docs
         context['object'] = package
-        context['object_type'] = self.get_requirement_type(package)
+        context['object_id'] = package.pk
+        context['object_type'] = package.get_object_type()
+
         context['edit_form'] = InternalPackageForm(instance=package)
+        context['dashboard_active'], context['is_internal'] = True, True
         return render(request, 'marketplace/package_detail/internalpackage_dashboard.html', context)
 
 
@@ -113,32 +112,6 @@ class InternalPackageUpdateView(UpdateView):
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS, 'Package successfully updated')
         return super(InternalPackageUpdateView, self).form_valid(form)
-
-
-class PackageDetailView(ActiveExperimentsList, DetailView):
-    model = Package
-    template_name = 'marketplace/package_detail/package_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(PackageDetailView, self).get_context_data(**kwargs)
-        package_id = self.kwargs['pk']
-        context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
-        resources = PackageResource.objects.filter(package=self.kwargs['pk']).order_by('-created')[:5]
-        context['resources'] = resources
-        if InternalPackage.objects.filter(pk=self.object.pk):
-            context['is_internal'] = True
-            context['readme'] = self.readme_file_of_package()
-        else:
-            context['is_internal'] = False
-        return context
-
-    def readme_file_of_package(self):
-        internalpackage = InternalPackage.objects.get(id=self.kwargs['pk'])
-        github_helper = GitHubHelper(self.request.user, internalpackage.git_repo.name)
-        readme = github_helper.view_file('README.md')
-        md = Markdown()
-        content_file = md.convert(readme)
-        return content_file
 
 
 class InternalPackageVersionCreateView(CreateView):
@@ -156,6 +129,47 @@ class InternalPackageVersionCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['package_id']})
+
+
+class PackageListView(ListView):
+    model = Package
+
+
+class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
+    model = Package
+    template_name = 'marketplace/package_detail/package_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PackageDetailView, self).get_context_data(**kwargs)
+        package_id = self.kwargs['pk']
+        context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
+        context['index_active'] = True
+        if InternalPackage.objects.filter(pk=self.object.pk):
+            context['readme'] = self.readme_file_of_package()
+        return context
+
+    def readme_file_of_package(self):
+        internalpackage = InternalPackage.objects.get(id=self.kwargs['pk'])
+        github_helper = GitHubHelper(self.request.user, internalpackage.git_repo.name)
+        readme = github_helper.view_file('README.md')
+        md = Markdown()
+        content_file = md.convert(readme)
+        return content_file
+
+
+class PackageVersionListView(InternalPackageBaseView, ListView):
+    model = PackageVersion
+    template_name = 'marketplace/package_detail/packageversion_list.html'
+
+    def get_queryset(self):
+        qs = super(PackageVersionListView, self).get_queryset()
+        package_id = self.kwargs['pk']
+        return qs.filter(package_id=package_id)
+
+    def get_context_data(self, **kwargs):
+        context = super(PackageVersionListView, self).get_context_data(**kwargs)
+        context['versions_active'] = True
+        return context
 
 
 class PackageVersionDetailView(DetailView):
@@ -192,9 +206,10 @@ class PackageResourceCreateView(CreateView):
         return super(PackageResourceCreateView, self).form_valid(form)
 
 
-class PackageResourceListView(ListView):
+class PackageResourceListView(InternalPackageBaseView, ListView):
     model = PackageResource
     paginate_by = 10
+    template_name = 'marketplace/package_detail/packageresource_list.html'
 
     def get_queryset(self):
         package_id = self.kwargs['pk']
@@ -203,6 +218,7 @@ class PackageResourceListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(PackageResourceListView, self).get_context_data(**kwargs)
         context['object'] = Package.objects.get(pk=self.kwargs['pk'])
+        context['resources_active'] = True
         return context
 
 
@@ -245,3 +261,9 @@ def package_autocomplete(request):
         packages = Package.objects.all()[:50]
     result_list = [x.name for x in packages]
     return JsonResponse({'results': result_list})
+
+
+@login_required
+def package_status_create(request):
+    return render(request, 'marketplace/package_create/package_status_create.html', {})
+

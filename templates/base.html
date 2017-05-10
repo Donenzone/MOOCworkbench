@@ -44,8 +44,7 @@
                 <li><a href="{% url 'experiment_new' %}">Create new Experiment</a></li>
               </ul>
             </li>
-            <li class="{% block marketplace_active %}{% endblock %}"><a href="/marketplace/">Packages</a></li>
-            <li class="{% block wiki_active %}{% endblock %}"><a href="/wiki">Wiki</a></li>
+            <li class="{% block marketplace_active %}{% endblock %}"><a href="{% url 'marketplace_index' %}">Packages</a></li>
             <li class="dropdown {% block my_account_active %}{% endblock %}">
                 <a  href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></a>
                 <ul class="dropdown-menu">

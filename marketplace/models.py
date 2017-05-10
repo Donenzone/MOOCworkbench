@@ -97,6 +97,11 @@ class InternalPackage(Package):
     def get_object_type(self):
         return ExperimentPackageTypeMixin.PACKAGE_TYPE
 
+    def success_url_dict(self):
+        return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}),
+                'resources': '',
+                'versions': ''}
+
     @property
     def python_package_name(self):
         return slugify(self.name).replace('-', '_')

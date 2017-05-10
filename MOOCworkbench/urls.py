@@ -36,7 +36,7 @@ urlpatterns = [
 
     url(r'^experiments/', include('experiments_manager.urls')),
     url(r'^experiments/requirements/', include('requirements_manager.urls')),
-    url(r'^marketplace/', include('marketplace.urls')),
+    url(r'^packages/', include('marketplace.urls')),
     url(r'^builds/', include('build_manager.urls')),
     url(r'^coverage/', include('coverage_manager.urls')),
     url(r'^metrics/', include('quality_manager.urls')),

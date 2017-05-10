@@ -9,14 +9,7 @@
 
 {% block content %}
     <h2>Dashboard of {{ object.name }}</h2>
-
-    <ul class="nav nav-tabs">
-            <li><a href="{% url 'package_detail' object.pk %}" >Index</a></li>
-            <li><a href="{% url 'internalpackage_dashboard' object.pk %}" class="tab-btn" id="schema-click">Resources</a></li>
-            <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Dependencies</a></li>
-            <li><a data-toggle="tab" href="#requirements" class="tab-btn" id="requirements-click">Versions</a></li>
-            <li class="active"><a  href="#" class="tab-btn" id="dashboard-click">Dashboard</a></li>
-        </ul>
+    {% include "marketplace/package_detail/package_detail_tabs.html" %}
     <p></p>
     <div class="row">
         <div class="col-md-9">
@@ -36,15 +29,6 @@
 
     <div class="row">
         <h3>Workbench services</h3>
-
-        <div class="col-md-9">
-            <div class="panel panel-default">
-              <div class="panel-heading">Dependencies</div>
-                  <div class="panel-body"  id="requirements">
-                    Loading...
-                  </div>
-            </div>
-        </div>
 
         <div class="col-md-6">
             <div class="panel panel-default">
@@ -68,13 +52,11 @@
     <script type="text/javascript">
         $(document).ready(function() {
             url_dict = {
-              'requirements': "{% url 'requirements_list' object.id object_type %}",
               'readme': "{% url 'readme_view' object.id %}",
               'ci': "{% url 'build_status' object.id object_type %}",
               'docs': "{% url 'docs_status' object.id object_type %}",
             };
 
-            $("#requirements").load(url_dict['requirements']);
             $("#ci").load(url_dict['ci']);
             $("#docs").load(url_dict['docs']);
         })

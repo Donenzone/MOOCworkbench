@@ -31,7 +31,7 @@ from .tasks import initialize_repository
 class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
                            MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
-    template_name = "experiments_manager/detail/experiment_detail.html"
+    template_name = "experiments_manager/experiment_detail/experiment_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
@@ -48,7 +48,7 @@ class ExperimentCreateView(View):
         try:
             form = ExperimentForm()
             repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/create/experiment_new.html", {'form': form,
+            return render(request, "experiments_manager/experiment_create/experiment_new.html", {'form': form,
                                                                                     'experiment_id': experiment_id,
                                                                                     'repository_list': repository_list})
         except ValueError as a:
@@ -67,12 +67,13 @@ class ExperimentCreateView(View):
             return redirect(to=reverse('experiment_status_create'))
         else:
             repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/create/experiment_new.html", {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+            return render(request, "experiments_manager/experiment_create/experiment_new.html",
+                          {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
 
 
 @login_required
 def experiment_status_create(request):
-    return render(request, 'experiments_manager/create/experiment_status_create.html', {})
+    return render(request, 'experiments_manager/experiment_create/experiment_status_create.html', {})
 
 
 @login_required
@@ -85,7 +86,7 @@ def experiment_first_time(request, pk):
     context['configured'] = experiment.travis.enabled
     context['username'] = experiment.git_repo.owner
     context['reposlug'] = experiment.git_repo.name
-    return render(request, 'experiments_manager/create/experiment_enable_builds.html', context)
+    return render(request, 'experiments_manager/experiment_create/experiment_enable_builds.html', context)
 
 
 class FileListForStep(RepoFileListMixin, View):
@@ -109,7 +110,7 @@ class ChooseExperimentSteps(ExperimentContextMixin, View):
     def get(self, request, experiment_id):
         context = super(ChooseExperimentSteps, self).get(request, experiment_id)
         context['steps'] = ExperimentStep.objects.all()
-        return render(request, "experiments_manager/create/experimentsteps_choose.html", context)
+        return render(request, "experiments_manager/experiment_create/experimentsteps_choose.html", context)
 
     def post(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
@@ -229,4 +230,16 @@ def readme_of_experiment(request, experiment_id):
     content_file = github_helper.view_file('README.md')
     md = Markdown()
     content_file = md.convert(content_file)
-    return render(request, 'experiments_manager/detail/experiment_readme.html', {'readme': content_file, 'object': experiment, 'readme_active': True})
+    return render(request, 'experiments_manager/experiment_detail/experiment_readme.html', {'readme': content_file, 'object': experiment, 'readme_active': True})
+
+
+@login_required
+def experiment_issues(request, experiment_id):
+    experiment = verify_and_get_experiment(request, experiment_id)
+    github_helper = GitHubHelper(request.user, experiment.git_repo.name)
+    context = {'object': experiment, 'object_type': experiment.get_object_type(), 'issues_active': True}
+    context['issues'] = github_helper.get_issues()
+    print(context['issues'])
+    for issue in context['issues']:
+        print(issue)
+    return render(request, 'experiments_manager/experiment_detail/experiment_issues.html', context)

@@ -21,6 +21,7 @@ from .tasks import task_pylint_static_quality_check
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
+    template_name = 'quality_manager/dashboard.html'
 
     def get(self, request, experiment_id):
         context = super(DashboardView, self).get(request, experiment_id)
@@ -29,13 +30,14 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
         context['what_now_list'] = what_now.what_to_do_now()
         context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
         context['active_step_id'] = 0 if not active_step else active_step.id
+        context['dashboard_active'] = True
 
         messages = {}
         for measurement in self._get_recent_measurements_for_all_types(active_step):
             measurement_slug = slugify(measurement.measurement.name).replace('-', '_')
             messages[measurement_slug] = measurement.get_message()
         context['messages'] = messages
-        return render(request, 'quality_manager/dashboard.html', context)
+        return render(request, self.template_name, context)
 
 
 class VcsOverviewView(ExperimentContextMixin, View):

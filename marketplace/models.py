@@ -134,8 +134,9 @@ def add_package_config(sender, instance, created, **kwargs):
 
 class PackageResource(TimeStampedModel):
     package = models.ForeignKey(to=Package)
+    title = models.CharField(max_length=255)
     resource = MarkdownxField()
-    url = models.URLField(null=True)
+    url = models.URLField(null=True, blank=True)
     added_by = models.ForeignKey(to=WorkbenchUser)
 
     @property

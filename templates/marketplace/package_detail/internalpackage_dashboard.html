@@ -13,9 +13,9 @@
 
     <div class="row">
         <h3>Package publication</h3>
-        {% if not package.published %}
+        {% if not object.published %}
             <p class="lead">Only if you publish your package, will your colleagues be able to use and install the package locally. You can publish this package now:</p>
-            <a href="#" class="btn btn-primary">Publish My Package</a>
+            <a href="{% url "internalpackage_checklist" object.id %}" class="btn btn-primary">Publish My Package</a>
         {% else %}
             <p class="lead">This package is published on the Workbench pip server, making it installable by others.</p>
             <a href="#" class="btn btn-danger">Remove My Package</a>

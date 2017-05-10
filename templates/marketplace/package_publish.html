@@ -9,14 +9,22 @@
 
 {% block content %}
 
-  <h3>Publishing package</h3>
-    <p class="lead">In order to publish the package, ensure that the following aspects are taken care of:</p>
-    <ul>
-        <li><a href="#">Ensure that it is clear how someone can use your package in their project by documenting the main functions</a></li>
-        <li><a href="#">Ensure you have defined the required dependencies for your package</a></li>
-        <li><a href="#">Write a short Getting started guide for new users, with small examples how to use the package</a></li>
+    <h3>Publishing package</h3>
+    <p class="lead">In order to publish the package, make sure that the following aspects are taken care of:</p>
+    <ul class="list-group">
+        <li class="list-group-item"><i class="glyphicon glyphicon-check"></i>Ensure that it is clear how someone can use
+            your package in their project by documenting the main functions
+        </li>
+        <li class="list-group-item"><i class="glyphicon glyphicon-check"
+                                       {% if not dependencies_defined %}style="display:none;"{% endif %}></i>Ensure you
+            have defined the required dependencies for your package
+        </li>
+        <li class="list-group-item"><i class="glyphicon glyphicon-check"
+                                       {% if not getting_started %}style="display:none;"{% endif %}></i> Write a short
+            Getting started guide for new users, with small examples how to use the package
+        </li>
     </ul>
 
-    <a href="#" class="btn btn-success">I have done all these things and want to publish my package</a>
+    <a href="{% url "internalpackage_publish" object.id %}" class="btn btn-success">I have done all these things and want to publish my package</a>
 
 {% endblock %}

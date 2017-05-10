@@ -1,0 +1,26 @@
+{% extends "experiments_manager/experiments_table.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+
+{% block content %}
+
+    {% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb object.title "experiment_detail" object.pk object.slug %}
+    {% endblock %}
+
+    {% include "experiments_manager/experiment_detail/experiment_detail_tabs.html" %}
+
+    <div class="tab-content">
+        <div id="issues" class="tab-pane fade in active">
+            <ul class="list-group">
+                <h4>Issues</h4>
+                {% for issue in issues %}
+                    <li class="list-group-item">{{ issue.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+
+{% endblock %}

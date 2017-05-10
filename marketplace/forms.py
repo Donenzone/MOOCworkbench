@@ -1,8 +1,11 @@
+from markdownx.fields import MarkdownxFormField
+from markdownx.widgets import MarkdownxWidget
+
 from django import forms
 from django.forms import ModelForm
 from django.forms import TextInput
 
-from marketplace.models import InternalPackage
+from marketplace.models import InternalPackage, PackageResource
 
 
 class PackageNameField(forms.CharField):
@@ -18,3 +21,4 @@ class InternalPackageForm(ModelForm):
         widgets = {
             'name': TextInput(attrs={'placeholder': 'Package name'}),
         }
+

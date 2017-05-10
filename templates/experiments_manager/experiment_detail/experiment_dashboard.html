@@ -1,0 +1,21 @@
+{% extends "experiments_manager/experiments_table.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+
+{% block content %}
+
+    {% block breadcrumbs %}
+        {{ block.super }}
+        {% breadcrumb object.title "experiment_detail" object.pk object.slug %}
+    {% endblock %}
+
+    {% include "experiments_manager/experiment_detail/experiment_detail_tabs.html" %}
+
+    <div class="tab-content">
+        <div id="dependencies" class="tab-pane fade in active">
+            {% include "quality_manager/dashboard.html" %}
+        </div>
+    </div>
+
+
+{% endblock %}

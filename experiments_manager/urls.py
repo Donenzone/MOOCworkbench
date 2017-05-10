@@ -2,6 +2,8 @@ from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
 from requirements_manager.views import RequirementListView
+from dataschema_manager.views import DataSchemaOverview
+from quality_manager.views import DashboardView
 
 import experiments_manager.views
 
@@ -18,8 +20,16 @@ urlpatterns = [
     url(r'^file/(?P<experiment_id>\d+)/$', login_required(experiments_manager.views.FileViewGitRepository.as_view()), name='file_detail'),
     url(r'^readme/(?P<experiment_id>\d+)/$', experiments_manager.views.readme_of_experiment, name='experiment_readme'),
     url(r'^dependencies/(?P<pk>\d+)/(?P<object_type>[-\w]+)/$',
-        login_required(RequirementListView.as_view(template_name='experiments_manager/detail/experiment_dependencies.html')),
+        login_required(RequirementListView.as_view(template_name='experiments_manager/experiment_detail/experiment_dependencies.html')),
         name='experiment_dependencies'),
+    url(r'^overview/(?P<experiment_id>\d+)$',
+        login_required(DataSchemaOverview.as_view(template_name='experiments_manager/experiment_detail/experiment_schema.html')),
+        name="experiment_schema"),
+    url(r'^dashboard/(?P<experiment_id>\d+)/$',
+        login_required(DashboardView.as_view(template_name='experiments_manager/experiment_detail/experiment_dashboard.html')),
+        name="experiment_dashboard"),
+url(r'^issues/(?P<experiment_id>\d+)/$', experiments_manager.views.experiment_issues,
+        name="experiment_issues"),
     url(r'^score-card/(?P<pk>\d+)/(?P<slug>[-\w]+)$', experiments_manager.views.experimentstep_scorecard,
         name='experimentstep_scorecard'),
 

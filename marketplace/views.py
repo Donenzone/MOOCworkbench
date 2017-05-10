@@ -56,7 +56,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
     model = InternalPackage
     form_class = InternalPackageForm
     template_name = 'marketplace/package_create/package_form.html'
-    success_url = '/marketplace/new/status'
+    success_url = '/packages/new/status'
 
     def get_context_data(self, **kwargs):
         context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
@@ -142,6 +142,20 @@ def internalpackage_publish(request, pk):
     task_publish_update_package.delay(package.pk)
     return JsonResponse({"publish": "started"})
 
+@login_required
+def internalpackage_publish_checklist(request, pk):
+    package = InternalPackage.objects.get(id=pk)
+    assert package.owner.user == request.user
+    dependencies_defined = package.requirements.count() != 0
+    getting_started_guide = PackageResource.objects.filter(package=package.id, title='Getting started')
+    getting_started = False
+    if getting_started_guide:
+        getting_started_guide = getting_started_guide[0]
+        getting_started = len(getting_started_guide.resource) != 0
+    return render(request, 'marketplace/package_publish.html', {'object': package,
+                                                                'dependencies_defined': dependencies_defined,
+                                                                'getting_started': getting_started})
+
 
 @login_required
 def internalpackage_remove(request, pk):
@@ -219,7 +233,7 @@ class PackageVersionCreateView(CreateView):
 
 class PackageResourceCreateView(CreateView):
     model = PackageResource
-    fields = ['resource', 'url']
+    fields = ['title', 'resource', 'url']
 
     def form_valid(self, form):
         package = Package.objects.get(id=self.kwargs['package_id'])

@@ -75,6 +75,9 @@ class GitHubHelper(object):
     def get_commit(self, sha1_hash):
         return self.github_repository.get_commit(sha1_hash)
 
+    def get_issues(self):
+        return self.github_repository.get_issues()
+
     def _create_webhook(self):
         webhook_url = reverse('webhook_receive')
         config_dict = {'url': webhook_url}

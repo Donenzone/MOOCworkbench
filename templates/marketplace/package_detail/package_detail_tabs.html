@@ -8,8 +8,11 @@
         {% else %}
             <a href="{% url 'package_subscribe' object_id %}" class="btn btn-default">Unsubscribe</a>
         {% endif %}
-
-        <a href="#" class="btn btn-default" data-toggle="modal" data-target="#dependency-modal">Add Package To My Project</a>
+        {% if is_internal and object.published %}
+            <a href="#" class="btn btn-default" data-toggle="modal" data-target="#dependency-modal">Add Package To My Project</a>
+        {% elif is_internal %}
+            This package is not yet published.
+        {% endif %}
     </div>
 </div>
 

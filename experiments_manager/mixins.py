@@ -12,7 +12,8 @@ class ExperimentContextMixin(object):
     def get(self, request, experiment_id):
         self.experiment = verify_and_get_experiment(request, experiment_id)
         context = {}
-        context['experiment'] = self.experiment
+        context['object'] = self.experiment
+        context['object_id'] = self.experiment.id
         return context
 
 

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from django.views.generic import View
 
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.consumers import send_message
@@ -13,16 +14,21 @@ from .utils import get_data_schema
 from .tasks import task_write_data_schema
 
 
-@login_required
-def dataschema_overview(request, experiment_id):
-    experiment = verify_and_get_experiment(request, experiment_id)
-    context = {}
-    data_schema = experiment.schema.first()
-    context['data_schema_list'] = data_schema.fields.all()
-    context['experiment_id'] = experiment.id
-    context['form'] = DataSchemaFieldForm()
-    context['constraint_form'] = DataSchemaConstraintForm()
-    return render(request, 'dataschema_manager/dataschemafield_overview.html', context)
+class DataSchemaOverview(View):
+    template_name = 'dataschema_manager/dataschemafield_overview.html'
+
+    def get(self, request, experiment_id):
+        experiment = verify_and_get_experiment(request, experiment_id)
+        context = {}
+        data_schema = experiment.schema.first()
+        context['data_schema_list'] = data_schema.fields.all()
+        context['experiment_id'] = experiment.id
+        context['object'] = experiment
+        context['object_type'] = experiment.get_object_type()
+        context['form'] = DataSchemaFieldForm()
+        context['constraint_form'] = DataSchemaConstraintForm()
+        context['schema_active'] = True
+        return render(request, self.template_name, context)
 
 
 @login_required

@@ -21,8 +21,10 @@ from .forms import InternalPackageForm
 from .helpers.helper import create_tag_for_package_version
 from .helpers.helper import update_setup_py_with_new_version
 from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from .tasks import task_create_package_from_experiment
+from .tasks import task_create_package_from_experiment, task_publish_update_package
+from .tasks import task_remove_package, task_rename_package
 from .mixins import IsInternalPackageMixin, ObjectTypeIdMixin
+from .utils import internalpackge_remove
 
 
 class MarketplaceIndex(View):
@@ -33,6 +35,7 @@ class MarketplaceIndex(View):
         context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:5]
         context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:5]
         return render(request, 'marketplace/marketplace_index.html', context=context)
+
 
 class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
@@ -91,6 +94,7 @@ class InternalPackageListView(ListView):
 class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
     def get(self, request, pk):
         package = get_object_or_404(InternalPackage, pk=pk)
+
         context = {}
         context['docs'] = package.docs
         context['object'] = package
@@ -131,6 +135,22 @@ class InternalPackageVersionCreateView(CreateView):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['package_id']})
 
 
+@login_required
+def internalpackage_publish(request, pk):
+    package = InternalPackage.objects.get(id=pk)
+    assert package.owner.user == request.user
+    task_publish_update_package.delay(package.pk)
+    return JsonResponse({"publish": "started"})
+
+
+@login_required
+def internalpackage_remove(request, pk):
+    package = InternalPackage.objects.get(id=pk)
+    assert package.owner.user == request.user
+    task_remove_package.delay(package.pk)
+    return JsonResponse({"publish": "started"})
+
+
 class PackageListView(ListView):
     model = Package
 
@@ -150,6 +170,8 @@ class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailVi
 
     def readme_file_of_package(self):
         internalpackage = InternalPackage.objects.get(id=self.kwargs['pk'])
+
+        internalpackge_remove(internalpackage)
         github_helper = GitHubHelper(self.request.user, internalpackage.git_repo.name)
         readme = github_helper.view_file('README.md')
         md = Markdown()

@@ -2,6 +2,8 @@ import subprocess
 import os
 import shutil
 
+from django.conf import settings
+
 from git import Repo
 
 
@@ -17,13 +19,13 @@ class GitHelper(object):
 
     @property
     def repo_dir(self):
-        return '{0}{1}/{2}'.format(self.BASE_REPO_DIR,
-                                   self.github_helper.github_repository.owner.login,
-                                   self.github_helper.github_repository.name)
+        return os.path.join(settings.PROJECT_ROOT, self.BASE_REPO_DIR,
+                            self.github_helper.github_repository.owner.login,
+                            self.github_helper.github_repository.name)
 
     def repo_dir_of_user(self):
-        return '{0}{1}'.format(self.BASE_REPO_DIR,
-                               self.github_helper.github_repository.owner.login)
+        return os.path.join(settings.PROJECT_ROOT, self.BASE_REPO_DIR,
+                            self.github_helper.github_repository.owner.login)
 
     def clone_or_pull_repository(self):
         clone_url = self.github_helper.get_clone_url()

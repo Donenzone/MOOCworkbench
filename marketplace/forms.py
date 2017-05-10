@@ -1,7 +1,13 @@
+from django import forms
 from django.forms import ModelForm
 from django.forms import TextInput
 
 from marketplace.models import InternalPackage
+
+
+class PackageNameField(forms.CharField):
+    def to_python(self, value):
+        return value.lower()
 
 
 class InternalPackageForm(ModelForm):

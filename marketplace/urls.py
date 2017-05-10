@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^resources/list/(?P<pk>\d+)/$', login_required(PackageResourceListView.as_view()), name="packageresource_list"),
     url(r'^dependencies/(?P<pk>\d+)/(?P<object_type>\w+)/$', login_required(RequirementListView.as_view(template_name='marketplace/package_detail/package_dependencies.html')), name="package_dependencies"),
     url(r'^versions/(?P<pk>\d+)/$', login_required(PackageVersionListView.as_view()), name="packageversion_list"),
+    url(r'^publish/(?P<pk>\d+)/$', internalpackage_publish, name="internalpackage_publish"),
+    url(r'^remove-publish/(?P<pk>\d+)/$', internalpackage_remove, name="internalpackage_remove"),
 ]

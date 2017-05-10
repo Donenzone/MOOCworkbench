@@ -12,6 +12,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
+from django.core.validators import RegexValidator
 
 from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
@@ -48,8 +49,11 @@ class BasePackage(TimeStampedModel):
         abstract = True
 
 
+alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+
+
 class Package(BasePackage):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True, validators=[alphanumeric])
     description = models.TextField()
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
     owner = models.ForeignKey(to=WorkbenchUser, related_name='owner')

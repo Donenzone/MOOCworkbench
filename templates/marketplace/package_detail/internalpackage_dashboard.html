@@ -8,10 +8,24 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Dashboard of {{ object.name }}</h2>
     {% include "marketplace/package_detail/package_detail_tabs.html" %}
-    <p></p>
+
+
     <div class="row">
+        <h3>Package publication</h3>
+        {% if not package.published %}
+            <p class="lead">Only if you publish your package, will your colleagues be able to use and install the package locally. You can publish this package now:</p>
+            <a href="#" class="btn btn-primary">Publish My Package</a>
+        {% else %}
+            <p class="lead">This package is published on the Workbench pip server, making it installable by others.</p>
+            <a href="#" class="btn btn-danger">Remove My Package</a>
+        {% endif %}
+    </div>
+
+    <p></p>
+
+    <div class="row">
+        <h3>Package Settings</h3>
         <div class="col-md-9">
             <div class="panel panel-default">
             <div class="panel-heading">Settings</div>

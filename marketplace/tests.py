@@ -44,7 +44,8 @@ class MarketplaceTestCase(TestCase):
                                                                git_repo=self.git_repo,
                                                                language_id=1,
                                                                category_id=1,
-                                                               owner_id=1)
+                                                               owner_id=1,
+                                                               template_id=1)
         self.client = Client()
         self.client.login(username='test', password='test')
 
@@ -100,7 +101,7 @@ class MarketplaceTestCase(TestCase):
         self.assertIsNotNone(response.context['form'])
 
     def test_create_external_package_post(self):
-        external_package_data = {'name': 'My new package',
+        external_package_data = {'name': 'mynewpackage',
                                  'description': 'Desc.',
                                  'project_page': 'http://test.nl',
                                  'category': '1',
@@ -111,7 +112,7 @@ class MarketplaceTestCase(TestCase):
         self.assertTrue(external_package)
 
     def test_create_external_package_post_invalid_url(self):
-        external_package_data = {'name': 'My new package',
+        external_package_data = {'name': 'mynewpackage',
                                  'description': 'Desc.',
                                  'project_page': 'http://test',
                                  'category': '1',
@@ -126,13 +127,13 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('marketplace.views.PackageGitRepoInit')
+    @patch('marketplace.views.task_create_package_from_experiment')
     def test_create_internal_package_post(self, mock_package_repo_init):
 
-        internal_package_data = {'name': 'My new package',
+        internal_package_data = {'name': 'mynewpackage',
                                  'description': 'Desc',
                                  'category': '1',
-                                 'language': '1'
+                                 'language': '1',
                                  }
         mock_package_repo_init.return_value = RepoInitMock(self.git_repo)
         response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}),
@@ -180,11 +181,13 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.context['object_type'], ExperimentPackageTypeMixin.PACKAGE_TYPE)
         self.assertIsNotNone(response.context['edit_form'])
 
-    def test_internal_package_detail(self):
+    @patch('marketplace.views.PackageDetailView.readme_file_of_package')
+    def test_internal_package_detail(self, mock_readme):
+        mock_readme.return_value = 'Test readme'
         response = self.client.get(reverse('package_detail', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['version_history'])
-        self.assertIsNotNone(response.context['resources'])
+        self.assertIsNotNone(response.context['index_active'])
 
     def test_internalpackage_edit_post(self):
         """

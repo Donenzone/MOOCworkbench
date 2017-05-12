@@ -90,7 +90,7 @@
         var sortedIDs = {'csrfmiddlewaretoken': '{{ csrf_token }}', 'steplist': JSON.stringify($("#step-list").sortable("toArray"))};
         $.ajax({
             type: "POST",
-            url: '{% url 'experimentsteps_choose' experiment.id %}',
+            url: '{% url 'experimentsteps_choose' object.id %}',
             data: sortedIDs,
             success: function(data) {
               window.location.replace(data.url);

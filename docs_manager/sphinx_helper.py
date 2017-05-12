@@ -19,6 +19,8 @@ class SphinxHelper(object):
         self.owner = github_login
         self.repo_name = exp_or_package.git_repo.name
         self.docs_src_location = exp_or_package.template.docs_src_location
+        if not self.docs_src_location:
+            self.docs_src_location = 'docs/'
         self.path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name, self.docs_src_location)
         self.base_path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
         self.folders = folders
@@ -40,7 +42,7 @@ class SphinxHelper(object):
 
     def _gen_docs_per_folder(self):
         for folder in self.folders:
-            folder_path = '{0}{1}'.format(self.base_path, folder)
+            folder_path = os.path.join(self.base_path, folder.location)
             subprocess.call(['sphinx-apidoc', '-o', self.path, folder_path])
 
     def _make_first_html(self):

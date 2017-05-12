@@ -74,9 +74,10 @@ def webhook_receive(request):
         event = json.loads(request.body)
         repo_name = event['repository']['name']
         sha_hash_list = []
-        for commit in event['commits']:
-            sha_hash_list.append(commit['sha'])
-        run_post_push_tasks(repo_name, sha_hash_list)
+        if 'commits' in event:
+            for commit in event['commits']:
+                sha_hash_list.append(commit['id'])
+            run_post_push_tasks(repo_name, sha_hash_list)
         return HttpResponse('success')
 
     # In case we receive an event that's not ping or push

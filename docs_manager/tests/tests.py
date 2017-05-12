@@ -30,7 +30,7 @@ class DocsManagerTestCase(TestCase):
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
                                                     language_id=1,
-                                                    template_id=1)
+                                                    template_id=1,)
 
         self.client = Client()
         self.client.login(username='test', password='test')

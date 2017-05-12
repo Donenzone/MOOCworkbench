@@ -58,7 +58,7 @@ class QualityManagerTestCase(TestCase):
         response = self.client.get(reverse('vcs_overview', kwargs={'experiment_id': self.experiment.id}))
         self.assertEqual(response.status_code, 200)
 
-    @patch('quality_manager.views.NrOfCommitsView.get_recent_measurements_for_type')
+    @patch('quality_manager.views.get_recent_measurements_for_type')
     def test_nr_of_commits_view(self, mock_recent_measurements):
         mock_recent_measurements.return_value = [MeasurementMockClass(), MeasurementMockClass(), MeasurementMockClass()]
         response = self.client.get(reverse('nr_of_commits', kwargs={'experiment_id': self.experiment.id}))
@@ -66,11 +66,11 @@ class QualityManagerTestCase(TestCase):
         json_response = json.loads(response.content)
         self.assertEqual(json_response['values'], ['5', '5', '5'])
 
-    @patch('quality_manager.views.version_control_quality_check')
-    @patch('quality_manager.views.test_quality_check')
-    @patch('quality_manager.views.requirements_quality_check')
-    @patch('quality_manager.views.ci_quality_check')
-    @patch('quality_manager.views.docs_coverage_check')
+    @patch('quality_manager.views.task_version_control_quality_check')
+    @patch('quality_manager.views.task_test_quality_check')
+    @patch('quality_manager.views.task_requirements_quality_check')
+    @patch('quality_manager.views.task_ci_quality_check')
+    @patch('quality_manager.views.task_docs_coverage_check')
     def test_refresh_measurements(self, mock_vcs, mock_test, mock_req, mock_ci, mock_docs):
         response = self.client.get(reverse('measurements_refresh', kwargs={'step_id': self.chosen_experiment_step.id}))
         self.assertEqual(response.status_code, 200)

@@ -68,6 +68,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         step_folder = self.get_step().location
         experiment = self.get_experiment()
         form.instance.owner = experiment.owner
+        form.instance.template_id = 1
         response = super(InternalPackageCreateView, self).form_valid(form)
         task_create_package_from_experiment.delay(form.instance.pk, experiment.pk, step_folder)
         return response
@@ -121,6 +122,7 @@ class InternalPackageUpdateView(UpdateView):
 class InternalPackageVersionCreateView(CreateView):
     model = PackageVersion
     fields = ['version_nr', 'changelog', 'pre_release']
+    template_name = 'marketplace/package_detail/packageversion_form.html'
 
     def form_valid(self, form):
         package = InternalPackage.objects.get(id=self.kwargs['package_id'])
@@ -220,6 +222,7 @@ class PackageVersionDetailView(DetailView):
 class PackageVersionCreateView(CreateView):
     model = PackageVersion
     fields = ['version_nr', 'changelog', 'url']
+    template_name = 'marketplace/package_detail/packageversion_form.html'
 
     def form_valid(self, form):
         package = Package.objects.get(id=self.kwargs['package_id'])

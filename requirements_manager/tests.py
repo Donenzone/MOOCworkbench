@@ -11,7 +11,7 @@ from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
 from marketplace.models import InternalPackage
 from requirements_manager.models import Requirement
-from requirements_manager.views import build_requirements_file
+from requirements_manager.helper import build_requirements_file
 from requirements_manager.helper import parse_requirements_file
 from user_manager.models import WorkbenchUser
 
@@ -36,7 +36,8 @@ class RequirementsManagerTestCase(TestCase):
                                                                git_repo=self.git_repo,
                                                                language_id=1,
                                                                category_id=1,
-                                                               owner_id=1)
+                                                               owner_id=1,
+                                                               template_id=1)
 
         self.requirement_one = Requirement.objects.create(package_name='django', version='1.11')
         self.requirement_two = Requirement.objects.create(package_name='pandas', version='1.23')
@@ -101,11 +102,11 @@ class RequirementsManagerTestCase(TestCase):
         self.experiment.refresh_from_db()
         self.assertFalse(requirement_one in self.experiment.requirements.all())
 
-    @patch('requirements_manager.views.GitHubHelper')
-    def test_write_requirements_file(self, mock_gh_helper):
+    @patch('requirements_manager.views.task_write_requirements_file')
+    def test_write_requirements_file(self, mock_helper_task):
         response = self.client.get(reverse('requirements_write', kwargs={'object_id': self.experiment.id,
                                                                         'object_type': self.experiment.get_object_type()}))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
     def test_build_requirements_file_requirements_present(self):
         self.experiment.requirements.add(self.requirement_two)

@@ -12,7 +12,7 @@
     $(document).ready(function() {
 
       $.get({
-        url: "{% url 'nr_of_commits' experiment.id %}",
+        url: "{% url 'nr_of_commits' object.id %}",
         success: function(data) {
           build_chart(data.keys, data.values);
         },

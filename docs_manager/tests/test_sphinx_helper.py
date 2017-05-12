@@ -29,7 +29,7 @@ class SphinxHelperTest(TestCase):
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
-        self.git_repo = GitRepository.objects.create(name='Sandbox-Research-5', owner=self.workbench_user, github_url='https://github.com/jlmdegoede/Sandbox-Research-5')
+        self.git_repo = GitRepository.objects.create(name='Sandbox-Experiment', owner=self.workbench_user, github_url='https://github.com/jlmdegoede/Sandbox-Research-5')
         self.experiment = Experiment.objects.create(title='Experiment',
                                                     description='test',
                                                     owner=self.workbench_user,
@@ -37,7 +37,7 @@ class SphinxHelperTest(TestCase):
                                                     language_id=1,
                                                     template_id=2)
 
-        step = ExperimentStep.objects.get(name='Publication phase')
+        step = ExperimentStep.objects.get(name='Visualization')
         self.chosen_step = ChosenExperimentSteps.objects.create(experiment=self.experiment, step=step, step_nr=1)
         self.steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
 

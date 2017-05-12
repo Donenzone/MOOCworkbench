@@ -24,7 +24,9 @@ class CookieCutterTemplate(models.Model):
     name = models.CharField(max_length=100)
     meant_for = models.CharField(choices=MEANT_FOR_CHOICES, default=EXPERIMENT, max_length=10)
     language = models.ForeignKey(to=Language)
-    folder_file_locations = models.ManyToManyField(to=CookieCutterLocationToStepMapping)
+    folder_file_locations = models.ManyToManyField(to=CookieCutterLocationToStepMapping, blank=True)
+
+    docs_src_location = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

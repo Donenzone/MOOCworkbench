@@ -91,6 +91,7 @@ class InternalPackage(Package):
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
     published = models.BooleanField(default=False)
+    template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
 
     def get_absolute_url(self):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.pk})
@@ -168,7 +169,7 @@ class PackageVersion(TimeStampedModel):
         return self.version_nr != version_nr
 
     def __str__(self):
-        return '{0} updated to version {1}'.format(self.package, self.version_nr)
+        return '{0} {1}'.format(self.package, self.version_nr)
 
     class Meta:
         unique_together = ('package', 'version_nr')

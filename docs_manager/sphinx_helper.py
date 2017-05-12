@@ -1,3 +1,4 @@
+import os
 import subprocess
 import pickle
 
@@ -8,7 +9,7 @@ class SphinxHelper(object):
     GITHUB_REPO_FOLDER = 'github_repositories'
     UNDOC_PICKLE_LOCATION = '_build/coverage/undoc.pickle'
 
-    def __init__(self, experiment, folders, github_login):
+    def __init__(self, exp_or_package, folders, github_login):
         """
         SphinxHelper helps with tasks related to document generation with Sphinx
         :param experiment: The package or experiment for which documents should be generated/managed
@@ -16,9 +17,10 @@ class SphinxHelper(object):
         :param github_login: The GitHub username under which the git repository lives
         """
         self.owner = github_login
-        self.repo_name = experiment.git_repo.name
-        self.path = '{0}/{1}/{2}/docs/'.format(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
-        self.base_path = '{0}/{1}/{2}/'.format(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
+        self.repo_name = exp_or_package.git_repo.name
+        self.docs_src_location = exp_or_package.template.docs_src_location
+        self.path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name, self.docs_src_location)
+        self.base_path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
         self.folders = folders
 
     def add_sphinx_to_repo(self):

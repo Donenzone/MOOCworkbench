@@ -124,7 +124,7 @@ class RHelper(LanguageHelper):
         packrat.init()
         utils = importr('utils')
         for requirement in self.exp_or_package.requirements.all():
-            if requirement.package_name != 'packrat':
+            if requirement.package_name != 'packrat': # no need to install packrat
                 utils.install_packages(requirement.package_name)
         packrat.snapshot()
 

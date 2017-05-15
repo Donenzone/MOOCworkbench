@@ -81,6 +81,10 @@ def add_experiment_config(sender, instance, created, **kwargs):
         pylint.save()
         instance.pylint = pylint
 
+        schema = DataSchema(name='main')
+        schema.save()
+        instance.schema.add(schema)
+
         instance.save()
 
 

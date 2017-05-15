@@ -6,14 +6,15 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from build_manager.models import TravisInstance, TravisCiConfig
+from dataschema_manager.models import DataSchema
 from docs_manager.models import Docs
 from git_manager.models import GitRepository
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.models import BasePackage
+from pylint_manager.models import PylintScan
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
-from pylint_manager.models import PylintScan
-from dataschema_manager.models import DataSchema
+from git_manager.helpers.language_helper import PythonHelper, RHelper
 
 
 class Experiment(BasePackage):
@@ -57,6 +58,10 @@ class Experiment(BasePackage):
         return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}),
                 'resources': '',
                 'versions': ''}
+
+    def language_helper(self):
+        language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}
+        return language_helper_dict[self.template.language.language](self)
 
 
 @receiver(post_save, sender=Experiment)

@@ -20,6 +20,7 @@ from git_manager.models import GitRepository
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
 from helpers.helper_mixins import ExperimentPackageTypeMixin
+from git_manager.helpers.language_helper import PythonHelper, RHelper
 
 
 PYPI_URL = 'https://pypi.python.org/pypi'
@@ -106,6 +107,10 @@ class InternalPackage(Package):
         return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}),
                 'resources': '',
                 'versions': ''}
+
+    def language_helper(self):
+        language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}
+        return language_helper_dict[self.template.language.language](self)
 
     @property
     def python_package_name(self):

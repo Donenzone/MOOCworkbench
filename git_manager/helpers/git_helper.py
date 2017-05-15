@@ -52,7 +52,7 @@ class GitHelper(object):
         :param message: The commit message
         :return: 
         """
-        self.repo.git.add('--all')
+        self.repo.git.add('.')
         self.repo.index.commit(message)
 
     def push(self):

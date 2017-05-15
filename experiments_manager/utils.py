@@ -6,7 +6,6 @@ from git_manager.views import create_new_github_repository
 from git_manager.helpers.git_helper import GitHelper
 from cookiecutter_manager.helpers.helper_cookiecutter import clone_cookiecutter_template
 from git_manager.models import GitRepository
-from requirements_manager.helper import parse_requirements_file
 
 
 class ExperimentProgress(object):
@@ -46,8 +45,11 @@ def init_git_repo_for_experiment(experiment, cookiecutter):
     git_helper.push()
     send_exp_package_creation_status_update(username, ExperimentProgress.STEP_PUSHING_BOILERPLATE_CODE)
 
-    requirements_file = github_helper.view_file('requirements.txt')
-    parse_requirements_file(experiment, requirements_file)
+    language_helper = experiment.language_helper()
+    req_file_loc = language_helper.get_requirements_file_location()
+    requirements_file = github_helper.view_file(req_file_loc)
+    language_helper.parse_requirements(requirements_file)
+
     send_exp_package_creation_status_update(username, ExperimentProgress.STEP_READING_DEPENDENCIES)
 
 

@@ -59,6 +59,7 @@ class RequirementCreateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMix
         exp_or_package = self.get_exp_or_package()
         return exp_or_package.success_url_dict()['dependencies']
 
+
 class RequirementUpdateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMixin, UpdateView):
     model = Requirement
     fields = ['package_name', 'version']

@@ -4,20 +4,45 @@ import subprocess
 import json
 import shutil
 
+from rpy2.robjects.packages import importr
+
 from django.db.models import Q
 
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.helpers.github_helper import GitHubHelper
+from MOOCworkbench.settings import PROJECT_ROOT
+
 
 from .models import PylintScan, PylintResult, PylintScanResult
 
 
-def run_pylint(experiment):
+def static_analysis_prepare(experiment):
     # clone git repository
-    active_step = experiment.get_active_step()
     github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
     git_helper = GitHelper(github_helper)
     git_helper.clone_or_pull_repository()
+    return git_helper
+
+
+def run_rlint(experiment):
+    git_helper = static_analysis_prepare(experiment)
+    repo_dir = git_helper.repo_dir
+    active_step = experiment.get_active_step()
+
+    old_active_dir = os.getcwd()
+    os.chdir(repo_dir + '/src/')
+    utils = importr('utils')
+    utils.install_packages('lintr', repos='http://cran.us.r-project.org')
+    lintr = importr('lintr')
+    results = lintr.lint('run_tests.R')
+    print("Results: {0}".format(results))
+    shutil.rmtree(repo_dir)
+    os.chdir(old_active_dir)
+
+
+def run_pylint(experiment):
+    git_helper = static_analysis_prepare(experiment)
+    active_step = experiment.get_active_step()
 
     # virtualenv create
     repo_dir = git_helper.repo_dir

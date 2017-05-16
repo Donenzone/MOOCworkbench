@@ -33,7 +33,8 @@ class RequirementsMeasurement(MeasurementAbstraction):
     def find_if_missing_dependency(self, log_file):
         module_match = re.search('ModuleNotFoundError: No module named', log_file)
         import_match = re.search('ImportError: cannot import name', log_file)
-        if module_match or import_match:
+        r_import_match = re.search('there is no package called', log_file)
+        if module_match or import_match or r_import_match:
             return False
         return True
 

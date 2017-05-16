@@ -28,7 +28,10 @@ class RepoFileListMixin(object):
             context['git_list'] = content_files
             return context
         else:
-            context['git_list'] = [ContentFile(name=active_location, path=active_location)]
+            git_file = ContentFile(name=active_location, path=active_location)
+            git_file.pylint_results = return_result_summary_for_file(experiment,
+                                                                         git_file.path)
+            context['git_list'] = [git_file]
             return context
 
     def _get_files_in_repository(self, user, repo_name, folder_name):

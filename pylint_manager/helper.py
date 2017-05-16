@@ -19,5 +19,6 @@ def return_result_summary_for_file(experiment, file_path):
     pylint_results = return_results_for_file(experiment, file_path)
     result_dict = {'e': pylint_results.filter(pylint_type='e').count(),
                    'w': pylint_results.filter(pylint_type='w').count(),
-                   'c': pylint_results.filter(pylint_type='c').count()}
+                   'c': pylint_results.filter(pylint_type='c').count(),
+                   's': pylint_results.filter(pylint_type='s').count()}
     return result_dict

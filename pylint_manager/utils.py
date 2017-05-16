@@ -3,6 +3,7 @@ import os
 import subprocess
 import json
 import shutil
+import re
 
 from rpy2.robjects.packages import importr
 
@@ -10,8 +11,6 @@ from django.db.models import Q
 
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.helpers.github_helper import GitHubHelper
-from MOOCworkbench.settings import PROJECT_ROOT
-
 
 from .models import PylintScan, PylintResult, PylintScanResult
 
@@ -34,10 +33,30 @@ def run_rlint(experiment):
     utils = importr('utils')
     utils.install_packages('lintr', repos='http://cran.us.r-project.org')
     lintr = importr('lintr')
-    results = lintr.lint('run_tests.R')
-    print("Results: {0}".format(results))
+    results = lintr.lint(active_step.main_module)
+
+    pylint_scan_result_object = PylintScanResult()
+    pylint_scan_result_object.for_project = experiment.pylint
+    pylint_scan_result_object.save()
+
+    for result in str(results).split('\n'):
+        pylint_result = parse_rlint_results(result, '/src/make_dataset.R')
+        if pylint_result:
+            pylint_result.for_result = pylint_scan_result_object
+            pylint_result.save()
     shutil.rmtree(repo_dir)
     os.chdir(old_active_dir)
+
+
+def parse_rlint_results(result_line, filename):
+    output = re.match(r"^(.*).R:(\d+):(\d+):\s(style|warning|error):(.*)$", result_line)
+    if output:
+        result = PylintResult()
+        result.file_path = filename
+        result.line_nr = output.group(2)
+        result.pylint_type = output.group(4)[0]
+        result.message = output.group(5)
+        return result
 
 
 def run_pylint(experiment):

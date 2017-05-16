@@ -6,6 +6,7 @@ from rpy2.robjects.packages import importr
 
 from requirements_manager.models import Requirement
 from requirements_manager.helper import delete_existing_requirements
+from pylint_manager.utils import run_rlint, run_pylint
 from .git_helper import GitHelper
 from .github_helper import GitHubHelper
 
@@ -28,6 +29,9 @@ class LanguageHelper(object):
         pass
 
     def get_requirements_file_location(self):
+        pass
+
+    def static_code_analysis(self):
         pass
 
 
@@ -69,6 +73,9 @@ class PythonHelper(LanguageHelper):
     def get_requirements_file_location(self):
         return 'requirements.txt'
 
+    def static_code_analysis(self):
+        return run_pylint
+
 
 class RHelper(LanguageHelper):
     def __init__(self, exp_or_package):
@@ -109,6 +116,9 @@ class RHelper(LanguageHelper):
 
     def get_requirements_file_location(self):
         return 'src/packrat/packrat.lock'
+
+    def static_code_analysis(self):
+        return run_rlint
 
     def build_requirements_file(self):
         # clone repository

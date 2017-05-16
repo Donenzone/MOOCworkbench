@@ -39,6 +39,10 @@
                                 {% if item.pylint_results.c %}
                                     <span class="label label-info">{{ item.pylint_results.c }} other issues</span>
                                 {% endif %}
+
+                                {% if item.pylint_results.s %}
+                                    <span class="label label-info">{{ item.pylint_results.s }} style issues</span>
+                                {% endif %}
                             </td>
                             <td>
                                                     <span class="label label-info code-coverage" id="{{ item.slug }}"

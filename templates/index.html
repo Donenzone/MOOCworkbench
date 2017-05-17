@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load activity_tags %}
 
 
 {% block content %}
@@ -7,9 +6,6 @@
         <div class="col-md-9">
             <h2>Welcome to the MOOC Workbench</h2>
             <h3>Activity Feed</h3>
-            {% for action in activity %}
-                <p class="lead">{{ action }}</p>
-            {% endfor %}
         </div>
         <div class="col-md-3">
 

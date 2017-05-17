@@ -66,27 +66,41 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            var hash = window.location.hash;
+
+            if (hash === '#edit') {
+                enableEditMode()
+            }
+
             $('#enable-edit').click(function () {
                 edit_mode = $(this).attr('data-edit-mode');
                 if (edit_mode === 'true') {
-                    $('.edit-dependency-link').hide();
-                    $('.delete-dependency-link').hide();
-                    $('#add-new-requirement').hide();
-                    $(this).text('Edit Dependencies');
-                    $(this).attr('data-edit-mode', false);
-                    $.get({
-                        url: '{% url "requirements_write" object_id object_type %}',
-                        success: function (data) {
-                        }
-                    });
+                    disableEditMode()
                 } else {
-                    $('.edit-dependency-link').show();
-                    $('.delete-dependency-link').show();
-                    $('#add-new-requirement').show();
-                    $(this).text('Stop Editing and Save to GitHub');
-                    $(this).attr('data-edit-mode', true);
+                    enableEditMode();
                 }
             });
+
+            function enableEditMode() {
+                $('.edit-dependency-link').show();
+                $('.delete-dependency-link').show();
+                $('#add-new-requirement').show();
+                $('#enable-edit').text('Stop Editing and Save to GitHub');
+                $('#enable-edit').attr('data-edit-mode', true);
+                window.location.hash = 'edit';
+            }
+            function disableEditMode() {
+                $('.edit-dependency-link').hide();
+                $('.delete-dependency-link').hide();
+                $('#add-new-requirement').hide();
+                $('#enable-edit').text('Edit Dependencies');
+                $('#enable-edit').attr('data-edit-mode', false);
+                $.get({
+                    url: '{% url "requirements_write" object_id object_type %}',
+                    success: function (data) {
+                    }
+                });
+            }
 
             $('.edit-dependency-link').click(function () {
                 var editUrl = $(this).attr('data-url');

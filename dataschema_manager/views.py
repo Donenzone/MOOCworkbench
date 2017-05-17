@@ -46,7 +46,7 @@ def dataschema_new(request, experiment_id):
                 data_schema = get_data_schema(experiment)
                 data_schema.fields.add(edit_form.instance)
                 data_schema.save()
-            return redirect(to=experiment.get_absolute_url('schema'))
+            return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
             context['constraint_form'] = constraint_form
@@ -68,7 +68,7 @@ def dataschema_edit(request, pk, experiment_id):
             constraints.save()
             dataschema.constraint = constraints
             dataschema.save()
-            return redirect(to=experiment.get_absolute_url('schema'))
+            return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
             context['constraint_form'] = constraint_form

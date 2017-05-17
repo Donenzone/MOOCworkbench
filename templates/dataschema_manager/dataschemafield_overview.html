@@ -88,6 +88,12 @@ such as a String, Number or DateTime.</p>
 
 <script type="text/javascript">
     $(document).ready(function() {
+        var hash = window.location.hash;
+
+        if (hash === '#edit') {
+            enableEditMode()
+        }
+
         $('.edit-field-link').click(function() {
             var editUrl = $(this).attr('data-url');
             $('.edit-field').load(editUrl);
@@ -96,20 +102,29 @@ such as a String, Number or DateTime.</p>
         $('#enable-edit').click(function() {
             edit_mode = $(this).attr('data-edit-mode');
             if (edit_mode === 'true') {
-                $('.edit-field-link').hide();
-                $('.add-field').hide();
-                $(this).text('Edit Data Schema');
-                $(this).attr('data-edit-mode', false);
-                $.get({
-                        url: '{% url "dataschema_write" experiment_id %}',
-                        success: function(data) { }
-                    });
+                diableEditMode();
             } else {
-                $('.edit-field-link').show();
-                $('.add-field').show();
-                $(this).text('Stop Editing and Save to GitHub');
-                $(this).attr('data-edit-mode', true);
+                enableEditMode()
             }
-        })
+        });
+
+        function enableEditMode() {
+            $('.edit-field-link').show();
+            $('.add-field').show();
+            $('#enable-edit').text('Stop Editing and Save to GitHub');
+            $('#enable-edit').attr('data-edit-mode', true);
+            window.location.hash = 'edit';
+        }
+
+        function diableEditMode() {
+            $('.edit-field-link').hide();
+            $('.add-field').hide();
+            $('#enable-edit').text('Edit Data Schema');
+            $('#enable-edit').attr('data-edit-mode', false);
+            $.get({
+                    url: '{% url "dataschema_write" experiment_id %}',
+                    success: function(data) { }
+                });
+        }
     });
 </script>

@@ -16,6 +16,7 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 from user_manager.models import get_workbench_user
 from requirements_manager.helper import add_internalpackage_to_experiment
 from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.mixins.repo_file_list import RepoFileListMixin
 
 from .forms import InternalPackageForm
 from .helpers.helper import create_tag_for_package_version
@@ -171,11 +172,12 @@ class PackageListView(ListView):
     model = Package
 
 
-class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
+class PackageDetailView(RepoFileListMixin, InternalPackageBaseView, ActiveExperimentsList, DetailView):
     model = Package
     template_name = 'marketplace/package_detail/package_detail.html'
 
     def get_context_data(self, **kwargs):
+        self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
         context = super(PackageDetailView, self).get_context_data(**kwargs)
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]

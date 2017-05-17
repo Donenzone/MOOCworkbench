@@ -10,10 +10,10 @@ from helpers.helper import get_package_or_experiment
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 
-class DocExperimentView(ExperimentContextMixin, View):
+class DocView(ExperimentContextMixin, View):
     def get(self, request, object_id, object_type, page_slug=None):
-        context = super(DocExperimentView, self).get(request, object_id)
-        language_helper = self.experiment.language_helper()
+        context = super(DocView, self).get(request, object_type, object_id)
+        language_helper = self.exp_or_package.language_helper()
         if page_slug:
             context['document'] = language_helper.get_document(page_slug)
         else:

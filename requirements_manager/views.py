@@ -57,7 +57,7 @@ class RequirementCreateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMix
 
     def get_success_url(self):
         exp_or_package = self.get_exp_or_package()
-        return exp_or_package.success_url_dict()['dependencies']
+        return exp_or_package.success_url_dict(hash='#edit')['dependencies']
 
 
 class RequirementUpdateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMixin, UpdateView):

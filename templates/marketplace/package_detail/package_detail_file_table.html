@@ -1,0 +1,26 @@
+<table class="table table-striped main-step-table">
+    <thead>
+    <tr>
+        <th>
+            File/Folder name
+        </th>
+    </tr>
+    </thead>
+    <tbody id="tbody-{{ step.id }}">
+    {% for item in git_list %}
+        <tr class="clickable-row">
+            <td>
+                {% if item.type == 'dir' %}
+                    <a href="/package/folder/{{ object.id }}?folder_name={{ item.path }}"
+                       class="base-url">{{ item.name }}</a>
+
+                {% else %}
+                    <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}"
+                       class="base-url">{{ item.name }}</a>
+
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

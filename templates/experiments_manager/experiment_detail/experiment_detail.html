@@ -31,9 +31,13 @@
     <script type='text/javascript'>
 
         $(document).ready(function () {
-            introJs().setOption('doneLabel', 'Next page').start().oncomplete(function() {
-              window.location.href = '#schema';
-            });
+            var hash = window.location.hash;
+
+            if (hash === '#intro') {
+                introJs().setOption('doneLabel', 'Next page').start().oncomplete(function () {
+                    window.location.href = '#schema';
+                });
+            }
 
             $(".clickable-row").click(function () {
                 window.location = $(this).find('.base-url').attr('href');

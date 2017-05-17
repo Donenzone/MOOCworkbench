@@ -12,7 +12,11 @@
       {{ document.sidebar|safe }}
     </div>
     <div class="col-md-9">
-      {{ document.body|safe }}
+        {% if not document.body %}
+            <pre>{{ document|safe }}</pre>
+        {% else %}
+            {{ document.body|safe }}
+        {% endif %}
     </div>
   </div>
 {% endblock %}

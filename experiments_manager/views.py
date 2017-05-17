@@ -23,21 +23,20 @@ from .forms import ExperimentForm
 from .models import *
 from .helper import verify_and_get_experiment
 from .helper import get_steps
-from .mixins import ActiveStepMixin
 from .mixins import ExperimentContextMixin
 from .tasks import initialize_repository
 
 
-class ExperimentDetailView(RepoFileListMixin, ActiveStepMixin,
-                           MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
+class ExperimentDetailView(RepoFileListMixin, MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
     template_name = "experiments_manager/experiment_detail/experiment_detail.html"
 
     def get_context_data(self, **kwargs):
-        context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
+        self.object_type = self.get_requirement_type(experiment)
+        context = super(ExperimentDetailView, self).get_context_data(**kwargs)
         context['steps'] = get_steps(experiment)
-        context['object_type'] = self.get_requirement_type(experiment)
+        context['object_type'] = self.object_type
         context['active_step_id'] = experiment.get_active_step().id
         context['index_active'] = True
         return context

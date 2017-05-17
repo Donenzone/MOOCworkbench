@@ -234,9 +234,9 @@ class RHelper(LanguageHelper):
             manual_file = 'man/{0}.Rd'.format(document_name)
             manual_contents = self.github_helper.view_file(manual_file)
             temp_file = self._temp_save_rd_file(manual_contents)
-            self._convert_rd_to_txt(temp_file)
+            document = self._convert_rd_to_txt(temp_file)
             self._del_tmp_file(temp_file)
-            return
+            return document
         else:
             return self.github_helper.view_file(document_name)
 

@@ -40,11 +40,17 @@ class GitHubHelper(object):
 
     def list_files_in_folder(self, folder=''):
         try:
-            if not folder.startswith('/'):
-                folder = '/{0}'.format(folder)
+            folder = self._fix_folder_slashes(folder)
             return self.github_repository.get_contents(folder)
         except GithubException as e:
             return [e.data['message']]
+
+    def _fix_folder_slashes(self, folder):
+        if not folder.startswith('/'):
+            folder = '/{0}'.format(folder)
+        if folder != '/' and folder.endswith('/'):
+            folder = folder[:-1]
+        return folder
 
     def view_file(self, file_name):
         try:

@@ -35,10 +35,7 @@ class Experiment(BasePackage):
         return slugify(self.title)
 
     def get_absolute_url(self, tab=None):
-        absolute_url = reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
-        if tab:
-            absolute_url = '{0}#{1}'.format(absolute_url, tab)
-        return absolute_url
+        return reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
 
     def get_docs_folder(self):
         return [x.location for x in ChosenExperimentSteps.objects.filter(experiment=self).order_by('step_nr')]
@@ -54,10 +51,13 @@ class Experiment(BasePackage):
     def __str__(self):
         return self.title
 
-    def success_url_dict(self):
-        return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}),
+    def success_url_dict(self, hash=''):
+        return {'dependencies': reverse('experiment_dependencies', kwargs={'pk': self.pk,
+                                                                           'object_type': self.get_object_type()})
+                                                                            + hash,
                 'resources': '',
-                'versions': ''}
+                'versions': '',
+                'schema': reverse('experiment_schema', kwargs={'experiment_id': self.pk}) + hash}
 
     def language_helper(self):
         language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}

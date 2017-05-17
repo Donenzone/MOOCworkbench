@@ -16,6 +16,8 @@
             {{ readme|safe }}
         {% endif %}
 
+        {% include "marketplace/package_detail/package_detail_file_table.html" %}
+
         <p class="lead">{{ object.description }}</p>
         <div class="row">
             <div class="col-md-8">

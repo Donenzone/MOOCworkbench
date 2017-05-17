@@ -103,14 +103,17 @@ class InternalPackage(Package):
     def get_object_type(self):
         return ExperimentPackageTypeMixin.PACKAGE_TYPE
 
-    def success_url_dict(self):
-        return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}),
+    def success_url_dict(self, hash=''):
+        return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}) + hash,
                 'resources': '',
                 'versions': ''}
 
     def language_helper(self):
         language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}
         return language_helper_dict[self.language.language](self)
+
+    def __str__(self):
+        return self.name
 
     @property
     def python_package_name(self):

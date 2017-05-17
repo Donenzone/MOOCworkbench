@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -8,6 +10,9 @@ from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.helper import get_github_helper
 from helpers.helper import get_package_or_experiment
+
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -22,11 +27,13 @@ def coveralls_enable(request):
         if coveralls_helper.coverage_enabled_check():
             existing_config.badge_url = coveralls_helper.get_badge_url()
             existing_config.save()
+            logger.debug('enabled coveralls for: %s', experiment)
             return JsonResponse({'enabled': True})
         else:
             return JsonResponse({'enabled': False, 'message': 'Invalid response from Coveralls. '
                                                               'Are you sure you flipped the switch on Coveralls?'})
     else:
+        logger.debug('tried to enable coveralls, travis was not enabled: %s, %s', experiment, travis_instance)
         return JsonResponse({'enabled': False, 'message': 'First enable Travis CI builds!'})
 
 
@@ -41,6 +48,7 @@ def coveralls_disable(request):
         current_config.enabled = False
         current_config.save()
 
+        logger.debug('disabled coveralls for: %s, %s', experiment, travis_instance)
         return JsonResponse({'disabled': True})
 
     return JsonResponse({'disabled': False})
@@ -54,7 +62,9 @@ def coveralls_filecoverage(request):
     filename = request.POST['filename']
     github_helper = get_github_helper(request, experiment)
     coverage_helper = CoverallsHelper(github_helper.owner, github_helper.repo_name)
-    return JsonResponse({'coverage': coverage_helper.get_file_coverage(filename)})
+    coverage = coverage_helper.get_file_coverage(filename)
+    logger.debug('coveralls file coverage for file with coverage %d: %s', filename, coverage, experiment)
+    return JsonResponse({'coverage': coverage})
 
 
 @login_required
@@ -69,6 +79,7 @@ def coveralls_status(request, object_id, object_type):
     if current_config:
         context['current_config'] = current_config[0]
         context['configured'] = context['current_config'].enabled
+    logger.debug('fetched coveralls status %s: %s', exp_or_package, context)
     return render(request, 'coverage_manager/coverage_status.html', context)
 
 

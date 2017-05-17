@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db import transaction
@@ -14,6 +16,9 @@ from .utils import get_data_schema
 from .tasks import task_write_data_schema
 
 
+logger = logging.getLogger(__name__)
+
+
 class DataSchemaOverview(View):
     template_name = 'dataschema_manager/dataschemafield_overview.html'
 
@@ -28,6 +33,7 @@ class DataSchemaOverview(View):
         context['form'] = DataSchemaFieldForm()
         context['constraint_form'] = DataSchemaConstraintForm()
         context['schema_active'] = True
+        logger.debug('data schema overview for: %s', experiment)
         return render(request, self.template_name, context)
 
 
@@ -46,10 +52,12 @@ def dataschema_new(request, experiment_id):
                 data_schema = get_data_schema(experiment)
                 data_schema.fields.add(edit_form.instance)
                 data_schema.save()
+            logger.debug('new data schema created for %s: %s', experiment, data_schema)
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
             context['constraint_form'] = constraint_form
+            logger.debug('invalid data schema form for %s: %s', experiment, context)
             return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
 
 
@@ -68,6 +76,7 @@ def dataschema_edit(request, pk, experiment_id):
             constraints.save()
             dataschema.constraint = constraints
             dataschema.save()
+            logger.debug('edit data schema for %s: %s', experiment, dataschema)
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
@@ -84,5 +93,6 @@ def dataschema_write(request, experiment_id):
     verify_and_get_experiment(request, experiment_id)
     task_write_data_schema.delay(experiment_id)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update data schema...')
+    logger.debug('started updating schema for: %d', experiment_id)
     return JsonResponse({'success': True})
 

@@ -1,22 +1,27 @@
+import logging
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
 from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-from marketplace.models import ExternalPackage, InternalPackage, PackageVersion, PackageResource
 
 from .models import get_workbench_user, WorkbenchUser
 from .forms import WorkbenchUserForm, UserLoginForm
 from .forms import RegisterForm
 
 
+logger = logging.getLogger(__name__)
+
+
 @login_required
 def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user)[:5]
+    logger.debug('%s accessed index', workbench_user)
     return render(request, 'index.html', {'experiments': experiments,
                                           'tasks': get_available_tasks(workbench_user)})
 
@@ -31,6 +36,7 @@ def sign_in(request):
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
             if user:
                 login(request, user)
+                logger.debug('%s signed in successfully', user)
                 return redirect(to='/')
             else:
                 return render(request, 'login.html', {'form': form, 'error': 'Incorrect username/password'})
@@ -48,6 +54,7 @@ class EditProfileView(View):
     def get(self, request):
         workbench_user = get_workbench_user(request.user)
         form = WorkbenchUserForm(instance=workbench_user)
+        logger.debug('%s edit get profile view', workbench_user)
         return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
 
     def post(self, request):
@@ -55,12 +62,14 @@ class EditProfileView(View):
         form = WorkbenchUserForm(request.POST, instance=workbench_user)
         if form.is_valid():
             form.save()
+            logger.debug('%s edited profile successfully', workbench_user)
             return redirect(to='/')
         else:
             return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
 
 
 def sign_out(request):
+    logger.debug('%s user about to sign out', request.user)
     logout(request)
     return redirect(to='/')
 
@@ -81,6 +90,7 @@ class RegisterView(View):
                 workbench_user = WorkbenchUser.objects.get(user=user)
                 workbench_user.netid = form.cleaned_data['netid']
                 workbench_user.save()
+                logger.debug('new user created: %s', workbench_user)
                 return redirect(to='/')
             else:
                 return render(request, 'user_manager/register.html', {'form': form})

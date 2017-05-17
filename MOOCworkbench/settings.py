@@ -186,3 +186,42 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "staticfiles"),
     os.path.join(BASE_DIR, "bower_components"),
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'build_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'cookiecutter_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'coverage_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'dataschema_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'user_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+    },
+}

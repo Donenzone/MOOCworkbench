@@ -1,6 +1,10 @@
+import logging
 from travispy import TravisPy
-from git_manager.helpers.github_helper import GitHubHelper
-import requests, json
+import requests
+
+
+logger = logging.getLogger(__name__)
+
 
 class TravisCiHelper(object):
     def __init__(self, github_helper):
@@ -19,11 +23,12 @@ class TravisCiHelper(object):
     def trigger_build_for_repo(self):
         repo_slug_2f = self.get_repo_slug(two_f=True)
         url = 'https://api.travis-ci.org/repo/{0}/requests'.format(repo_slug_2f)
-        body='{"request": {"branch":"master"} }'
+        body = '{"request": {"branch":"master"} }'
         access_token = self.get_access_token()
         auth_token = 'token {0}'.format(access_token)
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Travis-API-Version': '3', 'Authorization': auth_token}
-        requests.post(url, data=body, headers=headers)
+        response = requests.post(url, data=body, headers=headers)
+        logger.debug('build triggered for repo %s, travis response: %s', self.repo_slug, response.content)
 
     def get_access_token(self):
         headers = {'Content-Type': 'application/json', 'User-Agent': 'TravisMOOCworkbench', 'Accept': 'application/vnd.travis-ci.2+json'}

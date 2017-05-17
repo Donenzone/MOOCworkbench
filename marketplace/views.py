@@ -22,9 +22,8 @@ from .helpers.helper import create_tag_for_package_version
 from .helpers.helper import update_setup_py_with_new_version
 from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from .tasks import task_create_package_from_experiment, task_publish_update_package
-from .tasks import task_remove_package, task_rename_package
+from .tasks import task_remove_package
 from .mixins import IsInternalPackageMixin, ObjectTypeIdMixin
-from .utils import internalpackge_remove
 
 
 class MarketplaceIndex(View):
@@ -141,9 +140,7 @@ class InternalPackageVersionCreateView(CreateView):
 def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
-    #task_publish_update_package.delay(package.pk)
-    language_helper = package.language_helper()
-    language_helper.publish_package()
+    task_publish_update_package.delay(package.pk)
     return JsonResponse({"publish": "started"})
 
 
@@ -189,8 +186,6 @@ class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailVi
 
     def readme_file_of_package(self):
         internalpackage = InternalPackage.objects.get(id=self.kwargs['pk'])
-
-        internalpackge_remove(internalpackage)
         github_helper = GitHubHelper(self.request.user, internalpackage.git_repo.name)
         readme = github_helper.view_file('README.md')
         md = Markdown()

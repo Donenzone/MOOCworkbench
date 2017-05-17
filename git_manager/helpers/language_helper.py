@@ -1,12 +1,16 @@
 import os
 import shutil
+import subprocess
 
 import requirements
 from rpy2.robjects.packages import importr
 
+from MOOCworkbench.settings import PROJECT_ROOT
+from docs_manager.sphinx_helper import SphinxHelper
 from requirements_manager.models import Requirement
 from requirements_manager.helper import delete_existing_requirements
 from pylint_manager.utils import run_rlint, run_pylint
+from marketplace.utils import internalpackage_publish_update, internalpackage_remove
 
 from .git_helper import GitHelper
 from .github_helper import GitHubHelper
@@ -39,6 +43,12 @@ class LanguageHelper(object):
         pass
 
     def publish_package(self):
+        pass
+
+    def remove_package(self):
+        pass
+
+    def get_document(self, document_name):
         pass
 
     def generate_documentation(self):
@@ -95,10 +105,30 @@ class PythonHelper(LanguageHelper):
                 'project_short_description': internal_package.description}
 
     def publish_package(self):
-        pass
+        internalpackage_publish_update(self.exp_or_package)
+
+        self.exp_or_package.published = True
+        self.exp_or_package.save()
+
+    def remove_package(self):
+        internalpackage_remove(self.exp_or_package)
+
+        self.exp_or_package.published = False
+        self.exp_or_package.save()
 
     def generate_documentation(self):
-        pass
+        git_helper = GitHelper(self.github_helper)
+        git_helper.clone_or_pull_repository()
+        folders = self.exp_or_package.get_docs_folder()
+        sphinx_helper = SphinxHelper(self.exp_or_package, folders, self.github_helper.owner)
+        sphinx_helper.add_sphinx_to_repo()
+        sphinx_helper.build_and_sync_docs()
+
+    def get_document(self, document_name):
+        from experiments_manager.helper import get_steps
+        steps = get_steps(self.exp_or_package)
+        sphinx_helper = SphinxHelper(self.exp_or_package, steps, self.github_helper.owner)
+        return sphinx_helper.get_document(document_name)
 
 
 class RHelper(LanguageHelper):
@@ -182,9 +212,35 @@ class RHelper(LanguageHelper):
                 'depends': depency_str}
 
     def generate_documentation(self):
-        self.publish_package()
+        from marketplace.models import InternalPackage
+        if isinstance(self.exp_or_package, InternalPackage):
+            self._devtools_document()
 
     def publish_package(self):
+        self._devtools_document()
+
+        self.exp_or_package.published = True
+        self.exp_or_package.save()
+
+    def remove_package(self):
+        # R packages are installed directly from GitHub
+        # so removing is "impossible"
+        self.exp_or_package.published = False
+        self.exp_or_package.save()
+
+    def get_document(self, document_name):
+        from marketplace.models import InternalPackage
+        if isinstance(self.exp_or_package, InternalPackage):
+            manual_file = 'man/{0}.Rd'.format(document_name)
+            manual_contents = self.github_helper.view_file(manual_file)
+            temp_file = self._temp_save_rd_file(manual_contents)
+            self._convert_rd_to_txt(temp_file)
+            self._del_tmp_file(temp_file)
+            return
+        else:
+            return self.github_helper.view_file(document_name)
+
+    def _devtools_document(self):
         git_helper = GitHelper(self.github_helper)
         git_helper.clone_or_pull_repository()
 
@@ -197,3 +253,22 @@ class RHelper(LanguageHelper):
         git_helper.commit('Published package and generated docs')
         git_helper.push()
         os.chdir(old_active_dir)
+
+    def _temp_save_rd_file(self, manual):
+        file_name = 'temp/temp{0}.Rd'.format(str(self.exp_or_package.pk))
+        temp = open(file_name, 'w')
+        temp.write(manual)
+        temp.close()
+        return file_name
+
+    def _convert_rd_to_txt(self, rd_file):
+        rd_file_path = os.path.join(PROJECT_ROOT, rd_file)
+        p = subprocess.run(['R', 'CMD', 'Rdconv', '-t', 'txt', rd_file_path],
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
+        result = p.stdout.decode('utf-8')
+        return result
+
+    def _del_tmp_file(self, file_name):
+        os.remove(file_name)
+

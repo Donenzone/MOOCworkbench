@@ -37,7 +37,7 @@ def internalpackage_rename(package, old_name):
     shutil.copytree(git_helper.repo_dir, dst_dir)
 
 
-def internalpackge_remove(package):
+def internalpackage_remove(package):
     dst_dir = os.path.join(PACKAGES_DIR, package.git_repo.name)
     if os.path.exists(dst_dir):
         shutil.rmtree(dst_dir)

@@ -4,7 +4,6 @@ from experiments_manager.models import Experiment
 from experiments_manager.consumers import send_exp_package_creation_status_update
 
 from .models import update_all_versions, InternalPackage
-from .utils import internalpackage_publish_update, internalpackage_rename, internalpackge_remove
 
 
 @app.task
@@ -28,20 +27,12 @@ def task_create_package_from_experiment(internalpackage_id, experiment_id, step_
 @app.task
 def task_publish_update_package(internalpackage_id):
     package = InternalPackage.objects.get(pk=internalpackage_id)
-    internalpackage_publish_update(package)
-    package.published = True
-    package.save()
+    language_helper = package.language_helper()
+    language_helper.publish_package()
 
 
 @app.task
 def task_remove_package(internalpackage_id):
     package = InternalPackage.objects.get(pk=internalpackage_id)
-    internalpackge_remove(package)
-    package.published = False
-    package.save()
-
-
-@app.task
-def task_rename_package(internalpackage_id):
-    package = InternalPackage.objects.get(pk=internalpackage_id)
-    internalpackage_rename(package)
+    language_helper = package.language_helper()
+    language_helper.remove_package()

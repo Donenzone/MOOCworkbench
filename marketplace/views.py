@@ -141,8 +141,11 @@ class InternalPackageVersionCreateView(CreateView):
 def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
-    task_publish_update_package.delay(package.pk)
+    #task_publish_update_package.delay(package.pk)
+    language_helper = package.language_helper()
+    language_helper.publish_package()
     return JsonResponse({"publish": "started"})
+
 
 @login_required
 def internalpackage_publish_checklist(request, pk):

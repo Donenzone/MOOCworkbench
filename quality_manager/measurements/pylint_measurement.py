@@ -14,7 +14,6 @@ class PylintMeasurement(MeasurementAbstraction):
     def measure(self):
         language_helper = self.experiment.language_helper()
         language_helper.static_code_analysis()(self.experiment)
-
         self.result.result = ExperimentMeasureResult.HIGH
 
     def save_and_get_result(self):

@@ -110,7 +110,7 @@ class InternalPackage(Package):
 
     def language_helper(self):
         language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}
-        return language_helper_dict[self.template.language.language](self)
+        return language_helper_dict[self.language.language](self)
 
     @property
     def python_package_name(self):

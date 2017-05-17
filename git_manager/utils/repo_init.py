@@ -31,6 +31,8 @@ class PackageGitRepoInit(GitRepoInit):
         self.internal_package = internal_package
         self.step_folder = step_folder
         self.username = username
+        self.language_helper = self.experiment.language_helper()
+        self.language = self.experiment.language
 
     def init_repo_boilerplate(self):
         # create git repository in DB
@@ -60,13 +62,9 @@ class PackageGitRepoInit(GitRepoInit):
         return git_repo_obj
 
     def create_cookiecutter_boilerplate(self, git_helper):
-        template_to_clone = CookieCutterTemplate.objects.filter(meant_for=CookieCutterTemplate.PACKAGE).first()
-        project_dict = {'project_name': self.internal_package.name,
-                        'app_name': self.github_helper.repo_name,
-                        'full_name': self.username,
-                        'email': self.experiment.owner.user.email,
-                        'github_username': self.github_helper.owner,
-                        'project_short_description': self.internal_package.description}
+        template_to_clone = CookieCutterTemplate.objects.filter(meant_for=CookieCutterTemplate.PACKAGE,
+                                                                language=self.language).first()
+        project_dict = self.language_helper.cookiecutter_dict(self.internal_package)
         clone_cookiecutter_template_with_dict(template_to_clone, git_helper.repo_dir_of_user(), project_dict)
         git_helper.repo.git.add('.')
         git_helper.repo.index.commit('Pip package template added')
@@ -102,7 +100,10 @@ class PackageGitRepoInit(GitRepoInit):
         return package_repo
 
     def move_module_into_folder(self, git_helper, package_name):
-        git_helper.move_repo_contents_to_folder(package_name)
+        if 'Python' in self.language.language:
+            git_helper.move_repo_contents_to_folder(package_name)
+        elif 'R' in self.language.language:
+            git_helper.move_repo_contents_to_folder('R')
         git_helper.repo.index.commit('Moved module into own folder')
         git_helper.push()
 

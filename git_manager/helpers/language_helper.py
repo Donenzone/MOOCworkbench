@@ -7,6 +7,7 @@ from rpy2.robjects.packages import importr
 from requirements_manager.models import Requirement
 from requirements_manager.helper import delete_existing_requirements
 from pylint_manager.utils import run_rlint, run_pylint
+
 from .git_helper import GitHelper
 from .github_helper import GitHubHelper
 
@@ -32,6 +33,15 @@ class LanguageHelper(object):
         pass
 
     def static_code_analysis(self):
+        pass
+
+    def cookiecutter_dict(self, internal_package):
+        pass
+
+    def publish_package(self):
+        pass
+
+    def generate_documentation(self):
         pass
 
 
@@ -75,6 +85,20 @@ class PythonHelper(LanguageHelper):
 
     def static_code_analysis(self):
         return run_pylint
+
+    def cookiecutter_dict(self, internal_package):
+        return {'project_name': self.exp_or_package.name,
+                'app_name': self.github_helper.repo_name,
+                'full_name': self.exp_or_package.owner,
+                'email': self.exp_or_package.owner.user.email,
+                'github_username': self.github_helper.owner,
+                'project_short_description': internal_package.description}
+
+    def publish_package(self):
+        pass
+
+    def generate_documentation(self):
+        pass
 
 
 class RHelper(LanguageHelper):
@@ -127,6 +151,7 @@ class RHelper(LanguageHelper):
         self._delete_requirements(git_helper)
 
         # make src dir active
+        old_active_dir = os.getcwd()
         os.chdir(git_helper.repo_dir + '/src/')
 
         # R cli install
@@ -140,4 +165,35 @@ class RHelper(LanguageHelper):
 
         git_helper.commit('Updated dependencies in Packrat')
         git_helper.push()
+        os.chdir(old_active_dir)
 
+    def cookiecutter_dict(self, internalpackage):
+        dependencies = self.exp_or_package.requirements.all()
+        depency_str = ''
+        for dependency in dependencies:
+            depency_str += '{0} (>= {1}), '.format(dependency.package_name, dependency.version)
+
+        return {'author_name': self.exp_or_package.owner,
+                'email': self.exp_or_package.owner.user.email,
+                'github_username': self.github_helper.owner,
+                'project_name': internalpackage.name,
+                'description': internalpackage.description,
+                'short_description': internalpackage.description,
+                'depends': depency_str}
+
+    def generate_documentation(self):
+        self.publish_package()
+
+    def publish_package(self):
+        git_helper = GitHelper(self.github_helper)
+        git_helper.clone_or_pull_repository()
+
+        old_active_dir = os.getcwd()
+        os.chdir(git_helper.repo_dir + '/R/')
+
+        devtools = importr('devtools')
+        devtools.document()
+
+        git_helper.commit('Published package and generated docs')
+        git_helper.push()
+        os.chdir(old_active_dir)

@@ -22,7 +22,6 @@ from django.views.generic.base import TemplateView
 import notifications.urls
 
 import user_manager.views
-import git_manager.views
 
 urlpatterns = [
     url(r'^$', user_manager.views.index, name="index"),
@@ -49,5 +48,4 @@ urlpatterns = [
     url(r'^markdownx/', include('markdownx.urls')),
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
     url(r'^accounts/', include('allauth.urls')),
-    url('^activity/', include('actstream.urls')),
 ]

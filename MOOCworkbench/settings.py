@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.gitlab',
 
     'django_bootstrap_breadcrumbs',
-    'actstream',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {

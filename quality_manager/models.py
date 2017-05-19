@@ -3,6 +3,7 @@ from actstream import action
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.defaultfilters import slugify
 
 from experiments_manager.models import ChosenExperimentSteps
 from model_utils.models import TimeStampedModel
@@ -65,6 +66,9 @@ class ExperimentMeasureResult(TimeStampedModel):
                 ExperimentMeasureResult.MEDIUM: 'warning',
                 ExperimentMeasureResult.HIGH: 'success'}
         return style_classes[self.result]
+
+    def slug(self):
+        return slugify(self.measurement.name).replace('-', '_')
 
     def __str__(self):
         return "Workbench scan of {0}".format(self.measurement.name)

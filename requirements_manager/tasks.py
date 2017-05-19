@@ -2,7 +2,6 @@ from MOOCworkbench.celery import app
 
 from experiments_manager.consumers import send_message
 from experiments_manager.helper import MessageStatus
-from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.helper import get_experiment_from_repo_name
 from helpers.helper import get_package_or_experiment_without_request
 

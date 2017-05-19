@@ -42,7 +42,7 @@ class SphinxHelper(object):
 
     def _gen_docs_per_folder(self):
         for folder in self.folders:
-            folder_path = os.path.join(self.base_path, folder.location)
+            folder_path = os.path.join(self.base_path, folder)
             subprocess.call(['sphinx-apidoc', '-o', self.path, folder_path])
 
     def _make_first_html(self):

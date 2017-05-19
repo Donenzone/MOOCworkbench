@@ -6,7 +6,7 @@
                href="#collapse{{ forloop.counter }}" {% if step.active %}
                aria-expanded="true" {% else %} aria-expanded="false" {% endif %}
                aria-controls="collapse{{ forloopcounter }}">
-                {{ step.step }} {% if step.completed %}(completed){% endif %}
+                Step {{ forloop.counter }}: {{ step.step }} {% if step.completed %}(completed){% endif %}
             </a>
         </h4>
     </div>
@@ -14,24 +14,26 @@
          class="panel-collapse collapse {% if step.active %}in{% endif %}" role="tabpanel"
          aria-labelledby="heading{{ forloop.counter }}">
         <div class="panel-body">
+            <p class="lead">
+                {{ step.step.description }}
+            </p>
             {% if docs.enabled %}
                 <div class="row">
                     <div class="col-md-12">
+
                     {% include "experiments_manager/experiment_detail/experimentstep/experimentstep_docs.html" %}
                     </div>
                 </div>
-                <hr/>
+                <hr />
             {% endif %}
+
+            <h3>Files in this step</h3>
             {% include "experiments_manager/experiment_detail/experimentstep/experimentstep_panel_files.html" %}
             <hr/>
 
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     {% include "experiments_manager/experiment_detail/experimentstep/experimentstep_recommendations.html" %}
-                </div>
-                <div class="col-sm-6"
-                     {% if step.active %}data-intro='During your work, the Workbench checks several aspects. You can see how you are doing here.'{% endif %}>
-                    {% include "experiments_manager/experiment_detail/experimentstep/experimentstep_qualitymessages.html" %}
                 </div>
             </div>
             <p></p>

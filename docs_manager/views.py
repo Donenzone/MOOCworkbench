@@ -1,19 +1,23 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 
-from experiments_manager.mixins import ExperimentContextMixin
+from experiments_manager.consumers import send_message
+from experiments_manager.helper import MessageStatus
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
 from helpers.helper import get_package_or_experiment
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
+from .tasks import task_generate_docs
 
-class DocView(ExperimentContextMixin, View):
+
+class DocView(View):
     def get(self, request, object_id, object_type, page_slug=None):
-        context = super(DocView, self).get(request, object_type, object_id)
-        language_helper = self.exp_or_package.language_helper()
+        exp_or_package = get_package_or_experiment(request, object_type, object_id)
+        context = {}
+        language_helper = exp_or_package.language_helper()
         if page_slug:
             context['document'] = language_helper.get_document(page_slug)
         else:
@@ -49,10 +53,7 @@ def toggle_docs_status(request, object_id, object_type):
 @login_required
 def docs_generate(request, object_id, object_type):
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
-    if exp_or_package.docs.enabled:
-        language_helper = exp_or_package.language_helper()
-        language_helper.generate_documentation()
-    else:
-        messages.add_message(request, messages.WARNING,
-                             'Before you can generate docs, first enable docs for your experiment.')
-    return redirect(exp_or_package.get_absolute_url())
+    send_message(exp_or_package.owner.user.username, MessageStatus.INFO,
+                 'Task to regenerate documentation started.')
+    task_generate_docs.delay(object_type, object_id)
+    return JsonResponse({})

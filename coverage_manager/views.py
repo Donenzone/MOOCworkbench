@@ -59,11 +59,13 @@ def coveralls_disable(request):
 def coveralls_filecoverage(request):
     experiment = get_experiment_from_request_post(request)
     assert 'filename' in request.POST
-    filename = request.POST['filename']
-    github_helper = get_github_helper(request, experiment)
-    coverage_helper = CoverallsHelper(github_helper.owner, github_helper.repo_name)
-    coverage = coverage_helper.get_file_coverage(filename)
-    logger.debug('coveralls file coverage for file with coverage %d: %s', filename, coverage, experiment)
+    coverage = -1
+    if experiment.travis.codecoverage_set.first().enabled:
+        filename = request.POST['filename']
+        github_helper = get_github_helper(request, experiment)
+        coverage_helper = CoverallsHelper(github_helper.owner, github_helper.repo_name)
+        coverage = coverage_helper.get_file_coverage(filename)
+        logger.debug('coveralls file coverage for file %s with coverage %s: %s', filename, coverage, experiment)
     return JsonResponse({'coverage': coverage})
 
 

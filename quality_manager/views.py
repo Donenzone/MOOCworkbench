@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views import View
-from django.template.defaultfilters import slugify
 
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.mixins import ExperimentContextMixin
@@ -34,9 +33,9 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
         messages = {}
         for measurement in self._get_recent_measurements_for_all_types(active_step):
-            measurement_slug = slugify(measurement.measurement.name).replace('-', '_')
-            messages[measurement_slug] = measurement.get_message()
-        context['messages'] = messages
+            measurement_slug = measurement.slug()
+            messages[measurement_slug] = measurement
+        context['dashboard_messages'] = messages
         return render(request, self.template_name, context)
 
 
@@ -51,7 +50,7 @@ class NrOfCommitsView(MeasurementMixin, View):
         experiment = verify_and_get_experiment(request, experiment_id)
         experiment_measure = ExperimentMeasure.objects.get(name='Version control use')
         measurement = get_recent_measurements_for_type(experiment.get_active_step(),
-                                                            experiment_measure)
+                                                       experiment_measure)
 
         raw_values = []
         key_values = []

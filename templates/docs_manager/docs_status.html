@@ -5,8 +5,18 @@
       You've already enabled automatic documentation generation. You can now write reStructredText directly into your source files and it will appear in the documentation.
     </p>
 
-    <a href="{% url 'docs_generate' object.id object_type %}" class="btn btn-success">Generate documentation</a>
+    <a href="#" class="btn btn-primary" id="generate-docs">Generate documentation</a>
     <a href="{% url 'toggle_docs_status' object.id object_type %}" class="btn btn-default">Disable automatic document generation</a>
+
+      <script type="text/javascript">
+        $(document).ready(function() {
+            $('#generate-docs').click(function() {
+                $.get({
+                    url: '{% url 'docs_generate' object.id object_type %}',
+                })
+            })
+        })
+      </script>
   {% else %}
   <p class="lead">Enable automatic documentation generation so that docs you write in your source files will automatically be viewable from your experiment page in the workbench.</p>
   <p>

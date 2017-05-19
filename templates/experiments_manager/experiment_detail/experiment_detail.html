@@ -18,6 +18,8 @@
             <p class="lead"> {{ object.description }}</p>
 
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" data-intro='Here you can see the progress of your experiment, divided in steps'>
+                <h3>Progress</h3>
+                <p>You have divided your experiment in the following steps. Each step has a different set of files, documentation and packages.</p>
                 {% for step in steps %}
                     {% include "experiments_manager/experiment_detail/experimentstep/experimentstep_panel.html" %}
                 {% endfor %}

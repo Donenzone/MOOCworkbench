@@ -5,4 +5,3 @@ class ExperimentPackageTypeMixin(object):
 
     def get_requirement_type(self, django_object):
         return self.requirement_types[django_object.__class__.__name__]
-

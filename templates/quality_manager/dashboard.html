@@ -1,33 +1,43 @@
 {% load bootstrap %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-md-9">
-      <h2>Dashboard</h2>
-      <p class="lead">The MOOC workbench scans the progress of your experiment regularly.
-        It checks your results from CI, your requirements, your tests and more.</p>
-    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <h2>Dashboard</h2>
+            <p class="lead">The MOOC workbench scans the progress of your experiment regularly.
+                It checks your results from CI, your requirements, your tests and more.</p>
+        </div>
 
-      <div class="col-md-3">
-        <h3>Refresh</h3>
-        <a href="#" id="refresh" class="btn btn-default">Refresh this data</a>
-        <span id="refresh-message"></span>
-      </div>
+        <div class="col-md-3">
+            <h3>Refresh</h3>
+            <a href="#" id="refresh" class="btn btn-default">Refresh this data</a>
+            <span id="refresh-message"></span>
+        </div>
     </div>
-  <hr />
+    <hr/>
 
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-primary">
-              <div class="panel-heading">What to do now?</div>
-                  <div class="panel-body">
-                        <p>Check out this repository using git clone <github-url></p>
-                        {% for what_now in what_now_list %}
-                          {% if what_now %}
-                          <p>{{ what_now }}</p>
-                          {% endif %}
-                        {% endfor %}
-                  </div>
+                <div class="panel-heading">What to do now?</div>
+                <div class="panel-body">
+                    <p>Check out this repository using git clone</p>
+                    {% for what_now in what_now_list %}
+                        {% if what_now %}
+                            <p>{{ what_now }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="panel panel-{{ dashboard_messages.static_code_analysis.get_class }}">
+                <div class="panel-heading">Static code analysis</div>
+                <div class="panel-body">
+                    <p class="lead">{{ dashboard_messages.static_code_analysis.get_message }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -35,35 +45,38 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="panel panel-default">
-              <div class="panel-heading">Documentation</div>
-                  <div class="panel-body" id="docs-dashboard">
-                    Loading...
-                  </div>
+            <div class="panel panel-{{ dashboard_messages.documentation.get_class }}">
+                <div class="panel-heading">Documentation</div>
+                <div class="panel-body">
+                    <p class="lead">{{ dashboard_messages.documentation.get_message }}</p>
+                    <div id="docs-dashboard">
+                        Loading...
+                    </div>
+                </div>
             </div>
         </div>
 
 
         <div class="col-md-6">
-            <div class="panel panel-default">
-              <div class="panel-heading">Requirements</div>
-                  <div class="panel-body">
-                    <p>{{ messages.dependencies_defined }}</p>
-                  </div>
+            <div class="panel panel-{{ dashboard_messages.dependencies_defined.get_class }}">
+                <div class="panel-heading">Requirements</div>
+                <div class="panel-body">
+                    <p class="lead">{{ dashboard_messages.dependencies_defined.get_message }}</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-default">
-              <div class="panel-heading">Version control</div>
-                  <div class="panel-body">
-                    <p>{{ messages.version_control_use }}</p>
+            <div class="panel panel-{{ dashboard_messages.version_control_use.get_class }}">
+                <div class="panel-heading">Version control</div>
+                <div class="panel-body">
+                    <p class="lead">{{ dashboard_messages.version_control_use.get_message }}</p>
                     <div id="vcs-dashboard">
                         <p>Loading...</p>
                     </div>
-                  </div>
+                </div>
             </div>
         </div>
     </div>
@@ -71,49 +84,55 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="panel panel-default">
-              <div class="panel-heading">Continuous integration</div>
-                  <div class="panel-body" id="ci-dashboard">
-                    <p>Loading...</p>
-                  </div>
+            <div class="panel panel-{{ dashboard_messages.use_of_ci.get_class }}">
+                <div class="panel-heading">Continuous integration</div>
+                <div class="panel-body">
+                    <p class="lead">{{ dashboard_messages.use_of_ci.get_message }}</p>
+                    <div id="ci-dashboard">
+                        <p>Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="panel panel-default">
-              <div class="panel-heading">Testing</div>
-                  <div class="panel-body" id="coverage-dashboard">
-                    <p>Loading...</p>
-                  </div>
+            <div class="panel panel-{{ dashboard_messages.testing.get_class }}">
+                <div class="panel-heading">Testing</div>
+                <div  class="panel-body">
+                    <p class="lead">{{ dashboard_messages.testing.get_message }}</p>
+                    <div id="coverage-dashboard">
+                        <p>Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-  <script type='text/javascript'>
-    $(document).ready(function() {
-      url_dict = {
-        'ci': "{% url 'build_status' object.id object_type %}",
-        'docs': "{% url 'docs_status' object.id object_type %}",
-        'vcs': "{% url 'vcs_overview' object.id %}",
-        'coverage': "{% url 'coveralls_status' object.id object_type %}"
-      };
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            url_dict = {
+                'ci': "{% url 'build_status' object.id object_type %}",
+                'docs': "{% url 'docs_status' object.id object_type %}",
+                'vcs': "{% url 'vcs_overview' object.id %}",
+                'coverage': "{% url 'coveralls_status' object.id object_type %}"
+            };
 
-      $("#docs-dashboard").load(url_dict['docs']);
-      $("#ci-dashboard").load(url_dict['ci']);
-      $("#vcs-dashboard").load(url_dict['vcs']);
-      $("#coverage-dashboard").load(url_dict['coverage']);
+            $("#docs-dashboard").load(url_dict['docs']);
+            $("#ci-dashboard").load(url_dict['ci']);
+            $("#vcs-dashboard").load(url_dict['vcs']);
+            $("#coverage-dashboard").load(url_dict['coverage']);
 
-      $('#refresh').click(function() {
-        $.get({
-          url: "{% url 'measurements_refresh' active_step_id %}",
-          success: function(data) {
-            if (data.refresh) {
-              $('#refresh-message').text("Refreshing data...")
-            }
-          }
-        })
-      })
+            $('#refresh').click(function () {
+                $.get({
+                    url: "{% url 'measurements_refresh' active_step_id %}",
+                    success: function (data) {
+                        if (data.refresh) {
+                            $('#refresh-message').text("Refreshing data...")
+                        }
+                    }
+                })
+            })
 
-  });
-</script>
+        });
+    </script>
 {% endblock %}

@@ -27,7 +27,7 @@ from .mixins import ExperimentContextMixin
 from .tasks import initialize_repository
 
 
-class ExperimentDetailView(RepoFileListMixin, MeasurementMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
+class ExperimentDetailView(RepoFileListMixin, DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
     template_name = "experiments_manager/experiment_detail/experiment_detail.html"
 
@@ -229,7 +229,9 @@ def readme_of_experiment(request, experiment_id):
     content_file = github_helper.view_file('README.md')
     md = Markdown()
     content_file = md.convert(content_file)
-    return render(request, 'experiments_manager/experiment_detail/experiment_readme.html', {'readme': content_file, 'object': experiment, 'readme_active': True})
+    return render(request, 'experiments_manager/experiment_detail/experiment_readme.html', {'readme': content_file,
+                                                                                            'object': experiment,
+                                                                                            'readme_active': True})
 
 
 @login_required

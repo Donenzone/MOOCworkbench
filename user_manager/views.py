@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
-    experiments = Experiment.objects.filter(owner=workbench_user)[:5]
+    experiments = Experiment.objects.filter(owner=workbench_user).order_by('-created')[:5]
     logger.debug('%s accessed index', workbench_user)
     return render(request, 'index.html', {'experiments': experiments,
                                           'tasks': get_available_tasks(workbench_user)})

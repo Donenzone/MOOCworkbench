@@ -23,7 +23,7 @@
                     <div class="panel-heading">New internal packages</div>
                     <div class="panel-body">
                         {% for package in new_internal_packages %}
-                            <p class="lead"><b><a href="{% url 'package_detail' package.pk %}"
+                            <p class="lead"><b><a href="{{ package.get_absolute_url }}"
                                       class="text-primary">{{ package.name }}</a></b></p>
                         {% endfor %}
                     </div>
@@ -35,7 +35,7 @@
                     <div class="panel-heading">New external packages</div>
                     <div class="panel-body">
                         {% for package in new_packages %}
-                            <p class="lead"><b><a href="{% url 'package_detail' package.pk %}"
+                            <p class="lead"><b><a href="{% url 'externalpackage_detail' package.pk %}"
                                       class="text-primary">{{ package.name }}</a></b></p>
                         {% endfor %}
                     </div>
@@ -47,7 +47,7 @@
                     <div class="panel-body">
                         {% for package_version in recent_updates %}
                             <p class="lead"><b><a
-                                    href="{% url 'package_detail' package_version.package.pk %}">{{ package_version }}</a></b>
+                                    href="{{ package.get_absolute_url }}">{{ package_version }}</a></b>
                             </p>
                         {% endfor %}
                     </div>
@@ -58,7 +58,7 @@
                     <div class="panel-heading">New resources</div>
                     <div class="panel-body">
                         {% for resource in recent_resources %}
-                            <p class="lead"><b><a href="{% url 'package_detail' resource.package.pk %}">{{ resource.added_by }}</a></b>
+                            <p class="lead"><b><a href="{{ resource.package.get_absolute_url }}">{{ resource }}</a></b>
                             </p>
                         {% endfor %}
                     </div>

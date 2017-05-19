@@ -8,5 +8,5 @@ class ExperimentTable(tables.Table):
 
     class Meta:
         model = Experiment
-        attrs = {'class': 'table'}
+        attrs = {'class': 'table table-striped'}
         fields = ['completed', 'title', 'language', 'template', 'git_repo', 'created']

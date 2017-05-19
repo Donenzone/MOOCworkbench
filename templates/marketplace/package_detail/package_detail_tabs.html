@@ -17,7 +17,7 @@
 </div>
 
 <ul class="nav nav-tabs">
-    <li class="{% if index_active %}active{% endif %}"><a href="{% url "package_detail" object_id %}">Index</a></li>
+    <li class="{% if index_active %}active{% endif %}"><a href="{{ object.get_absolute_url }}">Index</a></li>
     <li class="{% if resources_active %}active{% endif %}"><a href="{% url 'packageresource_list' object_id %}" class="tab-btn" id="schema-click">Resources</a></li>
     {% if is_internal %}
         <li class="{% if dependencies_active %}active{% endif %}"><a href="{% url "package_dependencies" object_id object_type %}" class="tab-btn">Dependencies</a></li>

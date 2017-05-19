@@ -70,7 +70,7 @@ class Package(BasePackage):
         return None
 
     def get_absolute_url(self):
-        return reverse('package_detail', kwargs={"pk": self.pk})
+        return reverse('package_detail', kwargs={'pk': self.pk})
 
 
 class ExternalPackage(Package):
@@ -78,6 +78,9 @@ class ExternalPackage(Package):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('externalpackage_detail', kwargs={'pk': self.pk})
 
 
 @receiver(post_save, sender=ExternalPackage)
@@ -95,7 +98,7 @@ class InternalPackage(Package):
     template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
 
     def get_absolute_url(self):
-        return reverse('internalpackage_dashboard', kwargs={'pk': self.pk})
+        return reverse('internalpackage_detail', kwargs={'pk': self.pk})
 
     def get_docs_folder(self):
         return [self.python_package_name]
@@ -153,7 +156,7 @@ class PackageResource(TimeStampedModel):
         return markdownify(self.resource)
 
     def __str__(self):
-        return "Resource by {0}".format(self.added_by)
+        return "{0} by {1}".format(self.title, self.added_by)
 
     def get_absolute_url(self):
         return self.package.get_absolute_url()

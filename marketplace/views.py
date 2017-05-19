@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
@@ -172,13 +172,21 @@ class PackageListView(ListView):
     model = Package
 
 
-class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, RepoFileListMixin, DetailView):
-    model = Package
+@login_required
+def package_detail(request, pk):
+    if InternalPackage.objects.filter(pk=pk):
+        return redirect(to=reverse('internalpackage_detail', kwargs={'pk': pk}))
+    else:
+        return redirect(to=reverse('externalpackage_detail', kwargs={'pk': pk}))
+
+
+class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, RepoFileListMixin, DetailView):
+    model = InternalPackage
     template_name = 'marketplace/package_detail/package_detail.html'
 
     def get_context_data(self, **kwargs):
         self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
-        context = super(PackageDetailView, self).get_context_data(**kwargs)
+        context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         context['index_active'] = True
@@ -195,8 +203,8 @@ class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, RepoFile
         return content_file
 
 
-class ExternalPackageDetailView(ActiveExperimentsList, DetailView):
-    model = Package
+class ExternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
+    model = ExternalPackage
     template_name = 'marketplace/package_detail/package_detail.html'
 
     def get_context_data(self, **kwargs):

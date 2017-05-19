@@ -31,5 +31,5 @@ sphinx_click
 tableschema
 ipaddress
 pypiserver
-django-activity-stream
 rpy2
+django-autoadmin

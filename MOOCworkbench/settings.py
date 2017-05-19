@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.gitlab',
 
     'django_bootstrap_breadcrumbs',
+    'autoadmin'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {

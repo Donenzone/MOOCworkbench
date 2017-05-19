@@ -6,6 +6,9 @@
         <div class="col-md-9">
             <h2>Welcome to the MOOC Workbench</h2>
             <h3>Activity Feed</h3>
+            {% for activity in activities %}
+                <p class="lead"><a href="{{ activity.get_absolute_url }}">{{ activity.get_activity_message }}</a></p>
+            {% endfor %}
         </div>
         <div class="col-md-3">
 

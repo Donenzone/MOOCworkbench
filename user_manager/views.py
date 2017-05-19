@@ -8,6 +8,7 @@ from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
+from marketplace.views import PackageVersion, PackageResource, InternalPackage, ExternalPackage
 
 from .models import get_workbench_user, WorkbenchUser
 from .forms import WorkbenchUserForm, UserLoginForm
@@ -22,8 +23,15 @@ def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user).order_by('-created')[:5]
     logger.debug('%s accessed index', workbench_user)
+    recent_versions = list(PackageVersion.objects.all().order_by('-created')[:5])
+    recent_resources = list(PackageResource.objects.all().order_by('-created')[:5])
+    recent_internal = list(InternalPackage.objects.all().order_by('-created')[:5])
+    recent_external = list(ExternalPackage.objects.all().order_by('-created')[:5])
+    total_list = recent_versions + recent_resources + recent_internal + recent_external
+    total_list = sorted(total_list, key=lambda x: x.created)
     return render(request, 'index.html', {'experiments': experiments,
-                                          'tasks': get_available_tasks(workbench_user)})
+                                          'tasks': get_available_tasks(workbench_user),
+                                          'activities': total_list})
 
 
 def sign_in(request):

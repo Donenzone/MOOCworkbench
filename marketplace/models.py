@@ -72,6 +72,9 @@ class Package(BasePackage):
     def get_absolute_url(self):
         return reverse('package_detail', kwargs={'pk': self.pk})
 
+    def get_activity_message(self):
+        return "Package {0} was created by {1}".format(self.name, self.owner)
+
 
 class ExternalPackage(Package):
     project_page = models.URLField()
@@ -81,12 +84,6 @@ class ExternalPackage(Package):
 
     def get_absolute_url(self):
         return reverse('externalpackage_detail', kwargs={'pk': self.pk})
-
-
-@receiver(post_save, sender=ExternalPackage)
-def send_package_action(sender, instance, created, **kwargs):
-    if created:
-        action.send(instance.owner, verb='created the package', target=instance)
 
 
 class InternalPackage(Package):
@@ -141,8 +138,6 @@ def add_package_config(sender, instance, created, **kwargs):
         package_version = PackageVersion(package=instance, version_nr='0.1', changelog='Initial version', added_by=instance.owner, url='')
         package_version.save()
 
-        action.send(instance.owner, verb='created the package', target=instance)
-
 
 class PackageResource(TimeStampedModel):
     package = models.ForeignKey(to=Package)
@@ -161,11 +156,8 @@ class PackageResource(TimeStampedModel):
     def get_absolute_url(self):
         return self.package.get_absolute_url()
 
-
-@receiver(post_save, sender=PackageResource)
-def send_action_package_resource(sender, instance, created, **kwargs):
-    if created:
-        action.send(instance, verb='was added to', target=instance.package)
+    def get_activity_message(self):
+        return "New resource '{0}' by {1} for package {2}".format(self.title, self.added_by, self.package)
 
 
 class PackageVersion(TimeStampedModel):
@@ -185,15 +177,17 @@ class PackageVersion(TimeStampedModel):
     class Meta:
         unique_together = ('package', 'version_nr')
 
+    def get_activity_message(self):
+        return "{0} was updated to version {1}".format(self.package, self.version_nr)
+
 
 @receiver(post_save, sender=PackageVersion)
-def send_notification_and_action(sender, instance, created, **kwargs):
+def send_notification(sender, instance, created, **kwargs):
     if created:
         subscribed_users = instance.package.subscribed_users.all()
         message = 'Package {0} is updated to {1}'.format(instance.package, instance.version_nr)
         for user in subscribed_users:
             notify.send(user, recipient=user.user, verb=message)
-        action.send(instance.package, verb='was updated to', target=instance)
 
 
 def update_all_versions():

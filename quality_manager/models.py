@@ -72,9 +72,3 @@ class ExperimentMeasureResult(TimeStampedModel):
 
     def __str__(self):
         return "Workbench scan of {0}".format(self.measurement.name)
-
-
-@receiver(post_save, sender=ExperimentMeasureResult)
-def add_experiment_config(sender, instance, created, **kwargs):
-    if created:
-        action.send(instance, verb='was completed', action_object=instance.step.experiment.owner)

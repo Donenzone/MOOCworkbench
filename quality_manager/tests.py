@@ -51,8 +51,8 @@ class QualityManagerTestCase(TestCase):
         mock_messages.return_value = [MeasurementMockClass(), MeasurementMockClass(), MeasurementMockClass()]
         response = self.client.get(reverse('dashboard', kwargs={'experiment_id': self.experiment.id}))
         self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.context['messages'])
-        self.assertIsNotNone(response.context['messages']['my_first_measurement'])
+        self.assertIsNotNone(response.context['dashboard_messages'])
+        self.assertIsNotNone(response.context['dashboard_messages']['test_slug'])
 
     def test_vcs_overview(self):
         response = self.client.get(reverse('vcs_overview', kwargs={'experiment_id': self.experiment.id}))
@@ -84,6 +84,9 @@ class MeasurementMockClass(object):
 
     def get_message(self):
         return 'Get to work fool!'
+
+    def slug(self):
+        return 'test_slug'
 
 
 class MeasurementMessageMockClass(object):

@@ -29,14 +29,14 @@ class DocsManagerTestCase(TestCase):
                                                     description='test',
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
-                                                    language_id=1,
-                                                    template_id=1,)
+                                                    language_id=2,
+                                                    template_id=2,)
 
         self.client = Client()
         self.client.login(username='test', password='test')
 
-    @patch('docs_manager.views.GitHubHelper')
-    @patch('docs_manager.views.SphinxHelper')
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
+    @patch('git_manager.helpers.language_helper.SphinxHelper')
     def test_doc_experiment_view(self, mock_gh_helper, mock_sphinx_helper):
         """
         Test if the DocExperimentView loads, for the default documentation view.
@@ -44,12 +44,13 @@ class DocsManagerTestCase(TestCase):
         :param mock_sphinx_helper: Autoloaded by the mock framework
         :return: 
         """
-        response = self.client.get(reverse('docs_view', kwargs={'object_id': 1, 'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
+        response = self.client.get(reverse('docs_view', kwargs={'object_id': 1,
+                                                                'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['document'])
 
-    @patch('docs_manager.views.GitHubHelper')
-    @patch('docs_manager.views.SphinxHelper')
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
+    @patch('git_manager.helpers.language_helper.SphinxHelper')
     def test_doc_experiment_view_with_page_slug(self, mock_gh_helper, mock_sphinx_helper):
         """
         Test if the DocExperimentView loads, given a pageslug to load.
@@ -105,9 +106,9 @@ class DocsManagerTestCase(TestCase):
         docs.refresh_from_db()
         self.assertTrue(docs.enabled)
 
-    @patch('docs_manager.views.GitHubHelper')
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
     @patch('docs_manager.views.GitHelper')
-    @patch('docs_manager.views.SphinxHelper')
+    @patch('git_manager.helpers.language_helper.SphinxHelper')
     def test_docs_generate_enabled(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
         """
         Test if the documentation view can be loaded.
@@ -115,11 +116,11 @@ class DocsManagerTestCase(TestCase):
         """
         response = self.client.get(reverse('docs_generate', kwargs={'object_id': 1,
                                                                   'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
-    @patch('docs_manager.views.GitHubHelper')
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
     @patch('docs_manager.views.GitHelper')
-    @patch('docs_manager.views.SphinxHelper')
+    @patch('git_manager.helpers.language_helper.SphinxHelper')
     def test_docs_generate_disabled(self, mock_gh_helper, mock_git_helper, mock_sphinx_helper):
         """
         Test if the documentation view can be loaded.
@@ -131,5 +132,5 @@ class DocsManagerTestCase(TestCase):
 
         response = self.client.get(reverse('docs_generate', kwargs={'object_id': 1,
                                                                   'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 

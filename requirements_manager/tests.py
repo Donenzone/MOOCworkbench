@@ -11,8 +11,6 @@ from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
 from marketplace.models import InternalPackage
 from requirements_manager.models import Requirement
-from requirements_manager.helper import build_requirements_file
-from requirements_manager.helper import parse_requirements_file
 from user_manager.models import WorkbenchUser
 
 
@@ -28,13 +26,13 @@ class RequirementsManagerTestCase(TestCase):
         self.experiment = Experiment.objects.create(title='Experiment', description='test',
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
-                                                    language_id=1,
+                                                    language_id=2,
                                                     template_id=2)
 
         self.internal_package = InternalPackage.objects.create(name='Package',
                                                                description='Package',
                                                                git_repo=self.git_repo,
-                                                               language_id=1,
+                                                               language_id=2,
                                                                category_id=1,
                                                                owner_id=1,
                                                                template_id=1)
@@ -50,6 +48,7 @@ class RequirementsManagerTestCase(TestCase):
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)
         call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
         call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
+        call_command('loaddata', 'fixtures/cookiecutter.json', verbosity=0)
 
     def test_requirements_list_view(self):
         response = self.client.get(reverse('requirements_list', kwargs={'pk': self.experiment.id,
@@ -108,43 +107,55 @@ class RequirementsManagerTestCase(TestCase):
                                                                         'object_type': self.experiment.get_object_type()}))
         self.assertEqual(response.status_code, 200)
 
-    def test_build_requirements_file_requirements_present(self):
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
+    def test_build_requirements_file_requirements_present(self, mock_gh_helper):
         self.experiment.requirements.add(self.requirement_two)
         self.experiment.requirements.add(self.requirement_three)
-        requirements_txt = build_requirements_file(self.experiment)
+        language_helper = self.experiment.language_helper()
+        requirements_txt = language_helper.build_requirements_file()
         self.assertFalse(self.requirement_one.package_name in requirements_txt)
         self.assertTrue(self.requirement_two.package_name in requirements_txt)
         self.assertTrue(self.requirement_three.package_name in requirements_txt)
 
-    def test_build_requirements_file_valid_requirement(self):
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
+    def test_build_requirements_file_valid_requirement(self, mock_gh_helper):
         self.experiment.requirements.add(self.requirement_one)
         self.experiment.requirements.add(self.requirement_two)
         self.experiment.requirements.add(self.requirement_three)
         requirements_list = [self.requirement_one, self.requirement_two, self.requirement_three]
         requirements_list_name = [x.package_name for x in requirements_list]
-        requirements_txt = build_requirements_file(self.experiment)
+        language_helper = self.experiment.language_helper()
+        requirements_txt = language_helper.build_requirements_file()
         for req in requirements.parse(requirements_txt):
             self.assertTrue(req.name in requirements_list_name)
 
-    def test_parse_requirements_file_package_name(self):
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
+    def test_parse_requirements_file_package_name(self, mock_gh_helper):
         self.experiment.requirements.add(self.requirement_one)
         self.experiment.requirements.add(self.requirement_two)
         self.experiment.requirements.add(self.requirement_three)
-        requirements_txt = build_requirements_file(self.experiment)
-        parse_requirements_file(self.internal_package, requirements_txt)
+        language_helper = self.experiment.language_helper()
+        requirements_txt = language_helper.build_requirements_file()
+        language_helper_package = self.internal_package.language_helper()
+        language_helper_package.parse_requirements(requirements_txt)
         self.assertTrue(self.internal_package.requirements)
+        self.internal_package.refresh_from_db()
         package_req_list = [x.package_name for x in self.internal_package.requirements.all()]
         self.assertTrue(self.requirement_one.package_name in package_req_list)
         self.assertTrue(self.requirement_two.package_name in package_req_list)
         self.assertTrue(self.requirement_three.package_name in package_req_list)
 
-    def test_parse_requirements_file_version(self):
+    @patch('git_manager.helpers.language_helper.GitHubHelper')
+    def test_parse_requirements_file_version(self, mock_gh_helper):
         self.experiment.requirements.add(self.requirement_one)
         self.experiment.requirements.add(self.requirement_two)
         self.experiment.requirements.add(self.requirement_three)
-        requirements_txt = build_requirements_file(self.experiment)
-        parse_requirements_file(self.internal_package, requirements_txt)
+        language_helper = self.experiment.language_helper()
+        requirements_txt = language_helper.build_requirements_file()
+        language_helper_package = self.internal_package.language_helper()
+        language_helper_package.parse_requirements(requirements_txt)
         self.assertTrue(self.internal_package.requirements)
+        self.internal_package.refresh_from_db()
         package_req_version_list = [x.version for x in self.internal_package.requirements.all()]
         self.assertTrue(self.requirement_one.version in package_req_version_list)
         self.assertTrue(self.requirement_two.version in package_req_version_list)

@@ -182,8 +182,13 @@ class MarketplaceTestCase(TestCase):
         self.assertIsNotNone(response.context['edit_form'])
 
     @patch('marketplace.views.PackageDetailView.readme_file_of_package')
-    def test_internal_package_detail(self, mock_readme):
+    @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
+    @patch('marketplace.views.RepoFileListMixin._get_files_in_repository')
+    @patch('marketplace.views.RepoFileListMixin.get_context_data')
+    def test_internal_package_detail(self, mock_context_data, mock_get_files, mock_file_list, mock_readme):
         mock_readme.return_value = 'Test readme'
+        mock_file_list.return_value = ['file']
+        mock_context_data.return_value = {}
         response = self.client.get(reverse('package_detail', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['version_history'])

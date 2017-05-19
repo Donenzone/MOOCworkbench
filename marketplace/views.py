@@ -172,7 +172,7 @@ class PackageListView(ListView):
     model = Package
 
 
-class PackageDetailView(RepoFileListMixin, InternalPackageBaseView, ActiveExperimentsList, DetailView):
+class PackageDetailView(InternalPackageBaseView, ActiveExperimentsList, RepoFileListMixin, DetailView):
     model = Package
     template_name = 'marketplace/package_detail/package_detail.html'
 
@@ -193,6 +193,19 @@ class PackageDetailView(RepoFileListMixin, InternalPackageBaseView, ActiveExperi
         md = Markdown()
         content_file = md.convert(readme)
         return content_file
+
+
+class ExternalPackageDetailView(ActiveExperimentsList, DetailView):
+    model = Package
+    template_name = 'marketplace/package_detail/package_detail.html'
+
+    def get_context_data(self, **kwargs):
+        self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
+        context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
+        package_id = self.kwargs['pk']
+        context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
+        context['index_active'] = True
+        return context
 
 
 class PackageVersionListView(InternalPackageBaseView, ListView):

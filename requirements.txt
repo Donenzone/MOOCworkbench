@@ -33,3 +33,4 @@ tableschema
 ipaddress
 pypiserver
 django-activity-stream
+rpy2

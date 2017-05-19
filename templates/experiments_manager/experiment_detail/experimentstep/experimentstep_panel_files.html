@@ -13,8 +13,8 @@
     </tr>
     </thead>
     <tbody id="tbody-{{ step.id }}">
-    {% if step.active %}
-        {% for item in git_list %}
+    {% if step.active or completed %}
+        {% for item in step.files %}
             <tr class="clickable-row">
                 <td>
                     {% if item.type == 'dir' %}

@@ -16,7 +16,7 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 from user_manager.models import get_workbench_user
 from requirements_manager.helper import add_internalpackage_to_experiment
 from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.mixins.repo_file_list import RepoFileListMixin
+from git_manager.mixins.repo_file_list import get_files_for_repository
 
 from .forms import InternalPackageForm
 from .helpers.helper import create_tag_for_package_version
@@ -180,7 +180,7 @@ def package_detail(request, pk):
         return redirect(to=reverse('externalpackage_detail', kwargs={'pk': pk}))
 
 
-class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, RepoFileListMixin, DetailView):
+class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
     model = InternalPackage
     template_name = 'marketplace/package_detail/package_detail.html'
 
@@ -190,6 +190,7 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         context['index_active'] = True
+        context['git_list'] = get_files_for_repository(self.object)
         if InternalPackage.objects.filter(pk=self.object.pk):
             context['readme'] = self.readme_file_of_package()
         return context

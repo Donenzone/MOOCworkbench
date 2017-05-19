@@ -76,7 +76,7 @@ class GitHubHelper(object):
         self.github_repository.update_file(repo_file_name, commit_message, contents, current_file.sha)
 
     def create_release(self, tag_name, name, body, pre_release):
-        self.github_repository.create_git_release(tag_name, name, body, prerelease=pre_release)
+        return self.github_repository.create_git_release(tag_name, name, body, prerelease=pre_release)
 
     def get_commit(self, sha1_hash):
         return self.github_repository.get_commit(sha1_hash)

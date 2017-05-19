@@ -23,13 +23,16 @@ class Experiment(BasePackage):
     owner = models.ForeignKey(to=WorkbenchUser)
     template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
     completed = models.BooleanField(default=False)
+    unique_id = models.CharField(max_length=100, null=True)
+    public = models.BooleanField(default=False)
+    publish_url_zip = models.URLField(null=True)
 
     git_repo = models.ForeignKey(to=GitRepository, null=True)
     travis = models.ForeignKey(to=TravisInstance, null=True)
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
     pylint = models.ForeignKey(to=PylintScan, null=True)
-    schema = models.ManyToManyField(to=DataSchema)
+    schema = models.ForeignKey(to=DataSchema)
 
     def slug(self):
         return slugify(self.title)
@@ -83,7 +86,8 @@ def add_experiment_config(sender, instance, created, **kwargs):
 
         schema = DataSchema(name='main')
         schema.save()
-        instance.schema.add(schema)
+        
+        instance.schema = schema
 
         instance.save()
 

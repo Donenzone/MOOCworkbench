@@ -86,7 +86,13 @@
         </div>
     </div>
     <a href="#" class="btn btn-success" data-toggle="modal"
-                                           data-target="#step-modal">Continue towards next step</a>
+                                           data-target="#step-modal">
+    {% if final_step %}
+        Finalize experiment
+    {% else %}
+        Continue towards next step
+    {% endif %}
+    </a>
 
        <div class="modal fade" id="step-modal" role="dialog">
         <div class="modal-dialog">

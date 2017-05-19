@@ -17,7 +17,7 @@
             <p class="lead">
                 {{ step.step.description }}
             </p>
-            {% if docs.enabled %}
+            {% if object.docs.enabled %}
                 <div class="row">
                     <div class="col-md-12">
 
@@ -43,8 +43,13 @@
                 <p>
                     <a href="{% url "experimentstep_scorecard" object.id object.slug %}"
                        class="btn btn-success"
-                       data-intro="Once you have completed the work in this step, click here to move on to the next step.">Complete
-                        and go to next step</a>
+                       data-intro="Once you have completed the work in this step, click here to move on to the next step.">
+                        {% if final_step %}
+                            Finalize experiment
+                        {% else %}
+                            Complete and go to next step
+                        {% endif %}
+                    </a>
                 </p>
             {% endif %}
         </div>

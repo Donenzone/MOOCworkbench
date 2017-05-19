@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 @app.task
 def task_write_data_schema(experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
-    data_schema = experiment.schema.first()
+    data_schema = experiment.schema
     data_schema_str = str(json.dumps(data_schema.to_dict()))
     logger.debug('writing data schema for %s with schema: %s', experiment, data_schema_str)
     github_helper = GitHubHelper(experiment.owner.user, experiment.git_repo.name)
@@ -35,7 +35,7 @@ def task_read_data_schema(repository_name):
     github_helper = GitHubHelper(experiment.owner.user, experiment.git_repo.name)
     schema_json = json.loads(github_helper.view_file('schema/schema.json'))
     data_schema_fields = parse_json_table_schema(schema_json)
-    data_schema = experiment.schema.first()
+    data_schema = experiment.schema
     for field in data_schema.fields.all():
         data_schema.fields.remove(field)
         data_schema.save()

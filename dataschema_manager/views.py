@@ -12,7 +12,6 @@ from experiments_manager.helper import MessageStatus
 
 from .models import DataSchemaField
 from .forms import DataSchemaFieldForm, DataSchemaConstraintForm
-from .utils import get_data_schema
 from .tasks import task_write_data_schema
 
 
@@ -25,7 +24,7 @@ class DataSchemaOverview(View):
     def get(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
         context = {}
-        data_schema = experiment.schema.first()
+        data_schema = experiment.schema
         context['data_schema_list'] = data_schema.fields.all()
         context['experiment_id'] = experiment.id
         context['object'] = experiment
@@ -49,7 +48,7 @@ def dataschema_new(request, experiment_id):
                 constraint_form.save()
                 edit_form.instance.constraints = constraint_form.instance
                 edit_form.save()
-                data_schema = get_data_schema(experiment)
+                data_schema = experiment.schema
                 data_schema.fields.add(edit_form.instance)
                 data_schema.save()
             logger.debug('new data schema created for %s: %s', experiment, data_schema)

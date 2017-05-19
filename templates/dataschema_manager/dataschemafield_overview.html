@@ -1,14 +1,15 @@
 {% load bootstrap %}
 
-<h3>Define your data schema</h3>
-<p class="lead">Define the data schema of your CSV files, by selecting which column in the CSVs correspond to which data type,
-such as a String, Number or DateTime.</p>
+{% if not completed %}
+    <h3>Define your data schema</h3>
+    <p class="lead">Define the data schema of your CSV files, by selecting which column in the CSVs correspond to which data type,
+    such as a String, Number or DateTime.</p>
 
-
-<h4>Your Data Schema</h4>
-<p>
-    <button class="btn btn-primary" id="enable-edit" data-edit-mode="false">Edit Data Schema</button>
-</p>
+    <h4>Your Data Schema</h4>
+    <p>
+        <button class="btn btn-primary" id="enable-edit" data-edit-mode="false">Edit Data Schema</button>
+    </p>
+{% endif %}
 
 <table class="table table-striped">
     <thead>
@@ -45,8 +46,11 @@ such as a String, Number or DateTime.</p>
         {% endfor %}
     </tbody>
 </table>
+
+{% if not completed %}
 <a href="#" style="display:none;" data-toggle="modal" class="add-field btn btn-default"
                                            data-target="#add-field-modal"><span class="glyphicon glyphicon-plus"></span> Add new field</a>
+
 
 <div class="modal fade" id="edit-field-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -64,6 +68,7 @@ such as a String, Number or DateTime.</p>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
 
 <div class="modal fade" id="add-field-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -128,3 +133,4 @@ such as a String, Number or DateTime.</p>
         }
     });
 </script>
+{% endif %}

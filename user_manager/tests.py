@@ -1,12 +1,10 @@
-from unittest.mock import patch
-
-import requirements
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import Client
 from django.shortcuts import reverse
 from django.core.management import call_command
 
+from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
 from user_manager.models import WorkbenchUser
@@ -20,11 +18,14 @@ class UserManagerTestCase(TestCase):
         self.git_repo = GitRepository.objects.create(name='Experiment',
                                                      owner=self.workbench_user,
                                                      github_url='https://github')
+        schema = DataSchema(name='main')
+        schema.save()
         self.experiment = Experiment.objects.create(title='Experiment', description='test',
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
                                                     language_id=1,
-                                                    template_id=2)
+                                                    template_id=2,
+                                                    schema=schema)
 
         self.client = Client()
         self.client.login(username='test', password='test')

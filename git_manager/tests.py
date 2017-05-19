@@ -7,6 +7,7 @@ from django.test import Client
 from django.test import TestCase
 from unittest.mock import patch
 
+from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
 from git_manager.helpers.github_helper import GitHubHelper
@@ -23,12 +24,15 @@ class GitManagerTestCases(TestCase):
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
+        schema = DataSchema(name='main')
+        schema.save()
         self.experiment = Experiment.objects.create(title='Experiment',
                                                     description='test',
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
                                                     language_id=1,
-                                                    template_id=2)
+                                                    template_id=2,
+                                                    schema=schema)
         self.client = Client()
         self.client.login(username='test', password='test')
 

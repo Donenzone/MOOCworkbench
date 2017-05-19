@@ -86,7 +86,6 @@ def add_experiment_config(sender, instance, created, **kwargs):
 
         schema = DataSchema(name='main')
         schema.save()
-        
         instance.schema = schema
 
         instance.save()

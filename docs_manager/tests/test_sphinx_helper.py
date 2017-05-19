@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from git import Repo
 from django.core.management import call_command
 
+from dataschema_manager.models import DataSchema
 from docs_manager.sphinx_helper import SphinxHelper
 from user_manager.models import WorkbenchUser
 from experiments_manager.models import Experiment, ChosenExperimentSteps
@@ -30,12 +31,15 @@ class SphinxHelperTest(TestCase):
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
         self.git_repo = GitRepository.objects.create(name='Sandbox-Experiment', owner=self.workbench_user, github_url='https://github.com/jlmdegoede/Sandbox-Research-5')
+        schema = DataSchema(name='main')
+        schema.save()
         self.experiment = Experiment.objects.create(title='Experiment',
                                                     description='test',
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
                                                     language_id=1,
-                                                    template_id=2)
+                                                    template_id=2,
+                                                    schema=schema)
 
         step = ExperimentStep.objects.get(name='Visualization')
         self.chosen_step = ChosenExperimentSteps.objects.create(experiment=self.experiment, step=step, step_nr=1)

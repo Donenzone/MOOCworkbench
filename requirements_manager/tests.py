@@ -7,6 +7,7 @@ from django.test import Client
 from django.shortcuts import reverse
 from django.core.management import call_command
 
+from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
 from git_manager.models import GitRepository
 from marketplace.models import InternalPackage
@@ -23,11 +24,14 @@ class RequirementsManagerTestCase(TestCase):
         self.git_repo = GitRepository.objects.create(name='Experiment',
                                                      owner=self.workbench_user,
                                                      github_url='https://github')
+        schema = DataSchema(name='main')
+        schema.save()
         self.experiment = Experiment.objects.create(title='Experiment', description='test',
                                                     owner=self.workbench_user,
                                                     git_repo=self.git_repo,
                                                     language_id=2,
-                                                    template_id=2)
+                                                    template_id=2,
+                                                    schema=schema)
 
         self.internal_package = InternalPackage.objects.create(name='Package',
                                                                description='Package',

@@ -23,6 +23,6 @@ class ObjectTypeIdMixin(object):
         else:
             package = ExternalPackage.objects.get(id=package_id)
         context['object_id'] = package.pk
-        context['object'] = package
+        context['package'] = package
 
         return context

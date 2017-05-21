@@ -4,7 +4,6 @@ from autoslug import AutoSlugField
 from markdownx.models import MarkdownxField
 from model_utils.models import TimeStampedModel
 from notifications.signals import notify
-from actstream import action
 from markdownx.utils import markdownify
 
 from django.urls import reverse
@@ -13,12 +12,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 from django.core.validators import RegexValidator
+from django.contrib.contenttypes.models import ContentType
 
 from build_manager.models import TravisInstance, TravisCiConfig
 from docs_manager.models import Docs
 from git_manager.models import GitRepository
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
+from recommendations.models import Recommendation
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from git_manager.helpers.language_helper import PythonHelper, RHelper
 
@@ -74,6 +75,11 @@ class Package(BasePackage):
 
     def get_activity_message(self):
         return "Package {0} was created by {1}".format(self.name, self.owner)
+
+    @property
+    def recommendations(self):
+        content_type = ContentType.objects.get(model="package")
+        return Recommendation.objects.filter(content_type=content_type, object_id=self.pk)
 
 
 class ExternalPackage(Package):

@@ -12,6 +12,15 @@ def get_package_or_experiment(request, object_type, object_id):
         return InternalPackage.objects.get(id=object_id)
 
 
+def get_package_or_experiment_with_context(context, request, object_type, object_id):
+    if object_type == ExperimentPackageTypeMixin.EXPERIMENT_TYPE:
+        context['object'] = verify_and_get_experiment(request, object_id)
+        return context
+    elif object_type == ExperimentPackageTypeMixin.PACKAGE_TYPE:
+        context['package'] = InternalPackage.objects.get(id=object_id)
+        return context
+
+
 def get_package_or_experiment_without_request(object_type, object_id):
     if object_type == ExperimentPackageTypeMixin.EXPERIMENT_TYPE:
         return Experiment.objects.get(pk=object_id)

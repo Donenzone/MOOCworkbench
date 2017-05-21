@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from django.contrib.auth.decorators import login_required
 
 from requirements_manager.views import RequirementListView
 
@@ -12,8 +11,9 @@ urlpatterns = [
     url(r'^new-internal-package/(?P<experiment_id>\d+)/(?P<step_id>\d+)$', login_required(InternalPackageCreateView.as_view()), name="internalpackage_create"),
     url(r'^new/status$', package_status_create, name="package_status_create"),
     url(r'^view/(?P<pk>\d+)/$', package_detail, name="package_detail"),
-    url(r'^view/i/(?P<pk>\d+)/$', login_required(InternalPackageDetailView.as_view()), name="internalpackage_detail"),
-    url(r'^view/e/(?P<pk>\d+)/$', login_required(ExternalPackageDetailView.as_view()), name="externalpackage_detail"),
+    url(r'^view/internal/(?P<pk>\d+)/$', login_required(InternalPackageDetailView.as_view()), name="internalpackage_detail"),
+    url(r'^view/external/(?P<pk>\d+)/$', login_required(ExternalPackageDetailView.as_view()), name="externalpackage_detail"),
+    url(r'^recommend/(?P<pk>\d+)/$', recommend_package, name="package_recommend"),
     url(r'^(?P<package_id>\d+)/version/new/$', login_required(PackageVersionCreateView.as_view()), name="packageversion_new"),
     url(r'^(?P<package_id>\d+)/internal/version/new/$', login_required(InternalPackageVersionCreateView.as_view()), name="internalpackageversion_new"),
     url(r'^(?P<package_id>\d+)/resource/new/$', login_required(PackageResourceCreateView.as_view()), name="packageresource_new"),
@@ -30,4 +30,6 @@ urlpatterns = [
     url(r'^publish/checklist/(?P<pk>\d+)/$', internalpackage_publish_checklist, name="internalpackage_checklist"),
     url(r'^publish/(?P<pk>\d+)/$', internalpackage_publish, name="internalpackage_publish"),
     url(r'^remove-publish/(?P<pk>\d+)/$', internalpackage_remove, name="internalpackage_remove"),
+    url(r'^resource/(?P<pk>\d+)/$', login_required(PackageResourceDetailView.as_view()), name="packageresource_detail"),
+    url(r'^resource/recommend/(?P<pk>\d+)/$', recommend_packageresource, name="packageresource_recommend"),
 ]

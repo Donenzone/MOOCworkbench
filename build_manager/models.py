@@ -6,7 +6,7 @@ class TravisCiConfig(models.Model):
 
 
 class TravisInstance(models.Model):
-    FAILED ='F'
+    FAILED = 'F'
     SUCCESS = 'S'
     CANCELLED = 'C'
 

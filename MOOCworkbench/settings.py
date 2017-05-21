@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'cookiecutter_manager',
     'pylint_manager',
     'dataschema_manager',
+    'recommendations',
 
     'bootstrapform',
     'django_tables2',

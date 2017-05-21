@@ -17,6 +17,7 @@ from user_manager.models import get_workbench_user
 from requirements_manager.helper import add_internalpackage_to_experiment
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import get_files_for_repository
+from recommendations.utils import recommend
 
 from .forms import InternalPackageForm
 from .helpers.helper import create_tag_for_package_version
@@ -267,6 +268,17 @@ class PackageResourceCreateView(CreateView):
         return super(PackageResourceCreateView, self).form_valid(form)
 
 
+class PackageResourceDetailView(DetailView):
+    model = PackageResource
+    template_name = 'marketplace/packageresource_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PackageResourceDetailView, self).get_context_data(**kwargs)
+        context['package'] = self.object.package
+        context['resources_active'] = True
+        return context
+
+
 class PackageResourceListView(InternalPackageBaseView, ListView):
     model = PackageResource
     paginate_by = 10
@@ -328,3 +340,16 @@ def package_autocomplete(request):
 def package_status_create(request):
     return render(request, 'marketplace/package_create/package_status_create.html', {})
 
+
+@login_required
+def recommend_package(request, pk):
+    package = Package.objects.get(id=pk)
+    workbench_user = get_workbench_user(request.user)
+    return recommend(package, workbench_user)
+
+
+@login_required
+def recommend_packageresource(request, pk):
+    resource = PackageResource.objects.get(id=pk)
+    workbench_user = get_workbench_user(request.user)
+    return recommend(resource, workbench_user)

@@ -2,7 +2,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Package Resources" "packageresource_list" %}
+    {% breadcrumb "Package Resources" "packageresource_list" package_id %}
 {% endblock %}
 
 
@@ -24,7 +24,7 @@
                         Resource URL: <a href="{{ resource.url }}">{{ resource.url }}</a>
                     {% endif %}
                     </div>
-                        <div class="panel-footer"><a href="#">View complete resource</a>
+                        <div class="panel-footer"><a href="{% url "packageresource_detail" resource.pk %}">View complete resource</a>
                         </div>
                 </div>
             </div>

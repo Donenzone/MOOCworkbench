@@ -6,6 +6,7 @@ from django.db import transaction
 
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from helpers.helper import get_package_or_experiment
+from helpers.helper import get_package_or_experiment_with_context
 from experiments_manager.consumers import send_message
 from experiments_manager.helper import MessageStatus
 
@@ -27,7 +28,7 @@ class RequirementListView(IsInternalPackageMixin, ExperimentPackageTypeMixin, Li
     def get_context_data(self, **kwargs):
         context = super(RequirementListView, self).get_context_data(**kwargs)
         context['requirements_form'] = RequirementForm()
-        context['object'] = get_package_or_experiment(self.request, self.kwargs['object_type'], self.kwargs['pk'])
+        context = get_package_or_experiment_with_context(context, self.request, self.kwargs['object_type'], self.kwargs['pk'])
         context['object_id'] = self.kwargs['pk']
         context['object_type'] = self.kwargs['object_type']
         context['dependencies_active'] = True

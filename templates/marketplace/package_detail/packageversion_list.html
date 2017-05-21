@@ -21,7 +21,7 @@
                     {% for version in object_list %}
                         <tr>
                             <td>
-                                <a href="#" class="version-btn" data-toggle="modal" data-target="#version-modal" data-url="{% url 'packageversion_detail' version.pk object.pk %}">{{ version.version_nr }}</a>
+                                <a href="#" class="version-btn" data-toggle="modal" data-target="#version-modal" data-url="{% url 'packageversion_detail' version.pk package.pk %}">{{ version.version_nr }}</a>
                             </td>
                             <td>
                                 {{ version.created }}
@@ -30,9 +30,9 @@
                     {% endfor %}
                 </table>
                 {% if is_internal %}
-                    <a href="{% url 'internalpackageversion_new' object.pk %}" class="btn btn-default">Add New Version</a>
+                    <a href="{% url 'internalpackageversion_new' package.pk %}" class="btn btn-default">Add New Version</a>
                 {% else %}
-                    <a href="{% url 'packageversion_new' object.pk %}" class="btn btn-default">Add New Version</a>
+                    <a href="{% url 'packageversion_new' package.pk %}" class="btn btn-default">Add New Version</a>
                 {% endif %}
             </div>
         </div>

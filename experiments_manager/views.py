@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.crypto import get_random_string
+from django.views.generic.edit import UpdateView
 
 from docs_manager.mixins import DocsMixin
 from git_manager.helpers.github_helper import GitHubHelper
@@ -18,7 +19,7 @@ from quality_manager.mixins import get_most_recent_measurement
 from pylint_manager.helper import return_results_for_file
 
 from .tables import ExperimentTable
-from .forms import ExperimentForm
+from .forms import ExperimentForm, ExperimentEditForm
 from .models import *
 from .helper import verify_and_get_experiment, get_readme_of_experiment
 from .mixins import ExperimentContextMixin
@@ -241,6 +242,34 @@ class ExperimentReadOnlyView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
         context['readme'] = get_readme_of_experiment(self.object)
         context['experiment_id'] = self.object.id
         return context
+
+
+class ExperimentEditView(UpdateView):
+    model = Experiment
+    form_class = ExperimentEditForm
+    template_name = 'experiments_manager/experiment_edit.html'
+
+    def get_form(self, form_class=None):
+        form_instance = super(ExperimentEditView, self).get_form(form_class)
+        form_instance.initial = {'title': self.object.title,
+                                 'description': self.object.description,
+                                 'github_url': self.object.git_repo.github_url}
+        return form_instance
+
+    def get_context_data(self, **kwargs):
+        context = super(ExperimentEditView, self).get_context_data(**kwargs)
+        context['settings_active'] = True
+        return context
+
+    def form_valid(self, form):
+        git_repo = self.object.git_repo
+        git_repo.github_url = form.cleaned_data['github_url']
+        git_repo.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Changes saved successfully.')
+        return super(ExperimentEditView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('experiment_edit', kwargs={'pk': self.object.id})
 
 
 @login_required

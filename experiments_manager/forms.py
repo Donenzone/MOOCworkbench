@@ -21,3 +21,11 @@ class ExperimentSelectForm(forms.Form):
         self.fields['experiments'].queryset = Experiment.objects.filter(owner__user_id=user_id)
 
     experiments = forms.ModelChoiceField(queryset=Experiment.objects.filter(completed=False))
+
+
+class ExperimentEditForm(forms.ModelForm):
+    github_url = forms.URLField()
+
+    class Meta:
+        model = Experiment
+        fields = ('title', 'description', 'github_url')

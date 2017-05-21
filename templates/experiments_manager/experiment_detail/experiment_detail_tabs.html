@@ -13,5 +13,8 @@
     <li {% if issues_active %}class="active"{% endif %}><a href="{% url "experiment_issues" object.id %}"
                                                            class="tab-btn">Issues</a></li>
     <li {% if dashboard_active %}class="active"{% endif %}><a href="{% url "experiment_dashboard" object.id %}"
-                                                              class="tab-btn" id="dashboard-click">Dashboard</a></li>
+                                                              class="tab-btn">Dashboard</a></li>
+
+    <li {% if settings_active %}class="active"{% endif %}><a href="{% url "experiment_edit" object.id %}"
+                                                              class="tab-btn">Settings</a></li>
 </ul>

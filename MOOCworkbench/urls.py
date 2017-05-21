@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^my-account/$', login_required(user_manager.views.DetailProfileView.as_view()), name="view_my_profile"),
     url(r'^accounts/edit/$', login_required(user_manager.views.EditProfileView.as_view()), name="edit_profile"),
     url(r'^accounts/register/$', user_manager.views.RegisterView.as_view(), name="register"),
+    url(r'^search/$', user_manager.views.search, name="search"),
     url(r'^notifications/view/$', login_required(TemplateView.as_view(template_name='other/notification_index.html')), name="notification_index"),
 
     url(r'^experiments/', include('experiments_manager.urls')),

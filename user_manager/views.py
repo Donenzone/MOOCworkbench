@@ -8,7 +8,7 @@ from django.views.generic import View
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-from marketplace.views import PackageVersion, PackageResource, InternalPackage, ExternalPackage
+from marketplace.models import PackageVersion, PackageResource, InternalPackage, ExternalPackage
 
 from .models import get_workbench_user, WorkbenchUser
 from .forms import WorkbenchUserForm, UserLoginForm
@@ -108,3 +108,17 @@ class RegisterView(View):
 
 def existing_user_check(email_address):
     return User.objects.filter(email=email_address)
+
+
+@login_required
+def search(request):
+    if 'q' in request.GET:
+        q = request.GET['q']
+        recent_versions = list(PackageVersion.objects.filter(version_nr__contains=q).order_by('-created')[:5])
+        recent_resources = list(PackageResource.objects.filter(title__contains=q).order_by('-created')[:5])
+        recent_internal = list(InternalPackage.objects.filter(name__contains=q).order_by('-created')[:5])
+        recent_external = list(ExternalPackage.objects.filter(name__contains=q).order_by('-created')[:5])
+        total_list = recent_versions + recent_resources + recent_internal + recent_external
+        total_list = sorted(total_list, key=lambda x: x.created)
+        return render(request, 'search.html', {'results': total_list, 'query': q})
+    return render(request, 'search.html', {})

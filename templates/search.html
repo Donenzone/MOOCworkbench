@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Search</h1>
+
+            <form method="get" action="/search">
+                <div class="form-group">
+                    <label for="searchInput">Search query</label>
+                    <input type="text" class="form-control" id="searchInput" name="q" placeholder="Search query..." {% if query %}value="{{ query }}"{% endif %}>
+                  </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if results %}
+        <h2>Results for '{{ query }}'</h2>
+        {% for result in results %}
+            <p class="lead"><a href="{{ result.get_absolute_url }}">{{ result }}</a></p>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

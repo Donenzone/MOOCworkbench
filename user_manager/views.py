@@ -5,12 +5,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View
+from django.contrib import messages
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-from marketplace.models import PackageVersion, PackageResource, InternalPackage, ExternalPackage
+from marketplace.models import PackageVersion, PackageResource, InternalPackage, ExternalPackage, Package
 
 from .models import get_workbench_user, WorkbenchUser
 from .forms import WorkbenchUserForm, UserLoginForm
@@ -29,7 +30,8 @@ def index(request):
     recent_resources = list(PackageResource.objects.all().order_by('-created')[:5])
     recent_internal = list(InternalPackage.objects.all().order_by('-created')[:5])
     recent_external = list(ExternalPackage.objects.all().order_by('-created')[:5])
-    total_list = recent_versions + recent_resources + recent_internal + recent_external
+    recent_experiments = list(Experiment.objects.filter(public=True).order_by('created')[:5])
+    total_list = recent_versions + recent_resources + recent_internal + recent_external + recent_experiments
     total_list = sorted(total_list, key=lambda x: x.created)
     return render(request, 'index.html', {'experiments': experiments,
                                           'tasks': get_available_tasks(workbench_user),
@@ -71,11 +73,32 @@ class EditProfileView(View):
         workbench_user = get_workbench_user(request.user)
         form = WorkbenchUserForm(request.POST, instance=workbench_user)
         if form.is_valid():
+            current_password = form.cleaned_data['current_password']
+            user = workbench_user.user
+            if current_password:
+                if user.check_password(current_password) and change_password_of_user(workbench_user, form):
+                    messages.add_message(request, messages.SUCCESS, 'Your password has been changed. Sign in again')
+                    return sign_out(request)
+                else:
+                    messages.add_message(request, messages.ERROR, 'Passwords did not match '
+                                                                  'or incorrect current password.')
+                    return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
             form.save()
             logger.debug('%s edited profile successfully', workbench_user)
             return redirect(to='/')
         else:
             return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
+
+
+def change_password_of_user(w_user, form):
+        new_password = form.cleaned_data['new_password']
+        new_password_again = form.cleaned_data['new_password_again']
+        if new_password == new_password_again:
+            user = w_user.user
+            user.set_password(new_password)
+            user.save()
+            return True
+        return False
 
 
 def sign_out(request):
@@ -112,6 +135,16 @@ def existing_user_check(email_address):
     return User.objects.filter(email=email_address)
 
 
+class WorkbenchUserDetailView(View):
+    def get(self, request, username):
+        workbench_user = get_object_or_404(WorkbenchUser, user__username=username)
+        recent_experiments = Experiment.objects.filter(owner=workbench_user, completed=True).order_by('-created')[:5]
+        recent_packages = Package.objects.filter(owner=workbench_user).order_by('-created')[:5]
+        return render(request, "user_manager/user_profile.html", {'w_user': workbench_user,
+                                                                  'experiments': recent_experiments,
+                                                                  'packages': recent_packages})
+
+
 @login_required
 def search(request):
     if 'q' in request.GET:
@@ -144,7 +177,8 @@ def build_search_queries(q, user):
     package_resource_query = PackageResource.objects.filter(title__contains=q)
     internal_package_query = InternalPackage.objects.filter(name__contains=q)
     external_package_query = ExternalPackage.objects.filter(name__contains=q)
+    users_query = WorkbenchUser.objects.filter(user__username=q)
     experiment_query = Experiment.objects.filter(Q(owner__user=user, title__contains=q) |
                                                  Q(completed=True, title__contains=q))
     return package_version_query, package_resource_query, internal_package_query, external_package_query, \
-           experiment_query
+           experiment_query, users_query

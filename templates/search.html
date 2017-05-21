@@ -6,7 +6,11 @@
         {% for result in results %}
             <p class="lead"><a href="{{ result.get_absolute_url }}">{{ result }}</a></p>
         {% endfor %}
+    {% elif query and not results %}
+        <h2>Results for '{{ query }}'</h2>
+        <p class="lead">No results found</p>
     {% endif %}
+
 
      <ul class="pagination">
      {% for nr_page in nr_of_pages_range %}

@@ -15,7 +15,6 @@ class MiddlewareTaskCompleted(object):
                 active_task = active_task[0]
                 end_point = active_task.for_task.end_point
                 match = re.match(end_point, request.get_full_path())
-                print(match)
                 if match:
                     active_task.completed = True
                     active_task.active = False
@@ -24,6 +23,9 @@ class MiddlewareTaskCompleted(object):
         response = self.get_response(request)
 
         if match and active_task:
-            messages.add_message(request, messages.INFO, 'Great! You have completed the task {0}. Tell us about your experiences via Account / My Tasks'.format(active_task.for_task.name))
+            messages.add_message(request, messages.INFO,
+                                 'Great! You have completed the task {0}. '
+                                 'Tell us about your experiences via Account / My Tasks'.
+                                 format(active_task.for_task.name))
 
         return response

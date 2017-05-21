@@ -10,10 +10,15 @@ class UserLoginForm(forms.Form):
 
 class WorkbenchUserForm(forms.ModelForm):
     netid = forms.CharField(required=True, label="TU Delft Net ID")
+    current_password = forms.CharField(widget=forms.PasswordInput(),
+                                       help_text="Leave empty if you do not wish to change your password",
+                                       required=False)
+    new_password = forms.CharField(widget=forms.PasswordInput(), required=False)
+    new_password_again = forms.CharField(widget=forms.PasswordInput(), required=False, label="Password (confirmation)")
 
     class Meta:
         model = WorkbenchUser
-        fields = ('netid',)
+        fields = ('netid', 'current_password', 'new_password', 'new_password_again')
 
 
 class RegisterForm(forms.ModelForm):

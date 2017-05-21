@@ -1,10 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
+from django.shortcuts import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from model_utils.models import TimeStampedModel
 
-class WorkbenchUser(models.Model):
+
+class WorkbenchUser(TimeStampedModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     netid = models.CharField(max_length=200)
     can_run_experiments = models.BooleanField(default=True)
@@ -13,6 +16,9 @@ class WorkbenchUser(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_absolute_url(self):
+        return reverse('view_profile', kwargs={'username': self.user.username})
 
 
 def get_workbench_user(user):
@@ -26,11 +32,6 @@ def create_workbench_user(sender, instance, created, **kwargs):
         if not workbench_user:
             new_workbench_user = WorkbenchUser(user=instance, netid='superuser')
             new_workbench_user.save()
-
-
-class SSHKeys(models.Model):
-    ssh_key = models.CharField(max_length=1000, null=True)
-    workbench_user = models.ManyToManyField(to=WorkbenchUser)
 
 
 def get_researcher_group():

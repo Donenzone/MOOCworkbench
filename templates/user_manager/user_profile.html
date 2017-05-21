@@ -7,30 +7,38 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "My Account" "view_my_profile" %}
+    {% breadcrumb w_user "view_profile" %}
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <h1>{{ workbench_user.user.username }}</h1>
-        <table class="table table-bordered">
-            <tr>
-                <td>Email address</td>
-                <td>{{ workbench_user.user.email }}</td>
-            </tr>
-            <tr>
-                <td>Net ID</td>
-                <td>{{ workbench_user.netid }}</td>
-            </tr>
-        </table>
 
-        <p><a href="{% url "edit_profile" %}" class="btn btn-primary">Edit profile</a></p>
-    </div>
-    <div class="row">
+    <h1>User profile of {{ w_user }}</h1>
 
-        <h3>Connected accounts</h3>
+    <table class="table table-bordered">
+        <tr>
+            <td>Email address</td>
+            <td>{{ w_user.user.email }}</td>
+        </tr>
+        <tr>
+            <td>Net ID</td>
+            <td>{{ w_user.netid }}</td>
+        </tr>
+    </table>
 
-        <p><a href="/accounts/social/connections/" class="btn btn-primary">Manage social connections</a></p>
+
+    <h2>Experiments from {{ w_user.user.username }}</h2>
+    {% for experiment in experiments %}
+        <p class="lead"><a href="{{ experiment.get_absolute_url }}">{{ experiment }}</a></p>
+    {% endfor %}
+
+    <h2>Packages from {{ w_user.user.username }}</h2>
+    {% for package in packages %}
+        <p class="lead"><a href="{{ package.get_absolute_url }}">{{ package }}</a></p>
+    {% endfor %}
+
+    <h2>Connected accounts</h2>
+
+ <div class="row">
         <div class="col-md-6">
             {% for account in user.socialaccount_set.all %}
                 <div class="panel panel-primary">
@@ -41,14 +49,12 @@
                         <p>UID: <a href="{{ account.extra_data.link }}">{{ account.uid }}</a></p>
                         <p>Username: {{ account.extra_data.login }}</p>
                         <p>GitHub Profile:
-                            <a href="{{ account.extra_data.html_url }}">{{ account.extra_data.html_url }}</a></p>
+                            <a href="{{ account.extra_data.html_url }}">{{ account.extra_data.html_url }}</a>
+                        </p>
                     </div>
                 </div>
-
-                        {% empty %}
-                        <a href="{% provider_login_url "github" process="connect" %}" class="btn btn-primary">Connect
-                            with GitHub</a>
             {% endfor %}
         </div>
     </div>
+
 {% endblock %}

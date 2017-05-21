@@ -54,6 +54,12 @@ class Experiment(BasePackage):
     def __str__(self):
         return self.title
 
+    def get_activity_message(self):
+        message = "Experiment {0} by {1} was completed"
+        if self.public:
+            message = "Experiment  {0} by {1} was completed and made public"
+        return message.format(self.title, self.owner)
+
     def success_url_dict(self, hash=''):
         return {'dependencies': reverse('experiment_dependencies', kwargs={'pk': self.pk,
                                                                            'object_type': self.get_object_type()})

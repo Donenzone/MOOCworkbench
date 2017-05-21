@@ -29,6 +29,8 @@ urlpatterns = [
     url(r'^accounts/login/$', user_manager.views.sign_in, name="sign_in"),
     url(r'^accounts/logout/$', user_manager.views.sign_out, name="sign_out"),
     url(r'^my-account/$', login_required(user_manager.views.DetailProfileView.as_view()), name="view_my_profile"),
+    url(r'^user/(?P<username>[-\w]+)$', login_required(user_manager.views.WorkbenchUserDetailView.as_view()),
+        name="view_profile"),
     url(r'^accounts/edit/$', login_required(user_manager.views.EditProfileView.as_view()), name="edit_profile"),
     url(r'^accounts/register/$', user_manager.views.RegisterView.as_view(), name="register"),
     url(r'^search/$', user_manager.views.search, name="search"),

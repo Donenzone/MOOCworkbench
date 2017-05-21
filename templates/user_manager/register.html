@@ -1,5 +1,11 @@
 {% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Register a new account" "register" %}
+{% endblock %}
 
 {% block content %}
     <div class="row">

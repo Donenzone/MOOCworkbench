@@ -18,6 +18,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
+from django.contrib.auth import views as auth_views
 
 import notifications.urls
 
@@ -26,13 +27,29 @@ import user_manager.views
 urlpatterns = [
     url(r'^$', user_manager.views.index, name="index"),
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/login/$', user_manager.views.sign_in, name="sign_in"),
-    url(r'^accounts/logout/$', user_manager.views.sign_out, name="sign_out"),
+
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.html'), name="login"),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view(success_url_allowed_hosts='/'), name="logout"),
+    url(r'^accounts/edit/$', login_required(user_manager.views.EditProfileView.as_view()), name="edit_profile"),
+    url(r'^accounts/register/$', user_manager.views.RegisterView.as_view(), name="register"),
     url(r'^my-account/$', login_required(user_manager.views.DetailProfileView.as_view()), name="view_my_profile"),
     url(r'^user/(?P<username>[-\w]+)$', login_required(user_manager.views.WorkbenchUserDetailView.as_view()),
         name="view_profile"),
-    url(r'^accounts/edit/$', login_required(user_manager.views.EditProfileView.as_view()), name="edit_profile"),
-    url(r'^accounts/register/$', user_manager.views.RegisterView.as_view(), name="register"),
+
+    url('^reset-password/$', auth_views.PasswordResetView.as_view(
+        template_name='user_manager/password_reset/password_reset.html'),
+        name="password_reset"),
+    url('^reset-password/done$', auth_views.PasswordResetDoneView.as_view(
+        template_name='user_manager/password_reset/password_reset_done.html'),
+        name="password_reset_done"),
+    url('^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name='user_manager/password_reset/password_reset_confirm.html'),
+        name="password_reset_confirm"),
+    url('^reset-password/complete$', auth_views.PasswordResetCompleteView.as_view(
+        template_name="user_manager/password_reset/password_reset_complete.html"),
+        name="password_reset_complete"),
+
     url(r'^search/$', user_manager.views.search, name="search"),
     url(r'^notifications/view/$', login_required(TemplateView.as_view(template_name='other/notification_index.html')), name="notification_index"),
 

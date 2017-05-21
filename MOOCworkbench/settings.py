@@ -12,7 +12,11 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 from os.path import dirname, abspath, basename, normpath, join
+
 from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG, GITHUB_WEBHOOK_KEY
+from .production_settings import EMAIL_BACKEND, EMAIL_HOST, EMAIL_HOST_PASSWORD,\
+    EMAIL_HOST_USER,EMAIL_PORT,\
+    EMAIL_USE_TLS, DEFAULT_FROM_EMAIL
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -226,3 +230,5 @@ LOGGING = {
         },
     },
 }
+
+LOGIN_REDIRECT_URL = '/'

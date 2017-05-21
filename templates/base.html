@@ -33,7 +33,7 @@
           </button>
           <a class="navbar-brand" href="/">MOOC Workbench</a>
         </div>
-
+        {% if request.user.is_authenticated %}
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
@@ -51,7 +51,7 @@
                   <li><a href="{% url 'view_my_profile' %}">My Account</a></li>
                   <li><a href="{% url 'task_list' %}">My Tasks</a></li>
                   <li><a href="/accounts/social/connections/">Manage Social Connections</a></li>
-                  <li><a href="{% url "sign_out" %}">Sign out</a></li>
+                  <li><a href="{% url "logout" %}?next=/">Sign out</a></li>
                 </ul>
             </li>
           </ul>
@@ -62,9 +62,13 @@
             <button type="submit" class="btn btn-default">Search</button>
           </form>
           <ul class="nav navbar-nav navbar-right">
+            {% if request.user.is_superuser %}
+                <li><a href="{% url 'admin:index' %}">Admin</a></li>
+            {% endif %}
             <li><a href="{% url "notification_index" %}">Notifications <span class="badge">{% notifications_unread %}</span></a></li>
         </ul>
         </div><!-- /.navbar-collapse -->
+        {% endif %}
       </div><!-- /.container-fluid -->
     </nav>
 

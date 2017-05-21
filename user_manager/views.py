@@ -38,24 +38,6 @@ def index(request):
                                           'activities': total_list})
 
 
-def sign_in(request):
-    if request.method == 'GET':
-        form = UserLoginForm()
-        return render(request, 'login.html', {'form': form})
-    if request.method == 'POST':
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
-            if user:
-                login(request, user)
-                logger.debug('%s signed in successfully', user)
-                return redirect(to='/')
-            else:
-                return render(request, 'login.html', {'form': form, 'error': 'Incorrect username/password'})
-        else:
-            return render(request, 'login.html', {'form': form})
-
-
 class DetailProfileView(View):
     def get(self, request):
         workbench_user = get_workbench_user(request.user)
@@ -77,8 +59,7 @@ class EditProfileView(View):
             user = workbench_user.user
             if current_password:
                 if user.check_password(current_password) and change_password_of_user(workbench_user, form):
-                    messages.add_message(request, messages.SUCCESS, 'Your password has been changed. Sign in again')
-                    return sign_out(request)
+                    messages.add_message(request, messages.SUCCESS, 'Your password has been changed.')
                 else:
                     messages.add_message(request, messages.ERROR, 'Passwords did not match '
                                                                   'or incorrect current password.')
@@ -99,12 +80,6 @@ def change_password_of_user(w_user, form):
             user.save()
             return True
         return False
-
-
-def sign_out(request):
-    logger.debug('%s user about to sign out', request.user)
-    logout(request)
-    return redirect(to='/')
 
 
 class RegisterView(View):

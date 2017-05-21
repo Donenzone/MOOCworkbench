@@ -23,17 +23,6 @@ def get_readme_of_experiment(experiment):
     return md.convert(content_file)
 
 
-def set_up_experiment(workbench_user, git_repo):
-    schema = DataSchema(name='main')
-    schema.save()
-    return Experiment.objects.create(title='Experiment',
-                                      description='test',
-                                      owner=workbench_user,
-                                      git_repo=git_repo,
-                                      language_id=1,
-                                      template_id=1)
-
-
 class MessageStatus(object):
     SUCCESS = 'success'
     INFO = 'info'

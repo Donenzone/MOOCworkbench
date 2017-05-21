@@ -17,6 +17,7 @@ from git_manager.mixins.repo_file_list import get_files_for_steps, _get_files_in
 from git_manager.views import get_user_repositories
 from quality_manager.mixins import get_most_recent_measurement
 from pylint_manager.helper import return_results_for_file
+from recommendations.utils import get_recommendations
 
 from .tables import ExperimentTable
 from .forms import ExperimentForm, ExperimentEditForm
@@ -37,8 +38,10 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
         context['steps'] = get_files_for_steps(experiment, only_active=True)
         context['object_type'] = self.object_type
         if not experiment.completed:
-            context['active_step_id'] = experiment.get_active_step().id
+            active_step = experiment.get_active_step()
+            context['active_step_id'] = active_step.id
             context['final_step'] = experiment.get_active_step().step_nr == experiment.chosenexperimentsteps_set.count()
+            context['recommendations'] = get_recommendations(active_step)
         context['index_active'] = True
         return context
 

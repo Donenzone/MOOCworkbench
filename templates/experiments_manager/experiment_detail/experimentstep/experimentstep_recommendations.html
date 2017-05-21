@@ -1,7 +1,12 @@
 <h4>Recommended packages in this step</h4>
+<p>These packages are most recommended by your peers to use during this step.</p>
     <ul>
-        <li>There aren't any recommended packages yet. Check back later!</li>
+        {% for recommendation in recommendations %}
+            <li><a href="{{ recommendation.get_absolute_url }}">{{ recommendation }}</a></li>
+            {% empty %}
+            <li>There aren't any recommended packages yet. Check back later!</li>
+        {% endfor %}
     </ul>
     <p>
-        <a href="{% url 'marketplace_index' %}" class="btn btn-default">View more packages</a>
+        <a href="{% url 'marketplace_index' %}" class="btn btn-default">Find more packages</a>
     </p>

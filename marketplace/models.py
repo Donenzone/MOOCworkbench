@@ -60,6 +60,7 @@ class Package(BasePackage):
     subscribed_users = models.ManyToManyField(to=WorkbenchUser)
     owner = models.ForeignKey(to=WorkbenchUser, related_name='owner')
     category = models.ForeignKey(to=Category)
+    recommended = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -76,10 +77,20 @@ class Package(BasePackage):
     def get_activity_message(self):
         return "Package {0} was created by {1}".format(self.name, self.owner)
 
+    def recount_recommendations(self):
+        content_type = ContentType.objects.get(model="package")
+        update_recommendations(content_type, self)
+
     @property
     def recommendations(self):
         content_type = ContentType.objects.get(model="package")
         return Recommendation.objects.filter(content_type=content_type, object_id=self.pk)
+
+
+def update_recommendations(content_type, content_object):
+    recommendations = Recommendation.objects.filter(content_type=content_type, object_id=content_object.pk)
+    content_object.recommended = recommendations.count()
+    content_object.save()
 
 
 class ExternalPackage(Package):
@@ -151,10 +162,20 @@ class PackageResource(TimeStampedModel):
     resource = MarkdownxField()
     url = models.URLField(null=True, blank=True)
     added_by = models.ForeignKey(to=WorkbenchUser)
+    recommended = models.IntegerField(default=0)
 
     @property
     def markdown(self):
         return markdownify(self.resource)
+
+    @property
+    def recommendations(self):
+        content_type = ContentType.objects.get(model="packageresource")
+        return Recommendation.objects.filter(content_type=content_type, object_id=self.pk)
+
+    def recount_recommendations(self):
+        content_type = ContentType.objects.get(model="packageresource")
+        update_recommendations(content_type, self)
 
     def __str__(self):
         return "{0} by {1}".format(self.title, self.added_by)

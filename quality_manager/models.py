@@ -1,8 +1,4 @@
-from actstream import action
-
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 
 from experiments_manager.models import ChosenExperimentSteps

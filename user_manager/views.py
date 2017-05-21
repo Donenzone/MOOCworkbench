@@ -1,8 +1,10 @@
 import logging
+import math
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views.generic import View
 
@@ -113,12 +115,36 @@ def existing_user_check(email_address):
 @login_required
 def search(request):
     if 'q' in request.GET:
-        q = request.GET['q']
-        recent_versions = list(PackageVersion.objects.filter(version_nr__contains=q).order_by('-created')[:5])
-        recent_resources = list(PackageResource.objects.filter(title__contains=q).order_by('-created')[:5])
-        recent_internal = list(InternalPackage.objects.filter(name__contains=q).order_by('-created')[:5])
-        recent_external = list(ExternalPackage.objects.filter(name__contains=q).order_by('-created')[:5])
-        total_list = recent_versions + recent_resources + recent_internal + recent_external
-        total_list = sorted(total_list, key=lambda x: x.created)
-        return render(request, 'search.html', {'results': total_list, 'query': q})
+        q = request.GET.get('q')
+        page = request.GET.get('page')
+        page = int(page) if page is not None else 1
+        results, nr_of_pages = get_search_results(request.user, q, page)
+        return render(request, 'search.html', {'results': results, 'query': q, 'page': page,
+                                               'next_page': page + 1,
+                                               'previous_page': page - 1,
+                                               'nr_of_pages': nr_of_pages,
+                                               'nr_of_pages_range': range(1, nr_of_pages+1)})
     return render(request, 'search.html', {})
+
+
+def get_search_results(user, q, page_nr=1, page_size=25):
+    start_value = (page_nr - 1) * page_size
+    end_value = start_value + page_size
+    search_query_list = build_search_queries(q, user)
+    total_count = sum([x.count() for x in search_query_list])
+    nr_of_pages = int(math.ceil(total_count / page_size))
+    total_list = [list(x.order_by('-created')[start_value:end_value]) for x in search_query_list]
+    total_flat_list = [item for sublist in total_list for item in sublist]
+    total_flat_list = sorted(total_flat_list, key=lambda x: x.created)
+    return total_flat_list, nr_of_pages
+
+
+def build_search_queries(q, user):
+    package_version_query = PackageVersion.objects.filter(version_nr__contains=q)
+    package_resource_query = PackageResource.objects.filter(title__contains=q)
+    internal_package_query = InternalPackage.objects.filter(name__contains=q)
+    external_package_query = ExternalPackage.objects.filter(name__contains=q)
+    experiment_query = Experiment.objects.filter(Q(owner__user=user, title__contains=q) |
+                                                 Q(completed=True, title__contains=q))
+    return package_version_query, package_resource_query, internal_package_query, external_package_query, \
+           experiment_query

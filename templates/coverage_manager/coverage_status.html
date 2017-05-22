@@ -2,10 +2,10 @@
 
 {% block content%}
 
-  {% if not travis %}
+  {% if not travis.enabled %}
     <p>Before you can enable code coverage measurements, you need to enable automatic builds with Travis CI.</p>
     <p>Head over to the Builds section and get started with Travis.</p>
-  {% elif not configured %}
+  {% elif not coverage_configured %}
     <p>You have not enabled code coverage measurements.</p>
 
     <h4>Step 1. Sign in</h4>

@@ -33,7 +33,7 @@ class CoverallsHelper(object):
     def _get_latest_commit_sha(self):
         response = requests.get(self.url)
         if response.status_code == 200:
-            json_dict = json.loads(response.content)
+            json_dict = json.loads(response.content.decode('utf-8'))
             return json_dict['commit_sha']
 
     def get_file_coverage(self, file_name):

@@ -89,6 +89,8 @@ def experiment_first_time(request, pk):
     context['configured'] = experiment.travis.enabled
     context['username'] = experiment.git_repo.owner
     context['reposlug'] = experiment.git_repo.name
+    context['travis'] = experiment.travis
+    context['coverage_configured'] = experiment.docs.enabled
     return render(request, 'experiments_manager/experiment_create/experiment_enable_builds.html', context)
 
 

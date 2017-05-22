@@ -77,6 +77,7 @@ class Experiment(BasePackage):
 def add_experiment_config(sender, instance, created, **kwargs):
     if created:
         docs = Docs()
+        docs.enabled = True
         docs.save()
         instance.docs = docs
 
@@ -87,6 +88,7 @@ def add_experiment_config(sender, instance, created, **kwargs):
         instance.travis = travis
 
         pylint = PylintScan()
+        pylint.enabled = True
         pylint.save()
         instance.pylint = pylint
 

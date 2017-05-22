@@ -76,11 +76,11 @@ def coveralls_status(request, object_id, object_type):
     context = {}
     current_config = CodeCoverage.objects.filter(travis_instance=travis_instance)
     context['object_id'] = exp_or_package.id
-    context['configured'] = False
+    context['coverage_configured'] = False
     context['travis'] = travis_instance.enabled
     if current_config:
         context['current_config'] = current_config[0]
-        context['configured'] = context['current_config'].enabled
+        context['coverage_configured'] = context['current_config'].enabled
     logger.debug('fetched coveralls status %s: %s', exp_or_package, context)
     return render(request, 'coverage_manager/coverage_status.html', context)
 

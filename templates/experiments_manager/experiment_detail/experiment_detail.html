@@ -63,7 +63,7 @@
 
             if (hash === '#intro') {
                 introJs().setOption('doneLabel', 'Next page').start().oncomplete(function () {
-                    window.location.href = '#schema';
+                    window.location.href = '{% url "experiment_dashboard" experiment.id %}#intro';
                 });
             }
 

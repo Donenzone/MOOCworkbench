@@ -1,11 +1,12 @@
-SECRET_KEY = '
+SECRET_KEY = '{{secretkey}}'
 DEBUG = False
-ALLOWED_HOSTS = ['your-domain-name.com']
-GITHUB_WEBHOOK_KEY = ''
+ALLOWED_HOSTS = ['{{domainname}}']
+GITHUB_WEBHOOK_KEY = '{{githubwebhookkey}}'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp_host'
-EMAIL_HOST_USER = 'email_address'
-EMAIL_HOST_PASSWORD = 'password'
+EMAIL_HOST = '{{smtphost}}'
+EMAIL_HOST_USER = '{{email}}'
+EMAIL_HOST_PASSWORD = '{{password}}'
 EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = '{{defaultfromemail}}'

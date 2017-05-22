@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  web:
+    build: '.'
+    image: 'websource'
+    ports:
+      - '8000:8000'
+    env_file: '.env'
+    command: 'daphne -b 0.0.0.0 -p 8000 MOOCworkbench.asgi:channel_layer'
+    depends_on:
+      - redis
+    volumes:
+      - ./:/workbench
+
+  daphne_worker1:
+    image: 'websource'
+    env_file: '.env'
+    command: 'python3 manage.py runworker'
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
+  celery_worker1:
+    image: 'websource'
+    env_file: '.env'
+    command: 'celery -A MOOCworkbench worker -l debug'
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
+  celery_worker2:
+    image: 'websource'
+    env_file: '.env'
+    command: 'celery -A MOOCworkbench worker -l debug'
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
+  redis:
+    container_name: 'redis'
+    image: 'redis:3.2.0'
+    ports:
+      - '127.0.0.1:6379:6379'
+

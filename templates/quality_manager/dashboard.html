@@ -4,8 +4,8 @@
     <div class="row">
         <div class="col-md-9">
             <h2>Dashboard</h2>
-            <p class="lead">The MOOC workbench scans the progress of your experiment regularly.
-                It checks your results from CI, your requirements, your tests and more.</p>
+            <p class="lead" data-intro="Make sure to regularly check the dashboard, to see how you are doing" data-step="7">The MOOC workbench scans the progress of your experiment regularly.
+                It checks your results from CI, your dependencies, your tests and more.</p>
         </div>
 
         <div class="col-md-3">
@@ -16,9 +16,9 @@
     </div>
     <hr/>
 
-    <div class="row">
+    <div class="row" data-last>
         <div class="col-md-6">
-            <div class="panel panel-primary">
+            <div class="panel panel-primary" data-intro="Here you can see quick actions that you can do right now to improve your experiment">
                 <div class="panel-heading">What to do now?</div>
                 <div class="panel-body">
                     <p>Check out this repository using git clone</p>
@@ -33,7 +33,8 @@
 
 
         <div class="col-md-6">
-            <div class="panel panel-{% if dashboard_messages.static_code_analysis %}{{ dashboard_messages.static_code_analysis.get_class }}{% else %}default{% endif %}">
+            <div class="panel panel-{% if dashboard_messages.static_code_analysis %}{{ dashboard_messages.static_code_analysis.get_class }}{% else %}default{% endif %}"
+                        data-intro="For example, the workbench automatically performs static code analysis on your experiment. Here you can see these results.">
                 <div class="panel-heading">Static code analysis</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.static_code_analysis.get_message }}</p>
@@ -84,7 +85,8 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="panel panel-{% if dashboard_messages.use_of_ci %}{{ dashboard_messages.use_of_ci.get_class }}{% else %}default{% endif %}">
+            <div class="panel panel-{% if dashboard_messages.use_of_ci %}{{ dashboard_messages.use_of_ci.get_class }}{% else %}default{% endif %}"
+            data-intro="The same holds for Continuous integration, which automatically runs all your tests in the cloud...">
                 <div class="panel-heading">Continuous integration</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.use_of_ci.get_message }}</p>
@@ -96,7 +98,8 @@
         </div>
 
         <div class="col-md-6">
-            <div class="panel panel-{% if dashboard_messages.testing %}{{ dashboard_messages.testing.get_class }}{% else %}default{% endif %}">
+            <div class="panel panel-{% if dashboard_messages.testing %}{{ dashboard_messages.testing.get_class }}{% else %}default{% endif %}"
+            data-intro="...and measures the code you've covered with your tests.">
                 <div class="panel-heading">Code coverage</div>
                 <div  class="panel-body">
                     <p class="lead">{{ dashboard_messages.testing.get_message }}</p>

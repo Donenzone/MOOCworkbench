@@ -11,11 +11,24 @@
 
     {% include "experiments_manager/experiment_detail/experiment_detail_tabs.html" %}
 
-    <div class="tab-content">
-        <div id="dependencies" class="tab-pane fade in active">
+    <div class="tab-content" data-intro="To install the dependencies, pull your changes and run pip3 install -r requirements.txt" data-step="5">
+        <div id="dependencies" class="tab-pane fade in active"
+             data-intro="During your experiment, you are likely to use functionality from other packages, such as pandas or numpy">
             {% include "requirements_manager/requirement_list.html" %}
         </div>
     </div>
+
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            var hash = window.location.hash;
+
+            if (hash === '#intro') {
+                introJs().setOption('doneLabel', 'Next page').start().oncomplete(function () {
+                    window.location.href = '{% url "experiment_schema" object.id %}#intro';
+                });
+            }
+        });
+    </script>
 
 
 {% endblock %}

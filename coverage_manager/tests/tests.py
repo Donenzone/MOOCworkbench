@@ -168,7 +168,7 @@ class CoverageManagerTestCase(TestCase):
                                                                        'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context['travis'])
-        self.assertFalse(response.context['configured'])
+        self.assertFalse(response.context['coverage_configured'])
 
     def test_coveralls_status_enabled(self):
         travis_instance = self.enable_travis_for_experiment()
@@ -178,7 +178,7 @@ class CoverageManagerTestCase(TestCase):
                                                                        'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['travis'])
-        self.assertTrue(response.context['configured'])
+        self.assertTrue(response.context['coverage_configured'])
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
         self.assertEqual(response.context['current_config'], code_coverage)
 

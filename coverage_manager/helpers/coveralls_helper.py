@@ -14,7 +14,7 @@ class CoverallsHelper(object):
     def code_coverage_data(self):
         response = requests.get(self.url)
         if response.status_code == 200:
-            json_dict = json.loads(response.content)
+            json_dict = json.loads(str(response.content, encoding='utf8'))
             return json_dict['covered_percent']
 
     def coverage_enabled_check(self):

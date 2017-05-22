@@ -55,7 +55,7 @@ class CoverageManagerTestCase(TestCase):
         """
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
-        json_response = json.loads(response.content)
+        json_response = json.loads(str(response.content, encoding='utf8'))
         self.assertEqual(response.status_code, 200)
         self.assertFalse(json_response['enabled'])
 
@@ -160,7 +160,7 @@ class CoverageManagerTestCase(TestCase):
         self.enable_travis_for_experiment()
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_disable'), data=coverage_data)
-        json_response = json.loads(response.content)
+        json_response = json.loads(str(response.content, encoding='utf8'))
         self.assertFalse(json_response['disabled'])
 
     def test_coveralls_status(self):

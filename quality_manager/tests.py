@@ -67,7 +67,7 @@ class QualityManagerTestCase(TestCase):
         mock_recent_measurements.return_value = [MeasurementMockClass(), MeasurementMockClass(), MeasurementMockClass()]
         response = self.client.get(reverse('nr_of_commits', kwargs={'experiment_id': self.experiment.id}))
         self.assertEqual(response.status_code, 200)
-        json_response = json.loads(response.content)
+        json_response = json.loads(str(response.content, encoding='utf8'))
         self.assertEqual(json_response['values'], ['5', '5', '5'])
 
     @patch('quality_manager.views.task_version_control_quality_check')

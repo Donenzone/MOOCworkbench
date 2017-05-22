@@ -181,19 +181,17 @@ class MarketplaceTestCase(TestCase):
         package = InternalPackage.objects.get(id=1)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['docs'])
-        self.assertEqual(response.context['object'], package)
+        self.assertEqual(response.context['package'], package)
         self.assertEqual(response.context['object_type'], ExperimentPackageTypeMixin.PACKAGE_TYPE)
         self.assertIsNotNone(response.context['edit_form'])
 
-    @patch('marketplace.views.PackageDetailView.readme_file_of_package')
+    @patch('marketplace.views.InternalPackageDetailView.readme_file_of_package')
     @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
-    @patch('marketplace.views.RepoFileListMixin._get_files_in_repository')
-    @patch('marketplace.views.RepoFileListMixin.get_context_data')
-    def test_internal_package_detail(self, mock_context_data, mock_get_files, mock_file_list, mock_readme):
+    @patch('marketplace.views.get_files_for_repository')
+    def test_internal_package_detail(self, mock_get_files, mock_file_list, mock_readme):
         mock_readme.return_value = 'Test readme'
         mock_file_list.return_value = ['file']
-        mock_context_data.return_value = {}
-        response = self.client.get(reverse('package_detail', kwargs={'pk': 1}))
+        response = self.client.get(reverse('internalpackage_detail', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['version_history'])
         self.assertIsNotNone(response.context['index_active'])

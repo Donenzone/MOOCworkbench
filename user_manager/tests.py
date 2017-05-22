@@ -45,32 +45,32 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(response.context['workbench_user'], self.workbench_user)
 
     def test_sign_out(self):
-        response = self.client.get(reverse('sign_out'), follow=True)
+        response = self.client.get(reverse('logout'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.context['user']), 'AnonymousUser')
 
     def test_sign_out_without_signed_in(self):
         c = Client()
-        response = c.get(reverse('sign_out'), follow=True)
+        response = c.get(reverse('logout'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.context['user']), 'AnonymousUser')
 
     def test_sign_in_get(self):
-        response = self.client.get(reverse('sign_in'))
+        response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
     def test_sign_in_post(self):
         c = Client()
         data = {'username': 'test', 'password': 'test'}
-        response = c.post(reverse('sign_in'), data=data, follow=True)
+        response = c.post(reverse('login'), data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'], self.user)
 
     def test_sign_in_post_incorrect_username(self):
         c = Client()
         data = {'username': 'NON_EXISTENT_USER', 'password': 'test'}
-        response = c.post(reverse('sign_in'), data=data)
+        response = c.post(reverse('login'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
         self.assertEqual(str(response.context['user']), 'AnonymousUser')
@@ -78,7 +78,7 @@ class UserManagerTestCase(TestCase):
     def test_sign_in_post_incorrect_password(self):
         c = Client()
         data = {'username': 'test', 'password': 'INCORRECT_PASSWORD'}
-        response = c.post(reverse('sign_in'), data=data)
+        response = c.post(reverse('login'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
         self.assertEqual(str(response.context['user']), 'AnonymousUser')
@@ -86,7 +86,7 @@ class UserManagerTestCase(TestCase):
     def test_sign_in_post_missing_password(self):
         c = Client()
         data = {'username': 'test'}
-        response = c.post(reverse('sign_in'), data=data)
+        response = c.post(reverse('login'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
         self.assertEqual(str(response.context['user']), 'AnonymousUser')
@@ -94,7 +94,7 @@ class UserManagerTestCase(TestCase):
     def test_sign_in_post_missing_username(self):
         c = Client()
         data = {'password': 'RANDOM_PASSWORD'}
-        response = c.post(reverse('sign_in'), data=data)
+        response = c.post(reverse('login'), data=data)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
         self.assertEqual(str(response.context['user']), 'AnonymousUser')

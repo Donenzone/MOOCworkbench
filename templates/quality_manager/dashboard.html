@@ -33,7 +33,7 @@
 
 
         <div class="col-md-6">
-            <div class="panel panel-{{ dashboard_messages.static_code_analysis.get_class }}">
+            <div class="panel panel-{% if dashboard_messages.static_code_analysis %}{{ dashboard_messages.static_code_analysis.get_class }}{% else %}default{% endif %}">
                 <div class="panel-heading">Static code analysis</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.static_code_analysis.get_message }}</p>
@@ -45,7 +45,7 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="panel panel-{{ dashboard_messages.documentation.get_class }}">
+            <div class="panel panel-{% if dashboard_messages.documentation %}{{ dashboard_messages.documentation.get_class }}{% else %}default{% endif %}">
                 <div class="panel-heading">Documentation</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.documentation.get_message }}</p>
@@ -58,8 +58,8 @@
 
 
         <div class="col-md-6">
-            <div class="panel panel-{{ dashboard_messages.dependencies_defined.get_class }}">
-                <div class="panel-heading">Requirements</div>
+            <div class="panel panel-{% if dashboard_messages.dependencies_defined %}{{ dashboard_messages.dependencies_defined.get_class }}{% else %}default{% endif %}">
+                <div class="panel-heading">Dependencies</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.dependencies_defined.get_message }}</p>
                 </div>
@@ -69,7 +69,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-{{ dashboard_messages.version_control_use.get_class }}">
+            <div class="panel panel-{% if dashboard_messages.version_control_use %}{{ dashboard_messages.version_control_use.get_class }}{% else %}default{% endif %}">
                 <div class="panel-heading">Version control</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.version_control_use.get_message }}</p>
@@ -84,7 +84,7 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="panel panel-{{ dashboard_messages.use_of_ci.get_class }}">
+            <div class="panel panel-{% if dashboard_messages.use_of_ci %}{{ dashboard_messages.use_of_ci.get_class }}{% else %}default{% endif %}">
                 <div class="panel-heading">Continuous integration</div>
                 <div class="panel-body">
                     <p class="lead">{{ dashboard_messages.use_of_ci.get_message }}</p>
@@ -96,8 +96,8 @@
         </div>
 
         <div class="col-md-6">
-            <div class="panel panel-{{ dashboard_messages.testing.get_class }}">
-                <div class="panel-heading">Testing</div>
+            <div class="panel panel-{% if dashboard_messages.testing %}{{ dashboard_messages.testing.get_class }}{% else %}default{% endif %}">
+                <div class="panel-heading">Code coverage</div>
                 <div  class="panel-body">
                     <p class="lead">{{ dashboard_messages.testing.get_message }}</p>
                     <div id="coverage-dashboard">

@@ -18,7 +18,6 @@ class DataSchemaFieldForm(ModelForm):
         fields = ('name', 'datatype', 'primary_key', 'title', 'description',)
 
         widgets = {
-            "name": TextInput(attrs={'placeholder': 'Name of field'}),
             "title": TextInput(attrs={'placeholder': 'Title of field'}),
             "description": Textarea(attrs={'placeholder': 'Description of the contents of the field'}),
         }
@@ -29,3 +28,10 @@ class DataSchemaConstraintForm(ModelForm):
     class Meta:
         model = DataSchemaConstraints
         fields = '__all__'
+        widgets = {
+            "format": TextInput(attrs={'placeholder': 'Define a format'}),
+            "minimum": TextInput(attrs={'placeholder': 'Set the minimum value'}),
+            "maximum": TextInput(attrs={'placeholder': 'Set the maximum value'}),
+            "min_length": TextInput(attrs={'placeholder': 'Set the minimum length of input'}),
+            "max_length": TextInput(attrs={'placeholder': 'Set the maximum length of input'}),
+        }

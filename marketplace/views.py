@@ -99,7 +99,7 @@ class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
 
         context = {}
         context['docs'] = package.docs
-        context['object'] = package
+        context['package'] = package
         context['object_id'] = package.pk
         context['object_type'] = package.get_object_type()
 

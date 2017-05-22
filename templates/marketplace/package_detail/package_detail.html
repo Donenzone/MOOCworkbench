@@ -27,7 +27,7 @@
                         <table class="table">
                             <tr>
                                 <td>Created by</td>
-                                <td>{{ object.owner }}</td>
+                                <td><a href="{{ object.owner.get_absolute_url }}">{{ object.owner }}</a></td>
                             </tr>
                             <tr>
                                 <td>Created</td>

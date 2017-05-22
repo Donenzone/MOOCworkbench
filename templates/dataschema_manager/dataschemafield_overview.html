@@ -37,9 +37,9 @@
             <td>{{ object.title }}</td>
             <td>{{ object.description }}</td>
             <td>{{ object.constraints.unique }}</td>
-            <td>{{ object.constraints.format }}</td>
-            <td>{{ object.constraints.minimum }}</td>
-            <td>{{ object.constraints.maximum }}</td>
+            <td>{% if object.constraints.format is not None %}{{ object.constraints.format }}{% endif %}</td>
+            <td>{% if object.constraints.minimum is not None %}{{ object.constraints.minimum }}{% endif %}</td>
+            <td>{% if object.constraints.maximum is not None %}{{ object.constraints.maximum }}{% endif %}</td>
             <td><a href="#" class="edit-field-link" style="display:none;" data-url="{% url "dataschemafield_edit" object.id experiment_id %}" data-toggle="modal"
                                            data-target="#edit-field-modal"><span class="glyphicon glyphicon-pencil"></span></a></td>
         </tr>

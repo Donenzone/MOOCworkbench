@@ -70,7 +70,6 @@ openpyxl==2.4.7
 packaging==16.8
 pbr==3.0.1
 Pillow==4.1.1
-pkg-resources==0.0.0
 poyo==0.4.1
 py==1.4.33
 pycryptodome==3.4.6

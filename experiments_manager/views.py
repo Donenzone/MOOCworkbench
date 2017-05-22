@@ -310,7 +310,7 @@ def experimentstep_scorecard(request, pk, slug):
 @login_required
 def readme_of_experiment(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
-    get_readme_of_experiment(experiment)
+    content_file = get_readme_of_experiment(experiment)
     return render(request, 'experiments_manager/experiment_detail/experiment_readme.html', {'readme': content_file,
                                                                                             'object': experiment,
                                                                                             'readme_active': True})

@@ -3,6 +3,8 @@
 <ul class="nav nav-tabs">
     <li {% if index_active %}class="active"{% endif %}><a href="{% url "experiment_detail" object.id object.slug %}"
                                                           class="tab-btn">Index</a></li>
+    <li {% if dashboard_active %}class="active"{% endif %}><a href="{% url "experiment_dashboard" object.id %}"
+                                                              class="tab-btn">Dashboard</a></li>
     <li {% if readme_active %}class="active"{% endif %}><a href="{% url "experiment_readme" object.id %}"
                                                            class="tab-btn">Read Me</a></li>
     <li {% if dependencies_active %}class="active"{% endif %}><a
@@ -12,8 +14,6 @@
                                                            class="tab-btn">Schema</a></li>
     <li {% if issues_active %}class="active"{% endif %}><a href="{% url "experiment_issues" object.id %}"
                                                            class="tab-btn">Issues</a></li>
-    <li {% if dashboard_active %}class="active"{% endif %}><a href="{% url "experiment_dashboard" object.id %}"
-                                                              class="tab-btn">Dashboard</a></li>
 
     <li {% if settings_active %}class="active"{% endif %}><a href="{% url "experiment_edit" object.id %}"
                                                               class="tab-btn">Settings</a></li>

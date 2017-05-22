@@ -15,7 +15,7 @@
         <h3>Package publication</h3>
         {% if not object.published %}
             <p class="lead">Only if you publish your package, will your colleagues be able to use and install the package locally. You can publish this package now:</p>
-            <a href="{% url "internalpackage_checklist" object.id %}" class="btn btn-primary">Publish My Package</a>
+            <a href="{% url "internalpackage_checklist" package.id %}" class="btn btn-primary">Publish My Package</a>
         {% else %}
             <p class="lead">This package is published on the Workbench pip server, making it installable by others.</p>
             <a href="#" class="btn btn-danger">Remove My Package</a>
@@ -30,7 +30,7 @@
             <div class="panel panel-default">
             <div class="panel-heading">Settings</div>
               <div class="panel-body">
-                <form action="{% url 'internalpackage_update' object.id %}" method="post">
+                <form action="{% url 'internalpackage_update' package.id %}" method="post">
                     {% csrf_token %}
                     {{ edit_form|bootstrap }}
                     <button class="btn btn-primary" value="Save">Save changes</button>
@@ -66,8 +66,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             url_dict = {
-              'ci': "{% url 'build_status' object.id object_type %}",
-              'docs': "{% url 'docs_status' object.id object_type %}",
+              'ci': "{% url 'build_status' package.id object_type %}",
+              'docs': "{% url 'docs_status' package.id object_type %}",
             };
 
             $("#ci").load(url_dict['ci']);

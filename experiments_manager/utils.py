@@ -1,11 +1,14 @@
-from django.db import transaction
+import logging
 
+from django.db import transaction
 
 from experiments_manager.consumers import send_exp_package_creation_status_update
 from git_manager.views import create_new_github_repository
 from git_manager.helpers.git_helper import GitHelper
 from cookiecutter_manager.helpers.helper_cookiecutter import clone_cookiecutter_template
 from git_manager.models import GitRepository
+
+logger = logging.getLogger(__name__)
 
 
 class ExperimentProgress(object):
@@ -17,40 +20,47 @@ class ExperimentProgress(object):
 
 
 def init_git_repo_for_experiment(experiment, cookiecutter):
-    username = experiment.owner.user.username
-    github_helper = create_new_github_repository(experiment.title, experiment.owner.user)
-    send_exp_package_creation_status_update(username, ExperimentProgress.STEP_CREATING_GITHUB_REPO)
-    repo = github_helper.github_repository
-    repo_name = repo.name
+    try:
+        username = experiment.owner.user.username
+        github_helper = create_new_github_repository(experiment.title, experiment.owner.user)
+        send_exp_package_creation_status_update(username, ExperimentProgress.STEP_CREATING_GITHUB_REPO)
+        repo = github_helper.github_repository
+        repo_name = repo.name
 
-    git_repo = GitRepository()
-    git_repo.name = repo_name
-    git_repo.owner = experiment.owner
-    git_repo.github_url = repo.html_url
+        git_repo = GitRepository()
+        git_repo.name = repo_name
+        git_repo.owner = experiment.owner
+        git_repo.github_url = repo.html_url
 
-    with transaction.atomic():
-        git_repo.save()
-        experiment.git_repo = git_repo
-        experiment.save()
+        with transaction.atomic():
+            git_repo.save()
+            experiment.git_repo = git_repo
+            experiment.save()
 
-    git_helper = GitHelper(github_helper)
-    git_helper.clone_or_pull_repository()
+        git_helper = GitHelper(github_helper)
+        git_helper.clone_or_pull_repository()
 
-    repo_dir = git_helper.repo_dir_of_user()
+        repo_dir = git_helper.repo_dir_of_user()
 
-    clone_cookiecutter_template(cookiecutter, repo_dir, repo_name, experiment.owner, experiment.description)
-    send_exp_package_creation_status_update(username, ExperimentProgress.STEP_CREATING_BOILERPLATE_CODE)
+        clone_cookiecutter_template(cookiecutter, repo_dir, repo_name, experiment.owner, experiment.description)
+        send_exp_package_creation_status_update(username, ExperimentProgress.STEP_CREATING_BOILERPLATE_CODE)
 
-    git_helper.commit('Cookiecutter template added')
-    git_helper.push()
-    send_exp_package_creation_status_update(username, ExperimentProgress.STEP_PUSHING_BOILERPLATE_CODE)
+        git_helper.commit('Cookiecutter template added')
+        git_helper.push()
+        send_exp_package_creation_status_update(username, ExperimentProgress.STEP_PUSHING_BOILERPLATE_CODE)
 
-    language_helper = experiment.language_helper()
-    req_file_loc = language_helper.get_requirements_file_location()
-    requirements_file = github_helper.view_file(req_file_loc)
-    language_helper.parse_requirements(requirements_file)
+        language_helper = experiment.language_helper()
+        req_file_loc = language_helper.get_requirements_file_location()
+        requirements_file = github_helper.view_file(req_file_loc)
+        language_helper.parse_requirements(requirements_file)
 
-    send_exp_package_creation_status_update(username, ExperimentProgress.STEP_READING_DEPENDENCIES)
+        send_exp_package_creation_status_update(username, ExperimentProgress.STEP_READING_DEPENDENCIES)
+        return True
+    except Exception as e:
+        logger.error('failed to create experiment %s with error', experiment, e)
+        logger.error('removing experiment %s to maintain db integrity', experiment)
+        experiment.delete()
+        return False
 
 
 

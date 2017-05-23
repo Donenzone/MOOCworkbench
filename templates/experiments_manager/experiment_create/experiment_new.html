@@ -16,7 +16,7 @@
         </div>
     </div>
   <h2>Create New Experiment</h2>
-    <form action="{% url "experiment_edit" experiment_id %}" method="post">
+    <form action="{% url "experiment_new" %}" method="post">
         {% csrf_token %}
         {{ form|bootstrap }}
 

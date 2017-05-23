@@ -1,7 +1,8 @@
+from model_utils.models import TimeStampedModel
+
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
-from model_utils.models import TimeStampedModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -32,7 +33,7 @@ class Experiment(BasePackage):
     docs = models.ForeignKey(to=Docs, null=True)
     requirements = models.ManyToManyField(to=Requirement)
     pylint = models.ForeignKey(to=PylintScan, null=True)
-    schema = models.ForeignKey(to=DataSchema)
+    schema = models.ForeignKey(to=DataSchema, null=True)
 
     def slug(self):
         return slugify(self.title)
@@ -51,13 +52,26 @@ class Experiment(BasePackage):
         if active_step:
             return active_step[0]
 
+    def delete(self, using=None, keep_parents=False):
+        if self.docs:
+            self.docs.delete()
+        if self.git_repo:
+            self.git_repo.delete()
+        if self.travis:
+            self.travis.delete()
+        if self.pylint:
+            self.pylint.delete()
+        if self.schema:
+            self.schema.delete()
+        super(Experiment, self).delete()
+
     def __str__(self):
         return self.title
 
     def get_activity_message(self):
         message = "Experiment {0} by {1} was completed"
         if self.public:
-            message = "Experiment  {0} by {1} was completed and made public"
+            message = "Experiment {0} by {1} was completed and made public"
         return message.format(self.title, self.owner)
 
     def success_url_dict(self, hash=''):
@@ -66,7 +80,8 @@ class Experiment(BasePackage):
                                                                             + hash,
                 'resources': '',
                 'versions': '',
-                'schema': reverse('experiment_schema', kwargs={'experiment_id': self.pk}) + hash}
+                'schema': reverse('experiment_schema', kwargs={'experiment_id': self.pk}) + hash,
+                'detail': self.get_absolute_url() + hash}
 
     def language_helper(self):
         language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}

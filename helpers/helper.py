@@ -1,8 +1,11 @@
+from MOOCworkbench.settings import ALLOWED_HOSTS
+from MOOCworkbench.settings import BASE_DIR
+
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import Experiment
 from marketplace.models import InternalPackage
-from helpers.helper_mixins import ExperimentPackageTypeMixin
-from MOOCworkbench.settings import BASE_DIR
+
+from .helper_mixins import ExperimentPackageTypeMixin
 
 
 def get_package_or_experiment(request, object_type, object_id):
@@ -35,3 +38,7 @@ def replace_variable_in_file(contents, variable, value):
 
 def get_absolute_path():
     return BASE_DIR
+
+
+def get_absolute_url(to):
+    return 'https://{0}{1}'.format(ALLOWED_HOSTS[0], to)

@@ -48,6 +48,9 @@
 
                 if (dictionary.completed) {
                     window.location.replace(dictionary.redirect_url)
+                } else if (dictionary.error) {
+                    alert(dictionary.error);
+                    window.location.replace(dictionary.redirect_url);
                 }
             }
         });

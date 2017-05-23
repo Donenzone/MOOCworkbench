@@ -1,0 +1,1 @@
+INTRODUCTION_HASH = '#intro'

@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from django.views.generic.detail import DetailView
@@ -14,17 +13,15 @@ from django.views.generic.edit import UpdateView
 from docs_manager.mixins import DocsMixin
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import get_files_for_steps, _get_files_in_repository
-from git_manager.views import get_user_repositories
 from quality_manager.mixins import get_most_recent_measurement
 from pylint_manager.helper import return_results_for_file
 from recommendations.utils import get_recommendations
 
-from .tables import ExperimentTable
-from .forms import ExperimentForm, ExperimentEditForm
-from .models import *
-from .helper import verify_and_get_experiment, get_readme_of_experiment
-from .mixins import ExperimentContextMixin
-from .tasks import initialize_repository
+from ..tables import ExperimentTable
+from ..forms import ExperimentEditForm
+from ..models import *
+from ..helper import verify_and_get_experiment, get_readme_of_experiment
+from ..mixins import ExperimentContextMixin
 
 
 class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
@@ -46,54 +43,6 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
         return context
 
 
-class ExperimentCreateView(View):
-    def get(self, request, experiment_id=0):
-        try:
-            form = ExperimentForm()
-            repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/experiment_create/experiment_new.html", {'form': form,
-                                                                                    'experiment_id': experiment_id,
-                                                                                    'repository_list': repository_list})
-        except ValueError as a:
-            messages.add_message(request, messages.INFO, 'Before creating an experiment, please connect with GitHub')
-            return redirect(to=reverse('view_my_profile'))
-
-    def post(self, request, experiment_id=0):
-        experiment = Experiment()
-        form = ExperimentForm(request.POST, instance=experiment)
-        if form.is_valid():
-            cookiecutter = form.cleaned_data['template']
-            experiment.language = cookiecutter.language
-            experiment.owner = WorkbenchUser.objects.get(user=request.user)
-            experiment.save()
-            initialize_repository.delay(experiment.id, cookiecutter.id)
-            return redirect(to=reverse('experiment_status_create'))
-        else:
-            repository_list = get_user_repositories(request.user)
-            return render(request, "experiments_manager/experiment_create/experiment_new.html",
-                          {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
-
-
-@login_required
-def experiment_status_create(request):
-    return render(request, 'experiments_manager/experiment_create/experiment_status_create.html', {})
-
-
-@login_required
-def experiment_first_time(request, pk):
-    experiment = verify_and_get_experiment(request, pk)
-    context = {}
-    context['object'] = experiment
-    context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
-    context['object_id'] = experiment.pk
-    context['configured'] = experiment.travis.enabled
-    context['username'] = experiment.git_repo.owner
-    context['reposlug'] = experiment.git_repo.name
-    context['travis'] = experiment.travis
-    context['coverage_configured'] = experiment.docs.enabled
-    return render(request, 'experiments_manager/experiment_create/experiment_enable_builds.html', context)
-
-
 class FileListForStep(View):
     def get(self, request):
         assert 'experiment_id' in request.GET
@@ -109,38 +58,6 @@ class FileListForStep(View):
         for content_file in file_list:
             return_dict.append((content_file.name, content_file.type))
         return JsonResponse({'files': return_dict})
-
-
-class ChooseExperimentSteps(ExperimentContextMixin, View):
-    def get(self, request, experiment_id):
-        context = super(ChooseExperimentSteps, self).get(request, experiment_id)
-        context['steps'] = ExperimentStep.objects.all()
-        return render(request, "experiments_manager/experiment_create/experimentsteps_choose.html", context)
-
-    def post(self, request, experiment_id):
-        experiment = verify_and_get_experiment(request, experiment_id)
-        step_json_list = json.loads(request.POST['steplist'])
-        counter = 1
-        if step_json_list:
-            delete_existing_chosen_steps(experiment)
-            cookiecutter = experiment.template
-            for step in step_json_list:
-                step = int(step)
-                step = ExperimentStep.objects.get(id=step)
-                chosen_experiment_step = ChosenExperimentSteps(experiment=experiment, step=step, step_nr=counter)
-                if counter == 1:
-                    chosen_experiment_step.active = True
-                    chosen_experiment_step.started_at = datetime.now()
-                cookiecutter_location = cookiecutter.folder_file_locations.get(step=step)
-                chosen_experiment_step.location = cookiecutter_location.location
-                chosen_experiment_step.main_module = cookiecutter_location.main_module
-                chosen_experiment_step.save()
-                counter += 1
-            url = reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()})
-            return JsonResponse({'url': url})
-        else:
-            return JsonResponse({'message': 'Choose at least one step'})
-
 
 class FileViewGitRepository(ExperimentContextMixin, View):
 

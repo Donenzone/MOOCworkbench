@@ -59,8 +59,8 @@ class FileListForStep(View):
             return_dict.append((content_file.name, content_file.type))
         return JsonResponse({'files': return_dict})
 
-class FileViewGitRepository(ExperimentContextMixin, View):
 
+class FileViewGitRepository(ExperimentContextMixin, View):
     def get(self, request, experiment_id):
         context = super(FileViewGitRepository, self).get(request, experiment_id)
         file_name = request.GET['file_name']

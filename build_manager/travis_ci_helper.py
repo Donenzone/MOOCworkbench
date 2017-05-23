@@ -1,6 +1,9 @@
 import logging
-from travispy import TravisPy
 import requests
+
+
+from travispy import TravisPy
+from travispy.errors import TravisError
 
 
 logger = logging.getLogger(__name__)
@@ -42,6 +45,10 @@ class TravisCiHelper(object):
         return '{0}/{1}'.format(self.travis_user.login, self.github_helper.github_repository.name)
 
     def get_log_for_last_build(self):
-        build = self.travis.build(self.travis_repo.last_build_id)
-        log = build.jobs[0].log.body
-        return log
+        try:
+            build = self.travis.build(self.travis_repo.last_build_id)
+            log = build.jobs[0].log.body
+            return log
+        except TravisError as e:
+            logger.error('could not retrieve log of last build for %s', self.repo_slug)
+            return 'Log not found'

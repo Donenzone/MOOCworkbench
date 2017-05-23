@@ -1,3 +1,5 @@
+from celery import chain
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -11,12 +13,8 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 from .models import ExperimentMeasure
 from .mixins import MeasurementMixin, get_recent_measurements_for_type
 from .helpers.what_now_helper import WhatNow
-from .tasks import task_version_control_quality_check
-from .tasks import task_requirements_quality_check
-from .tasks import task_test_quality_check
-from .tasks import task_ci_quality_check
-from .tasks import task_docs_coverage_check
-from .tasks import task_pylint_static_quality_check
+from .helpers.helper import get_description_measure_list
+from .tasks import task_complete_quality_check
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -35,6 +33,8 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
         for measurement in self._get_recent_measurements_for_all_types(active_step):
             measurement_slug = measurement.slug()
             messages[measurement_slug] = measurement
+
+        context['descriptions'] = get_description_measure_list()
         context['dashboard_messages'] = messages
         return render(request, self.template_name, context)
 
@@ -65,11 +65,5 @@ class NrOfCommitsView(MeasurementMixin, View):
 def refresh_measurements(request, step_id):
     step = ChosenExperimentSteps.objects.get(pk=step_id)
     verify_and_get_experiment(request, step.experiment_id)
-    task_version_control_quality_check.delay(step_id)
-    task_requirements_quality_check.delay(step_id)
-    task_test_quality_check.delay(step_id)
-    task_ci_quality_check.delay(step_id)
-    task_docs_coverage_check.delay(step_id)
-    task_pylint_static_quality_check.delay(step_id)
-
+    task_complete_quality_check.delay(step_id)
     return JsonResponse({'refresh': True})

@@ -1,5 +1,7 @@
 import logging
 
+from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.helpers.git_helper import GitHelper
 from MOOCworkbench.celery import app
 from helpers.helper import get_package_or_experiment_without_request
 from experiments_manager.consumers import send_message
@@ -14,6 +16,9 @@ def task_generate_docs(object_type, object_id):
     exp_or_package = get_package_or_experiment_without_request(object_type, object_id)
     username = exp_or_package.owner.user.username
     if exp_or_package.docs.enabled:
+        github_helper = GitHubHelper(exp_or_package.owner, exp_or_package.git_repo.name)
+        git_helper = GitHelper(github_helper)
+        git_helper.clone_or_pull_repository()
         logger.debug('start docs generation for %s (%s)', exp_or_package, username)
         language_helper = exp_or_package.language_helper()
         language_helper.generate_documentation()

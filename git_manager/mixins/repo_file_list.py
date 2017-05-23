@@ -19,6 +19,7 @@ def get_files_for_steps(experiment, only_active=False):
             location = step.location
             if _is_folder(location):
                 files = _get_files_in_repository(experiment.owner.user, experiment.git_repo.name, location)
+                files = _add_static_results_to_files(experiment, files)
             else:
                 files = [ContentFile(name=location, path=location)]
             step.files = files
@@ -50,7 +51,7 @@ def _folder_location(exp_or_package):
     return '/'
 
 
-def _single_file(location, context, exp_or_package):
+def _single_file(location, exp_or_package):
     git_file = ContentFile(name=location, path=location)
     git_file.pylint_results = return_result_summary_for_file(exp_or_package,
                                                              git_file.path)

@@ -1,8 +1,11 @@
 import os
+import logging
 import subprocess
 import pickle
 
 from sphinx.websupport import WebSupport
+
+logger = logging.getLogger(__name__)
 
 
 class SphinxHelper(object):
@@ -42,8 +45,6 @@ class SphinxHelper(object):
 
     def _gen_docs_per_folder(self):
         for folder in self.folders:
-            if folder.location is not None:
-                folder = folder.location
             folder_path = os.path.join(self.base_path, folder)
             subprocess.call(['sphinx-apidoc', '-o', self.path, folder_path])
 
@@ -100,9 +101,9 @@ class SphinxHelper(object):
                     if 'classes' in module_info[1]:
                         classes = module_info[1]['classes']
                         total_undocumented_classes += len(classes)
+            return coverage_list, total_undocumented_functions, total_undocumented_classes
         except IOError as e:
-            raise "Coverage data not found: {0}".format(e)
-        return coverage_list, total_undocumented_functions, total_undocumented_classes
+            logger.error("Coverage data not found for (%s, %s): %s", self.owner, self.repo_name, e)
 
     def _get_docs_dir(self):
         return '{0}/{1}/html/index.html'.format(self.owner, self.repo_name)

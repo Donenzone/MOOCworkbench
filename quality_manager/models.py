@@ -25,6 +25,9 @@ class ExperimentMeasure(models.Model):
     def get_high_message(self):
         return '{0}: {1}'.format(self.name, self.high_message)
 
+    def slug(self):
+        return slugify(self.name).replace('-', '_')
+
 
 class RawMeasureResult(models.Model):
     key = models.CharField(max_length=255)
@@ -61,10 +64,12 @@ class ExperimentMeasureResult(TimeStampedModel):
         style_classes = {ExperimentMeasureResult.LOW: 'danger',
                 ExperimentMeasureResult.MEDIUM: 'warning',
                 ExperimentMeasureResult.HIGH: 'success'}
+        if not self.result:
+            return "default"
         return style_classes[self.result]
 
     def slug(self):
-        return slugify(self.measurement.name).replace('-', '_')
+        return self.measurement.slug()
 
     def __str__(self):
         return "Workbench scan of {0}".format(self.measurement.name)

@@ -12,6 +12,16 @@ from .measurements.pylint_measurement import PylintMeasurement
 
 
 @app.task
+def task_complete_quality_check(step_id):
+    task_version_control_quality_check(step_id)
+    task_requirements_quality_check(step_id)
+    task_test_quality_check(step_id)
+    task_ci_quality_check(step_id)
+    task_docs_coverage_check(step_id)
+    task_pylint_static_quality_check(step_id)
+
+
+@app.task
 def task_requirements_quality_check(step_id):
     step = ChosenExperimentSteps.objects.get(id=step_id)
     req_measure = RequirementsMeasurement(step)

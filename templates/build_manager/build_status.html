@@ -13,13 +13,13 @@
       <p><a href="#" class="btn btn-primary" id='enable-builds'>Enable now</a></p>
 
   {% else %}
-    <img src='https://travis-ci.org/{{ username }}/{{ reposlug }}.svg?branch=master' />
-    <p class="lead">Travis CI will automatically run tests and check if your experiment has al the needed dependencies.</p>
+    <p><img src='https://travis-ci.org/{{ username }}/{{ reposlug }}.svg?branch=master' /></p>
+    <p>Travis CI will automatically run tests and check if your experiment has al the needed dependencies.</p>
 
     <p>
-      <button class="btn btn-primary" data-toggle="modal" data-target="#last-log-modal">View Log of Last Build</button>
-      <a href="#" class="btn btn-default" id='build-now'>Build My Experiment Now</a>
-      <a href="#" class="btn btn-default" id='disable-builds'>Disable Builds</a>
+      <button class="btn btn-primary" data-toggle="modal" data-target="#last-log-modal">View Log of Last Build</button></p>
+      <p><a href="#" class="btn btn-default" id='build-now'>Build My Experiment Now</a></p>
+      <p><a href="#" class="btn btn-default" id='disable-builds'>Disable Builds</a>
     </p>
 
   <div class="modal fade" id="last-log-modal" role="dialog">

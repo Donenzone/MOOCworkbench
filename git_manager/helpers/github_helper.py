@@ -84,11 +84,19 @@ class GitHubHelper(object):
         return self.github_repository.get_issues()
 
     def create_branch(self, branch_name):
+        branches = self.get_branches()
+        for branch in branches:
+            if branch.name == branch_name:
+                return
         latest_commit = self.github_repository.get_commits()[:1]
         for commit in latest_commit:
             latest_commit = commit
         branch = 'refs/heads/{0}'.format(branch_name)
         self.github_repository.create_git_ref(branch, latest_commit.sha)
+
+    def get_branches(self):
+        branches = self.github_repository.get_branches()
+        return branches
 
     def get_single_issue(self, issue_nr):
         return self.github_repository.get_issue(issue_nr)

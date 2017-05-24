@@ -8,7 +8,6 @@ from os.path import isfile, isdir
 
 from sphinx.websupport import WebSupport
 
-from pylint_manager.utils import activate_virtualenv, deactivate_virtualenv
 from git_manager.helpers.git_helper import GitHelper
 
 logger = logging.getLogger(__name__)
@@ -35,12 +34,13 @@ class SphinxHelper(object):
         self.base_path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
         self.folders = folders
 
-    def create_gh_page_branch(self):
+    def create_gh_pages_branch(self):
         self.github_helper.create_branch('gh-pages')
 
     def build_gh_pages(self):
         git_helper = GitHelper(self.github_helper)
         git_helper.clone_or_pull_repository()
+        self.create_gh_pages_branch()
         git_helper.switch_to_branch('master')
         html_folder = os.path.join(git_helper.repo_dir, 'docs/_build/html')
         user_dir = git_helper.repo_dir_of_user()
@@ -92,6 +92,5 @@ class SphinxHelper(object):
         return '{0}/{1}/html/index.html'.format(self.owner, self.repo_name)
 
     def get_document(self, document_name):
-        datadir = '{0}_build/html/data'.format(self.path)
-        support = WebSupport(datadir=datadir)
-        return support.get_document(document_name)
+        datadir = 'https://{0}.github.io/{1}/{2}.html'.format(self.github_helper.owner, self.github_helper.repo_name, document_name)
+        return datadir

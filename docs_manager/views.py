@@ -16,13 +16,12 @@ from .tasks import task_generate_docs
 class DocView(View):
     def get(self, request, object_id, object_type, page_slug=None):
         exp_or_package = get_package_or_experiment(request, object_type, object_id)
-        context = {}
         language_helper = exp_or_package.language_helper()
         if page_slug:
-            context['document'] = language_helper.get_document(page_slug)
+            location = language_helper.get_document(page_slug)
         else:
-            context['document'] = language_helper.get_document('index')
-        return render(request, 'docs_manager/docs_template.html', context)
+            location = language_helper.get_document('index')
+        return redirect(to=location)
 
 
 class DocStatusView(ExperimentPackageTypeMixin, View):

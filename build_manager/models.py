@@ -18,3 +18,4 @@ class TravisInstance(models.Model):
     last_build_status = models.CharField(max_length=1, choices=BUILD_STATUS, null=True)
     config = models.ForeignKey(to=TravisCiConfig)
     enabled = models.BooleanField(default=False)
+

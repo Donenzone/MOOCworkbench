@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from build_manager.models import TravisInstance, TravisCiConfig
+from coverage_manager.models import CodeCoverage
 from dataschema_manager.models import DataSchema
 from docs_manager.models import Docs
 from git_manager.models import GitRepository
@@ -57,6 +58,9 @@ class Experiment(BasePackage):
             self.docs.delete()
         if self.git_repo:
             self.git_repo.delete()
+        if self.travis.codecoverage_set:
+            coverage = self.travis.codecoverage_set.first()
+            coverage.delete()
         if self.travis:
             self.travis.delete()
         if self.pylint:
@@ -101,6 +105,10 @@ def add_experiment_config(sender, instance, created, **kwargs):
         travis = TravisInstance(config=travis_config)
         travis.save()
         instance.travis = travis
+
+        coverage = CodeCoverage()
+        coverage.travis_instance = travis
+        coverage.save()
 
         pylint = PylintScan()
         pylint.enabled = True

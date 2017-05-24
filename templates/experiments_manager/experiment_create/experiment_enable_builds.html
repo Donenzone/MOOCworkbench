@@ -49,31 +49,71 @@
 
         <h3>3. Set-up Your Experiment Locally</h3>
         <p class="lead">Execute these commands to get started quickly with your new experiment.
-        </p><p class="lead">With these commands, among other things, you are setting up a virtualenv for Python experiments, which is an encapsulated sandbox where you install your dependencies, which helps reproducibility of your experiment.
-        </p><p class="lead">For R, Packrat is used to help with dependency management.</p>
-        <ol>
-            <li>Clone your new experiment with the following command:
-                <pre>git clone git@github.com:{{ username }}/{{ reposlug }}.git</pre>
-            </li>
-            <li>Set up a new virtual environment for your project:
-                <pre>virtualenv -p python3 ~/.venv{{ reposlug|lower }}</pre>
-            </li>
-            <li>Activate your virtual environment:
-                <pre>source ~/.venv{{ reposlug|lower }}/bin/activate</pre>
-            </li>
-            <li>Make your new repository folder active:
-                <pre>cd {{ reposlug }}</pre>
-            </li>
-            <li>Install the initial dependencies:
-                <pre>pip3 install -r requirements.txt</pre>
-            </li>
-            <li>Check if the tests run:
-                <pre>python3 test_runner.py</pre>
-            </li>
-        </ol>
+        </p>
+        <p class="lead">With these commands, among other things, you are setting up a virtualenv for Python experiments,
+            which is an encapsulated sandbox where you install your dependencies, which helps reproducibility of your
+            experiment.
+        </p>
+        <p class="lead">For R, Packrat is used to help with dependency management.</p>
 
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#nix" aria-controls="home" role="tab" data-toggle="tab">macOS
+                and Linux</a></li>
+            <li role="presentation"><a href="#windows" aria-controls="profile" role="tab" data-toggle="tab">Windows</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="nix">
+                <h4>For macOS and Linux</h4>
+                <ol>
+                    <li>Clone your new experiment with the following command:
+                        <pre>git clone git@github.com:{{ username }}/{{ reposlug }}.git</pre>
+                    </li>
+                    <li>Use the make file to automate usual tasks
+                        <pre>make</pre>
+                    </li>
+                    <li>First, create a virtual environment:
+                        <pre>make create_environment</pre>
+                    </li>
+                    <li>Activate the environment with
+                        <pre>source activate {{ reposlug }}</pre>
+                    </li>
+                    <li>Install the dependencies
+                        <pre>make requirements</pre>
+                    </li>
+                    <li>Run the tests
+                        <pre>make tests</pre>
+                    </li>
+                </ol>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="windows">
+                <h4>For Windows</h4>
+                <ol>
+                    <li>Clone your new experiment with the following command:
+                        <pre>git clone git@github.com:{{ username }}/{{ reposlug }}.git</pre>
+                    </li>
+                    <li>Set up a new virtual environment for your project:
+                        <pre>virtualenv -p python3 ~/.venv{{ reposlug|lower }}</pre>
+                    </li>
+                    <li>Activate your virtual environment:
+                        <pre>source ~/.venv{{ reposlug|lower }}/bin/activate</pre>
+                    </li>
+                    <li>Make your new repository folder active:
+                        <pre>cd {{ reposlug }}</pre>
+                    </li>
+                    <li>Install the initial dependencies:
+                        <pre>pip3 install -r requirements.txt</pre>
+                    </li>
+                    <li>Check if the tests run:
+                        <pre>python3 test_runner.py</pre>
+                    </li>
+                </ol>
+            </div>
+        </div>
     </div>
 
-    <a href="{% url "experiment_detail" object_id object.slug %}#intro" class="btn btn-success">Continue</a>
+    <p><a href="{% url "experiment_detail" object_id object.slug %}#intro" class="btn btn-success">Continue</a></p>
 
 {% endblock %}

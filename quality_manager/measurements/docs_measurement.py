@@ -23,7 +23,6 @@ class DocsMeasurement(MeasurementAbstraction):
             github_helper = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)
             steps = ChosenExperimentSteps.objects.filter(experiment=self.experiment)
             sphinx_helper = SphinxHelper(self.experiment, steps, github_helper)
-            sphinx_helper.update_coverage()
             coverage = sphinx_helper.get_coverage_data()
             if coverage:
                 undoced_funcs = coverage[1]

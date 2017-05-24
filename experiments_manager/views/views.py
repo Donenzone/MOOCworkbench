@@ -28,6 +28,13 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
     model = Experiment
     template_name = "experiments_manager/experiment_detail/experiment_detail.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
+        active_step = experiment.get_active_step()
+        if not active_step and not experiment.completed:
+            return redirect(to=reverse('experimentsteps_choose', kwargs={'experiment_id': experiment.id}))
+        return super(ExperimentDetailView, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         self.object_type = self.get_requirement_type(experiment)

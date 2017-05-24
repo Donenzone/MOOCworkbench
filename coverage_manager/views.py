@@ -77,7 +77,7 @@ def coveralls_status(request, object_id, object_type):
     current_config = CodeCoverage.objects.filter(travis_instance=travis_instance)
     context['object_id'] = exp_or_package.id
     context['coverage_configured'] = False
-    context['travis'] = travis_instance.enabled
+    context['travis'] = travis_instance
     if current_config:
         context['current_config'] = current_config[0]
         context['coverage_configured'] = context['current_config'].enabled

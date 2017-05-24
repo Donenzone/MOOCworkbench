@@ -37,6 +37,9 @@ class PackageGitRepoInit(GitRepoInit):
     def init_repo_boilerplate(self):
         # create git repository in DB
         git_repo_obj = self.create_git_db_object()
+        self.internal_package.git_repo = git_repo_obj
+        self.internal_package.save()
+
         # clone current experiment
         git_helper = self.clone_basis_for_module_and_return_git_helper()
         # take code from module and commit it to new repo

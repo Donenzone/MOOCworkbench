@@ -83,7 +83,7 @@ class PythonHelper(LanguageHelper):
     def write_requirements_file(self):
         requirements_txt = self.build_requirements_file()
         self.github_helper.update_file('requirements.txt', 'Updated requirements.txt file by MOOC workbench',
-                                  requirements_txt)
+                                       requirements_txt)
 
     def update_requirements(self):
         requirements_file = self.github_helper.view_file('requirements.txt')
@@ -97,8 +97,8 @@ class PythonHelper(LanguageHelper):
         return run_pylint
 
     def cookiecutter_dict(self, internal_package):
-        return {'project_name': self.exp_or_package.name,
-                'app_name': self.github_helper.repo_name,
+        return {'project_name': internal_package.name,
+                'app_name': internal_package.git_repo.name,
                 'full_name': self.exp_or_package.owner,
                 'email': self.exp_or_package.owner.user.email,
                 'github_username': self.github_helper.owner,
@@ -122,8 +122,6 @@ class PythonHelper(LanguageHelper):
         folders = self.exp_or_package.get_docs_folder()
         sphinx_helper = SphinxHelper(self.exp_or_package, folders, self.github_helper)
         sphinx_helper.build_gh_pages()
-        #sphinx_helper.add_sphinx_to_repo()
-        #sphinx_helper.build_and_sync_docs()
 
     def get_document(self, document_name):
         from experiments_manager.helper import get_steps

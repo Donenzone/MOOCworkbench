@@ -35,6 +35,9 @@ class GitHelper(object):
             self.repo = Repo(self.repo_dir)
             self.pull()
 
+    def switch_to_branch(self, branch_name):
+        subprocess.call(['git', 'checkout', branch_name], cwd=self.repo_dir)
+
     def create_branch(self, branch_name):
         new_branch = self.repo.create_head(branch_name)
         assert self.repo.active_branch != new_branch

@@ -1,9 +1,15 @@
 import os
 import logging
 import subprocess
+import os
+import shutil
 import pickle
+from os.path import isfile, isdir
 
 from sphinx.websupport import WebSupport
+
+from pylint_manager.utils import activate_virtualenv, deactivate_virtualenv
+from git_manager.helpers.git_helper import GitHelper
 
 logger = logging.getLogger(__name__)
 
@@ -12,14 +18,15 @@ class SphinxHelper(object):
     GITHUB_REPO_FOLDER = 'github_repositories'
     UNDOC_PICKLE_LOCATION = '_build/coverage/undoc.pickle'
 
-    def __init__(self, exp_or_package, folders, github_login):
+    def __init__(self, exp_or_package, folders, github_helper):
         """
         SphinxHelper helps with tasks related to document generation with Sphinx
         :param experiment: The package or experiment for which documents should be generated/managed
         :param folders: The relevant folders that where source files live in the exp/package (for an experiment, the steps)
         :param github_login: The GitHub username under which the git repository lives
         """
-        self.owner = github_login
+        self.owner = github_helper.owner
+        self.github_helper = github_helper
         self.repo_name = exp_or_package.git_repo.name
         self.docs_src_location = exp_or_package.template.docs_src_location
         if not self.docs_src_location:
@@ -28,63 +35,39 @@ class SphinxHelper(object):
         self.base_path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
         self.folders = folders
 
-    def add_sphinx_to_repo(self):
-        """
-        Add Sphinx to an existing repository.
-        Assumes that this repository has already been cloned.
-        :return: 
-        """
-        self._quickstart_sphinx()
-        self._gen_docs_per_folder()
-        self._prepend_to_conf_py()
-        self._make_first_html()
+    def create_gh_page_branch(self):
+        self.github_helper.create_branch('gh-pages')
 
-    def _quickstart_sphinx(self):
-        subprocess.call(['sphinx-quickstart', '-q', '-a', self.owner, '-v', '0.1', '-p', self.repo_name,
-                         self.path, '--ext-autodoc', '--ext-coverage'])
+    def build_gh_pages(self):
+        git_helper = GitHelper(self.github_helper)
+        git_helper.clone_or_pull_repository()
+        git_helper.switch_to_branch('master')
+        html_folder = os.path.join(git_helper.repo_dir, 'docs/_build/html')
+        user_dir = git_helper.repo_dir_of_user()
+        repo_dir = git_helper.repo_dir
 
-    def _gen_docs_per_folder(self):
-        for folder in self.folders:
-            folder_path = os.path.join(self.base_path, folder)
-            subprocess.call(['sphinx-apidoc', '-o', self.path, folder_path])
+        subprocess.call(['mv', html_folder, '.'], cwd=user_dir)
+        subprocess.call(['git', 'pull'], cwd=repo_dir)
+        subprocess.call(['git', 'checkout', 'gh-pages'], cwd=repo_dir)
 
-    def _make_first_html(self):
-        self._make_command('clean')
-        self._make_command('html', 'coverage')
+        for file_name in os.listdir(repo_dir):
+            if file_name != '.git':
+                if isfile(os.path.join(repo_dir, file_name)):
+                    os.remove(os.path.join(repo_dir, file_name))
+                elif isdir(os.path.join(repo_dir, file_name)):
+                    shutil.rmtree(os.path.join(repo_dir, file_name))
 
-    def _prepend_to_conf_py(self):
-        file_path = '{0}conf.py'.format(self.path)
+        for file_name in os.listdir(os.path.join(user_dir, 'html/')):
+            subprocess.call(['mv', os.path.join(user_dir, 'html/', file_name), repo_dir])
 
-        with open(file_path, 'r+') as conf_file:
-            contents = conf_file.read()
-            new_contents = 'import os\nimport sys\nsys.path.insert(0, os.path.abspath(\'../\'))\n' + contents
-            conf_file.close()
+        subprocess.call(['touch', '.nojekyll'], cwd=repo_dir)
+        shutil.rmtree(os.path.join(user_dir, 'html/'))
+        subprocess.call(['git', 'add', '.'], cwd=repo_dir)
+        git_helper.commit('Updated docs')
+        git_helper.push()
 
-        if new_contents:
-            conf_file = open(file_path, 'w')
-            conf_file.write(new_contents)
-            conf_file.close()
-
-    def _make_command(self, command, arg=None):
-        if arg:
-            subprocess.call(['make', '-C', self.path, command, arg])
-        else:
-            subprocess.call(['make', '-C', self.path, command])
-
-    def build_and_sync_docs(self):
-        """
-        After a pull, run this function to rebuild the docs.
-        
-        :return: 
-        """
-        build_path = '{0}_build/html/'.format(self.path)
-        support = WebSupport(srcdir=self.path,
-                             builddir=build_path)
-        support.build()
-
-    def update_coverage(self):
-        build_path = '{0}_build/coverage/'.format(self.path)
-        subprocess.call(['sphinx-build', '-v', '-b', 'coverage', self.path, build_path])
+        git_helper = None
+        shutil.rmtree(repo_dir)
 
     def get_coverage_data(self):
         coverage_pickle = '{0}{1}'.format(self.path, self.UNDOC_PICKLE_LOCATION)

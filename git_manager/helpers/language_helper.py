@@ -120,14 +120,15 @@ class PythonHelper(LanguageHelper):
         git_helper = GitHelper(self.github_helper)
         git_helper.clone_or_pull_repository()
         folders = self.exp_or_package.get_docs_folder()
-        sphinx_helper = SphinxHelper(self.exp_or_package, folders, self.github_helper.owner)
-        sphinx_helper.add_sphinx_to_repo()
-        sphinx_helper.build_and_sync_docs()
+        sphinx_helper = SphinxHelper(self.exp_or_package, folders, self.github_helper)
+        sphinx_helper.build_gh_pages()
+        #sphinx_helper.add_sphinx_to_repo()
+        #sphinx_helper.build_and_sync_docs()
 
     def get_document(self, document_name):
         from experiments_manager.helper import get_steps
         steps = get_steps(self.exp_or_package)
-        sphinx_helper = SphinxHelper(self.exp_or_package, steps, self.github_helper.owner)
+        sphinx_helper = SphinxHelper(self.exp_or_package, steps, self.github_helper)
         return sphinx_helper.get_document(document_name)
 
 

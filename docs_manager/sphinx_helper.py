@@ -86,9 +86,6 @@ class SphinxHelper(object):
         except IOError as e:
             logger.error("Coverage data not found for (%s, %s): %s", self.owner, self.repo_name, e)
 
-    def _get_docs_dir(self):
-        return '{0}/{1}/html/index.html'.format(self.owner, self.repo_name)
-
     def get_document(self, document_name):
         datadir = 'https://{0}.github.io/{1}/{2}.html'.format(self.github_helper.owner, self.github_helper.repo_name, document_name)
         return datadir

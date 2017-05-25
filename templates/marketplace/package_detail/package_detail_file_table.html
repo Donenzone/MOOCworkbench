@@ -10,15 +10,8 @@
     {% for item in git_list %}
         <tr class="clickable-row">
             <td>
-                {% if item.type == 'dir' %}
-                    <a href="/package/folder/{{ object.id }}?folder_name={{ item.path }}"
-                       class="base-url">{{ item.name }}</a>
-
-                {% else %}
-                    <a href="{% url 'file_detail' object.id %}?file_name={{ item.path }}"
-                       class="base-url">{{ item.name }}</a>
-
-                {% endif %}
+                <a href="{{ item.github_url }}"
+                   class="base-url">{{ item.name }}</a>
             </td>
         </tr>
     {% endfor %}

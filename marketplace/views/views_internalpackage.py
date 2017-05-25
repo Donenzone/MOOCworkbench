@@ -2,9 +2,9 @@ from markdown2 import Markdown
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
@@ -17,35 +17,14 @@ from user_manager.models import get_workbench_user
 from requirements_manager.helper import add_internalpackage_to_experiment
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import get_files_for_repository
-from recommendations.utils import recommend
 
-from .forms import InternalPackageForm
-from .helpers.helper import create_tag_for_package_version
-from .helpers.helper import update_setup_py_with_new_version
-from .models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from .tasks import task_create_package_from_experiment, task_publish_update_package
-from .tasks import task_remove_package
-from .mixins import IsInternalPackageMixin, ObjectTypeIdMixin
-
-
-class MarketplaceIndex(View):
-    def get(self, request):
-        context = {}
-        context['new_packages'] = ExternalPackage.objects.all().order_by('-created')[:5]
-        context['new_internal_packages'] = InternalPackage.objects.all().order_by('-created')[:5]
-        context['recent_updates'] = PackageVersion.objects.all().order_by('-created')[:5]
-        context['recent_resources'] = PackageResource.objects.all().order_by('-created')[:5]
-        return render(request, 'marketplace/marketplace_index.html', context=context)
-
-
-class ExternalPackageCreateView(CreateView):
-    model = ExternalPackage
-    fields = ['name', 'description', 'project_page', 'category', 'language']
-    template_name = 'marketplace/package_create/package_form.html'
-
-    def form_valid(self, form):
-        form.instance.owner = get_workbench_user(self.request.user)
-        return super(ExternalPackageCreateView, self).form_valid(form)
+from marketplace.forms import InternalPackageForm
+from marketplace.helpers.helper import create_tag_for_package_version
+from marketplace.helpers.helper import update_setup_py_with_new_version
+from marketplace.models import InternalPackage, PackageVersion, PackageResource
+from marketplace.tasks import task_create_package_from_experiment, task_publish_update_package
+from marketplace.tasks import task_remove_package
+from marketplace.mixins import IsInternalPackageMixin, ObjectTypeIdMixin
 
 
 class InternalPackageBaseView(ObjectTypeIdMixin, IsInternalPackageMixin):
@@ -169,18 +148,6 @@ def internalpackage_remove(request, pk):
     return JsonResponse({"publish": "started"})
 
 
-class PackageListView(ListView):
-    model = Package
-
-
-@login_required
-def package_detail(request, pk):
-    if InternalPackage.objects.filter(pk=pk):
-        return redirect(to=reverse('internalpackage_detail', kwargs={'pk': pk}))
-    else:
-        return redirect(to=reverse('externalpackage_detail', kwargs={'pk': pk}))
-
-
 class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
     model = InternalPackage
     template_name = 'marketplace/package_detail/package_detail.html'
@@ -205,111 +172,6 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
         return content_file
 
 
-class ExternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
-    model = ExternalPackage
-    template_name = 'marketplace/package_detail/package_detail.html'
-
-    def get_context_data(self, **kwargs):
-        self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
-        context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
-        package_id = self.kwargs['pk']
-        context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
-        context['index_active'] = True
-        return context
-
-
-class PackageVersionListView(InternalPackageBaseView, ListView):
-    model = PackageVersion
-    template_name = 'marketplace/package_detail/packageversion_list.html'
-
-    def get_queryset(self):
-        qs = super(PackageVersionListView, self).get_queryset()
-        package_id = self.kwargs['pk']
-        return qs.filter(package_id=package_id)
-
-    def get_context_data(self, **kwargs):
-        context = super(PackageVersionListView, self).get_context_data(**kwargs)
-        context['versions_active'] = True
-        return context
-
-
-class PackageVersionDetailView(DetailView):
-    model = PackageVersion
-
-    def get_queryset(self):
-        qs = super(PackageVersionDetailView, self).get_queryset()
-        package_id = self.kwargs['package_id']
-        return qs.filter(package_id=package_id)
-
-
-class PackageVersionCreateView(CreateView):
-    model = PackageVersion
-    fields = ['version_nr', 'changelog', 'url']
-    template_name = 'marketplace/package_detail/packageversion_form.html'
-
-    def form_valid(self, form):
-        package = Package.objects.get(id=self.kwargs['package_id'])
-        form.instance.package = package
-        form.instance.added_by = get_workbench_user(self.request.user)
-        return super(PackageVersionCreateView, self).form_valid(form)
-
-    def get_success_url(self):
-        return reverse('package_detail', kwargs={'pk': self.kwargs['package_id']})
-
-
-class PackageResourceCreateView(CreateView):
-    model = PackageResource
-    fields = ['title', 'resource', 'url']
-
-    def form_valid(self, form):
-        package = Package.objects.get(id=self.kwargs['package_id'])
-        form.instance.package = package
-        form.instance.added_by = get_workbench_user(self.request.user)
-        return super(PackageResourceCreateView, self).form_valid(form)
-
-
-class PackageResourceDetailView(DetailView):
-    model = PackageResource
-    template_name = 'marketplace/packageresource_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(PackageResourceDetailView, self).get_context_data(**kwargs)
-        context['package'] = self.object.package
-        context['resources_active'] = True
-        return context
-
-
-class PackageResourceListView(InternalPackageBaseView, ListView):
-    model = PackageResource
-    paginate_by = 10
-    template_name = 'marketplace/package_detail/packageresource_list.html'
-
-    def get_queryset(self):
-        package_id = self.kwargs['pk']
-        return PackageResource.objects.filter(package__id=package_id)
-
-    def get_context_data(self, **kwargs):
-        context = super(PackageResourceListView, self).get_context_data(**kwargs)
-        context['object'] = Package.objects.get(pk=self.kwargs['pk'])
-        context['resources_active'] = True
-        return context
-
-
-class PackageSubscriptionView(View):
-    def get(self, request, *args, **kwargs):
-        package_id = self.kwargs['package_id']
-        package = Package.objects.get(id=package_id)
-        workbench_user = get_workbench_user(request.user)
-        if not workbench_user in package.subscribed_users.all():
-            package.subscribed_users.add(workbench_user)
-            package.save()
-        else:
-            package.subscribed_users.remove(workbench_user)
-            package.save()
-        messages.add_message(request, messages.SUCCESS, 'Subscription preferences changed')
-        return HttpResponseRedirect(redirect_to=reverse('package_detail', kwargs={'pk': package_id}))
-
-
 @login_required
 def internalpackage_install(request, pk):
     internal_package = InternalPackage.objects.get(pk=pk)
@@ -323,33 +185,3 @@ def internalpackage_install(request, pk):
     else:
         messages.add_message(request, messages.ERROR, 'Could not add package to your experiment')
         return JsonResponse({'added': False})
-
-
-@login_required
-def package_autocomplete(request):
-    if 'query' in request.POST:
-        query = request.POST['query']
-        packages = Package.objects.filter(name__icontains=query)
-    else:
-        packages = Package.objects.all()[:50]
-    result_list = [x.name for x in packages]
-    return JsonResponse({'results': result_list})
-
-
-@login_required
-def package_status_create(request):
-    return render(request, 'marketplace/package_create/package_status_create.html', {})
-
-
-@login_required
-def recommend_package(request, pk):
-    package = Package.objects.get(id=pk)
-    workbench_user = get_workbench_user(request.user)
-    return recommend(package, workbench_user)
-
-
-@login_required
-def recommend_packageresource(request, pk):
-    resource = PackageResource.objects.get(id=pk)
-    workbench_user = get_workbench_user(request.user)
-    return recommend(resource, workbench_user)

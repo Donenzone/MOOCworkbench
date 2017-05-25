@@ -1,4 +1,3 @@
-import os
 import logging
 import subprocess
 import os
@@ -6,7 +5,6 @@ import shutil
 import pickle
 from os.path import isfile, isdir
 
-from sphinx.websupport import WebSupport
 
 from git_manager.helpers.git_helper import GitHelper
 
@@ -15,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class SphinxHelper(object):
     GITHUB_REPO_FOLDER = 'github_repositories'
-    UNDOC_PICKLE_LOCATION = '_build/coverage/undoc.pickle'
+    UNDOC_PICKLE_LOCATION = '_build/html/undoc.pickle'
 
     def __init__(self, exp_or_package, folders, github_helper):
         """
@@ -26,6 +24,7 @@ class SphinxHelper(object):
         """
         self.owner = github_helper.owner
         self.github_helper = github_helper
+        self.git_helper = GitHelper(self.github_helper)
         self.repo_name = exp_or_package.git_repo.name
         self.docs_src_location = exp_or_package.template.docs_src_location
         if not self.docs_src_location:
@@ -38,13 +37,12 @@ class SphinxHelper(object):
         self.github_helper.create_branch('gh-pages')
 
     def build_gh_pages(self):
-        git_helper = GitHelper(self.github_helper)
-        git_helper.clone_or_pull_repository()
+        self.git_helper.clone_or_pull_repository()
         self.create_gh_pages_branch()
-        git_helper.switch_to_branch('master')
-        html_folder = os.path.join(git_helper.repo_dir, 'docs/_build/html')
-        user_dir = git_helper.repo_dir_of_user()
-        repo_dir = git_helper.repo_dir
+        self.git_helper.switch_to_branch('master')
+        html_folder = os.path.join(self.git_helper.repo_dir, 'docs/_build/html')
+        user_dir = self.git_helper.repo_dir_of_user()
+        repo_dir = self.git_helper.repo_dir
 
         subprocess.call(['mv', html_folder, '.'], cwd=user_dir)
         subprocess.call(['git', 'pull'], cwd=repo_dir)
@@ -63,14 +61,14 @@ class SphinxHelper(object):
         subprocess.call(['touch', '.nojekyll'], cwd=repo_dir)
         shutil.rmtree(os.path.join(user_dir, 'html/'))
         subprocess.call(['git', 'add', '.'], cwd=repo_dir)
-        git_helper.commit('Updated docs')
-        git_helper.push()
+        self.git_helper.commit('Updated docs')
+        self.git_helper.push()
 
-        git_helper = None
+        self.git_helper = None
         shutil.rmtree(repo_dir)
 
     def get_coverage_data(self):
-        coverage_pickle = '{0}{1}'.format(self.path, self.UNDOC_PICKLE_LOCATION)
+        coverage_pickle = os.path.join(self.git_helper.repo_dir, self.docs_src_location, self.UNDOC_PICKLE_LOCATION)
         total_undocumented_functions = 0
         total_undocumented_classes = 0
         try:

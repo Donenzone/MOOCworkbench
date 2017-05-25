@@ -165,7 +165,7 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
 
     def readme_file_of_package(self):
         internalpackage = InternalPackage.objects.get(id=self.kwargs['pk'])
-        github_helper = GitHubHelper(self.request.user, internalpackage.git_repo.name)
+        github_helper = GitHubHelper(internalpackage.owner, internalpackage.git_repo.name)
         readme = github_helper.view_file('README.md')
         md = Markdown()
         content_file = md.convert(readme)

@@ -115,7 +115,8 @@
     {% if request.user.is_authenticated %}
     <script type="text/javascript">
         $(document).ready(function() {
-            socket = new WebSocket("ws://" + window.location.host + "/");
+            var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+            socket = new WebSocket(ws_scheme + "://" + window.location.host + "/");
             if (socket.readyState == WebSocket.OPEN) {
                 socket.onopen();
             }

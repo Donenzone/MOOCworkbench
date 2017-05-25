@@ -41,7 +41,7 @@ def _files_in_folder(location, exp_or_package):
     if isinstance(exp_or_package, Experiment):
         files = _add_static_results_to_files(exp_or_package, content_files)
     else:
-        files = content_files
+        files = _add_github_url_to_files(exp_or_package, content_files)
     return files
 
 
@@ -63,6 +63,15 @@ def _add_static_results_to_files(experiment, content_files):
         git_file.pylint_results = return_result_summary_for_file(experiment,
                                                                  git_file.path)
         git_file.slug = slugify(git_file.name)
+    return content_files
+
+
+def _add_github_url_to_files(experiment, content_files):
+    github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
+    for git_file in content_files:
+        git_file.github_url = 'https://github.com/{0}/{1}/blob/master/{2}'.format(github_helper.owner,
+                                                                                  github_helper.repo_name,
+                                                                                  git_file.name)
     return content_files
 
 

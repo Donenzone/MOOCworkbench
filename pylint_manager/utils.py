@@ -1,4 +1,3 @@
-import virtualenv
 import os
 import subprocess
 import json
@@ -11,6 +10,7 @@ from django.db.models import Q
 
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.helpers.github_helper import GitHubHelper
+from MOOCworkbench.settings import PROJECT_ROOT
 
 from .models import PylintScan, PylintResult, PylintScanResult
 
@@ -65,18 +65,12 @@ def run_pylint(experiment):
 
     # virtualenv create
     repo_dir = git_helper.repo_dir
-    venv_dir = os.path.join(repo_dir, ".venv")
-    virtualenv.create_environment(venv_dir)
-
-    # install requirements
-    requirements_location = '{0}/requirements.txt'.format(repo_dir)
-    active_this = '{0}/.venv/bin/activate_this.py'.format(repo_dir)
-    subprocess.call(['python3', active_this])
-    subprocess.call(['pip3', 'install', '-r', requirements_location])
 
     # find python files in src/ folders
-    step_folder = '{0}{1}'.format(repo_dir, active_step.location)
+    step_folder = os.path.join(repo_dir, active_step.location)
     python_file_list = find_python_files_in_dir(step_folder)
+
+    subprocess.call(['./shell_scripts/run_pylint.sh', repo_dir], cwd=PROJECT_ROOT)
 
     # run pylint on files
     pylint_results = []

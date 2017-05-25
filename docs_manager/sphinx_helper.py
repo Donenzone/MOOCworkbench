@@ -5,7 +5,7 @@ import shutil
 import pickle
 from os.path import isfile, isdir
 
-
+from MOOCworkbench.settings import PROJECT_ROOT
 from git_manager.helpers.git_helper import GitHelper
 
 logger = logging.getLogger(__name__)
@@ -36,10 +36,15 @@ class SphinxHelper(object):
     def create_gh_pages_branch(self):
         self.github_helper.create_branch('gh-pages')
 
+    def create_venv_and_gen_docs(self):
+        repo_dir = self.git_helper.repo_dir
+        subprocess.call(['./shell_scripts/docs_generation.sh', repo_dir], cwd=PROJECT_ROOT)
+
     def build_gh_pages(self):
         self.git_helper.clone_or_pull_repository()
         self.create_gh_pages_branch()
         self.git_helper.switch_to_branch('master')
+        self.create_venv_and_gen_docs()
         html_folder = os.path.join(self.git_helper.repo_dir, 'docs/_build/html')
         user_dir = self.git_helper.repo_dir_of_user()
         repo_dir = self.git_helper.repo_dir

@@ -35,7 +35,6 @@ class ExternalPackageCreateView(CreateView):
         return super(ExternalPackageCreateView, self).form_valid(form)
 
 
-
 class PackageListView(ListView):
     model = Package
 

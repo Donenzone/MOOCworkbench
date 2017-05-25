@@ -2,7 +2,8 @@ from django.conf.urls import url
 
 from requirements_manager.views import RequirementListView
 
-from marketplace.views import *
+from marketplace.views.views import *
+from marketplace.views.views_internalpackage import *
 
 urlpatterns = [
     url(r'^$', login_required(MarketplaceIndex.as_view()), name="marketplace_index"),

@@ -13,6 +13,7 @@ from django.utils.encoding import force_bytes
 
 from requirements_manager.tasks import task_update_requirements
 from dataschema_manager.tasks import task_read_data_schema
+from docs_manager.tasks import task_generate_docs
 from quality_manager.tasks import task_complete_quality_check
 from git_manager.helpers.helper import get_experiment_from_repo_name
 
@@ -91,6 +92,7 @@ def run_post_push_tasks(repository_name, sha_list):
     task_read_data_schema.delay(repository_name)
     task_process_git_push.delay(repository_name, sha_list)
     active_step = experiment.get_active_step()
+    task_generate_docs.delay(experiment.get_object_type(), experiment.pk)
     if active_step:
         task_complete_quality_check.delay(active_step.id)
 

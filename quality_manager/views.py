@@ -1,5 +1,3 @@
-from celery import chain
-
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -10,10 +8,9 @@ from experiments_manager.mixins import ExperimentContextMixin
 from experiments_manager.models import ChosenExperimentSteps
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
-from .models import ExperimentMeasure
-from .mixins import MeasurementMixin, get_recent_measurements_for_type
+from .mixins import MeasurementMixin
 from .helpers.what_now_helper import WhatNow
-from .helpers.helper import get_description_measure_list
+from .helpers.helper import get_description_measure_list, get_nr_of_commits_last_week
 from .tasks import task_complete_quality_check
 
 
@@ -48,16 +45,7 @@ class VcsOverviewView(ExperimentContextMixin, View):
 class NrOfCommitsView(MeasurementMixin, View):
     def get(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
-        experiment_measure = ExperimentMeasure.objects.get(name='Version control use')
-        measurement = get_recent_measurements_for_type(experiment.get_active_step(),
-                                                       experiment_measure)
-
-        raw_values = []
-        key_values = []
-        for measure in measurement:
-            key_values.append(measure.created)
-            for raw in measure.raw_values.all():
-                raw_values.append(raw.value)
+        raw_values, key_values = get_nr_of_commits_last_week(experiment)
         return JsonResponse({'values': raw_values, 'keys': key_values})
 
 

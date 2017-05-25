@@ -12,8 +12,8 @@ class VersionControlUseMeasurement(MeasurementAbstraction):
         self.raw = RawMeasureResult()
 
     def measure(self):
-        today = datetime.now().date() - timedelta(3)
-        commits_last_three_days = self.experiment.git_repo.commits.filter(timestamp__gte=today)
+        last_three_days = datetime.now().date() - timedelta(3)
+        commits_last_three_days = self.experiment.git_repo.commits.filter(timestamp__gte=last_three_days)
         if commits_last_three_days:
             if commits_last_three_days.count() < 6:
                 self.result.result = ExperimentMeasureResult.MEDIUM

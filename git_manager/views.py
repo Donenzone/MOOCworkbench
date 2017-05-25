@@ -13,7 +13,8 @@ from django.utils.encoding import force_bytes
 
 from requirements_manager.tasks import task_update_requirements
 from dataschema_manager.tasks import task_read_data_schema
-from pylint_manager.tasks import task_run_pylint
+from quality_manager.tasks import task_complete_quality_check
+from git_manager.helpers.helper import get_experiment_from_repo_name
 
 from .helpers.github_helper import GitHubHelper
 from .tasks import task_process_git_push
@@ -71,7 +72,7 @@ def webhook_receive(request):
         return HttpResponse('pong')
     elif event == 'push':
         # Deploy some code for example
-        event = json.loads(request.body)
+        event = json.loads(str(request.body, encoding='utf8'))
         repo_name = event['repository']['name']
         sha_hash_list = []
         if 'commits' in event:
@@ -85,8 +86,11 @@ def webhook_receive(request):
 
 
 def run_post_push_tasks(repository_name, sha_list):
+    experiment = get_experiment_from_repo_name(repository_name)
     task_update_requirements.delay(repository_name)
     task_read_data_schema.delay(repository_name)
     task_process_git_push.delay(repository_name, sha_list)
-    task_run_pylint.delay(repository_name)
+    active_step = experiment.get_active_step()
+    if active_step:
+        task_complete_quality_check.delay(active_step.id)
 

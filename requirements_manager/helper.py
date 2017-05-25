@@ -1,10 +1,10 @@
 from .models import Requirement
 
 
-def delete_existing_requirements(self):
-    for req in self.exp_or_package.requirements.all():
-        self.exp_or_package.requirements.remove(req)
-        self.exp_or_package.save()
+def delete_existing_requirements(exp_or_package):
+    for req in exp_or_package.requirements.all():
+        exp_or_package.requirements.remove(req)
+        exp_or_package.save()
         req.delete()
 
 

@@ -6,7 +6,6 @@ from git_manager.helpers.helper import get_experiment_from_repo_name
 from helpers.helper import get_package_or_experiment_without_request
 
 
-
 @app.task
 def task_write_requirements_file(object_id, object_type):
     exp_or_package = get_package_or_experiment_without_request(object_type, object_id)

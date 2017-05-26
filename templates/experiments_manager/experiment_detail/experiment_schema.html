@@ -23,7 +23,9 @@
             var hash = window.location.hash;
 
             if (hash === '#intro') {
-                introJs().setOption('doneLabel', 'Close').start().oncomplete();
+                introJs().setOption('doneLabel', 'Next page').start().oncomplete(function () {
+                    window.location.href = '{% url "experiment_readme" object.id %}#intro';
+                });
             }
         });
     </script>

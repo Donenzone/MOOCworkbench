@@ -12,8 +12,6 @@
             id="requirements-click">Dependencies</a></li>
     <li {% if schema_active %}class="active"{% endif %}><a href="{% url "experiment_schema" object.id %}"
                                                            class="tab-btn">Schema</a></li>
-    <li {% if issues_active %}class="active"{% endif %}><a href="{% url "experiment_issues" object.id %}"
-                                                           class="tab-btn">Issues</a></li>
 
     <li {% if settings_active %}class="active"{% endif %}><a href="{% url "experiment_edit" object.id %}"
                                                               class="tab-btn">Settings</a></li>

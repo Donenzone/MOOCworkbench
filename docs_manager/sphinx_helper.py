@@ -74,7 +74,9 @@ class SphinxHelper(object):
         shutil.rmtree(repo_dir)
 
     def get_coverage_data(self):
-        coverage_pickle = os.path.join(self.git_helper.repo_dir, self.docs_src_location, self.UNDOC_PICKLE_LOCATION)
+        self.git_helper.clone_or_pull_repository()
+        self.create_venv_and_gen_docs()
+        coverage_pickle = os.path.join(self.path, self.UNDOC_PICKLE_LOCATION)
         total_undocumented_functions = 0
         total_undocumented_classes = 0
         try:
@@ -88,6 +90,8 @@ class SphinxHelper(object):
                     if 'classes' in module_info[1]:
                         classes = module_info[1]['classes']
                         total_undocumented_classes += len(classes)
+
+            shutil.rmtree(self.git_helper.repo_dir)
             return coverage_list, total_undocumented_functions, total_undocumented_classes
         except IOError as e:
             logger.error("Coverage data not found for (%s, %s): %s", self.owner, self.repo_name, e)

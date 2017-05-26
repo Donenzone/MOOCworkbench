@@ -20,12 +20,9 @@
 
             {% if step.step.name == 'Schema' %}
                 <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#schema-modal">Help me create a schema</a>
-            {% endif %}
-
-            {% if object.docs.enabled %}
+            {% elif object.docs.enabled %}
                 <div class="row">
                     <div class="col-md-12">
-
                     {% include "experiments_manager/experiment_detail/experimentstep/experimentstep_docs.html" %}
                     </div>
                 </div>

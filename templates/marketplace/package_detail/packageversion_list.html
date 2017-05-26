@@ -9,15 +9,16 @@
 {% block content %}
 
     {% include "marketplace/package_detail/package_detail_tabs.html" %}
+
     <div class="col-md-12">
         <div class="panel panel-info">
             <div class="panel-heading">Version history</div>
             <div class="panel-body">
-                <table class="table">
-                    <tr>
+                <table class="table table-striped">
+                    <thead>
                         <th>Version nr</th>
                         <th>Date added</th>
-                    </tr>
+                    </thead>
                     {% for version in object_list %}
                         <tr>
                             <td>

@@ -1,6 +1,7 @@
 import hmac
 from hashlib import sha1
 import json
+import logging
 
 import requests
 from ipaddress import ip_address, ip_network
@@ -19,6 +20,9 @@ from git_manager.helpers.helper import get_experiment_from_repo_name
 
 from .helpers.github_helper import GitHubHelper
 from .tasks import task_process_git_push
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_user_repositories(user):
@@ -88,6 +92,7 @@ def webhook_receive(request):
 
 def run_post_push_tasks(repository_name, sha_list):
     experiment = get_experiment_from_repo_name(repository_name)
+    logger.debug('received and processing git commit for %s', experiment)
     task_update_requirements.delay(repository_name)
     task_read_data_schema.delay(repository_name)
     task_process_git_push.delay(repository_name, sha_list)

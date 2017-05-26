@@ -61,7 +61,6 @@ class GitManagerTestCases(TestCase):
         self.assertIsNotNone(github_helper)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
-    @patch('git_manager.helpers.github_helper.GitHubHelper._check_webhook_exists')
     def test_init_github_helper_create(self, mock_web_hook, mock_github):
         mock_github.return_value = GithubMock()
         mock_web_hook.return_value = True

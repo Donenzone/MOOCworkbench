@@ -167,7 +167,7 @@ class CoverageManagerTestCase(TestCase):
         response = self.client.get(reverse('coveralls_status', kwargs={'object_id': 1,
                                                                        'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context['travis'])
+        self.assertTrue(response.context['travis'])
         self.assertFalse(response.context['coverage_configured'])
 
     def test_coveralls_status_enabled(self):

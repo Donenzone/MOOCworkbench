@@ -56,7 +56,7 @@ class ExperimentTestCase(TestCase):
         response = c.get(reverse('experiment_new'))
         self.assertEqual(response.status_code, 302)
 
-    @patch('experiments_manager.views.get_user_repositories')
+    @patch('experiments_manager.views.views_create.get_user_repositories')
     def test_create_new_experiment_get_mock(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
         response = self.client.get(reverse('experiment_new'))
@@ -75,7 +75,7 @@ class ExperimentTestCase(TestCase):
     #    self.assertEqual(response.status_code, 302)
     #    self.assertEqual(response.url, reverse('experimentsteps_choose', kwargs={'experiment_id': 2}))
 
-    @patch('experiments_manager.views.get_user_repositories')
+    @patch('experiments_manager.views.views_create.get_user_repositories')
     def test_create_new_experiment_post_missing_title(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
@@ -85,7 +85,7 @@ class ExperimentTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('experiments_manager.views.get_user_repositories')
+    @patch('experiments_manager.views.views_create.get_user_repositories')
     def test_create_new_experiment_post_missing_description(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
@@ -95,7 +95,7 @@ class ExperimentTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('experiments_manager.views.get_user_repositories')
+    @patch('experiments_manager.views.views_create.get_user_repositories')
     def test_create_new_experiment_post_missing_title_and_desc(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
@@ -105,7 +105,7 @@ class ExperimentTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('experiments_manager.views.get_user_repositories')
+    @patch('experiments_manager.views.views_create.get_user_repositories')
     def test_create_new_experiment_post_empty(self, mock_get_user_repositories):
         mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
 
@@ -157,10 +157,10 @@ class ExperimentTestCase(TestCase):
         response_json = json.loads(str(response.content, encoding='utf8'))
         self.assertIsNotNone(response_json['message'])
 
-    @patch('experiments_manager.views.GitHubHelper')
+    @patch('experiments_manager.views.views.GitHubHelper')
     @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
-    @patch('experiments_manager.views.get_files_for_steps')
-    @patch('experiments_manager.views._get_files_in_repository')
+    @patch('experiments_manager.views.views.get_files_for_steps')
+    @patch('experiments_manager.views.views._get_files_in_repository')
     def test_experiment_detail_view(self, mock_context_data, mock_get_files_in_repository, mock_github_helper_file_list, mock_github_helper):
         self.test_choose_experiment_steps_post()
         mock_context_data.return_value = {'git_list': self.get_mock_files()}
@@ -183,8 +183,8 @@ class ExperimentTestCase(TestCase):
         response = c.get(reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'}))
         self.assertEqual(response.status_code, 302)
 
-    @patch('experiments_manager.views.GitHubHelper')
-    @patch('experiments_manager.views._get_files_in_repository')
+    @patch('experiments_manager.views.views.GitHubHelper')
+    @patch('experiments_manager.views.views._get_files_in_repository')
     def test_get_file_list_for_exp_step(self, mock_get_files_in_repository, mock_github_helper):
         self.test_choose_experiment_steps_post()
         mock_github_helper.return_value = None

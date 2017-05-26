@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from git_manager.views import get_user_repositories
-from helpers.constants import INTRODUCTION_HASH
+from git_manager.helpers.github_helper import GitHubHelper
 
 from ..forms import ExperimentForm
 from ..models import *
@@ -85,11 +85,12 @@ class StepThreeChooseExperimentSteps(ExperimentContextMixin, View):
 def step_four_experiment_first_time(request, pk):
     experiment = verify_and_get_experiment(request, pk)
     context = {}
+    gh_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
     context['object'] = experiment
     context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
     context['object_id'] = experiment.pk
     context['configured'] = experiment.travis.enabled
-    context['username'] = experiment.git_repo.owner
+    context['github_username'] = gh_helper.owner
     context['reposlug'] = experiment.git_repo.name
     context['travis'] = experiment.travis
     context['coverage_configured'] = experiment.docs.enabled

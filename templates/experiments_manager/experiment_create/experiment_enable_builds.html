@@ -69,21 +69,21 @@
                 <h4>For macOS and Linux</h4>
                 <ol>
                     <li>Clone your new experiment with the following command:
-                        <pre>git clone git@github.com:{{ username }}/{{ reposlug }}.git</pre>
+                        <pre>git clone git@github.com:{{ github_username }}/{{ reposlug }}.git</pre>
                     </li>
-                    <li>Use the make file to automate usual tasks
+                    <li>Take a moment to look at what commands make supports:
                         <pre>make</pre>
                     </li>
-                    <li>First, create a virtual environment:
+                    <li>Then, create a virtual environment:
                         <pre>make create_environment</pre>
                     </li>
-                    <li>Activate the environment with
+                    <li>Activate the environment with:
                         <pre>source activate {{ reposlug }}</pre>
                     </li>
-                    <li>Install the dependencies
+                    <li>Install the dependencies:
                         <pre>make requirements</pre>
                     </li>
-                    <li>Run the tests
+                    <li>Run the tests:
                         <pre>make tests</pre>
                     </li>
                 </ol>

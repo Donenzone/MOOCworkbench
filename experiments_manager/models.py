@@ -108,6 +108,7 @@ def add_experiment_config(sender, instance, created, **kwargs):
 
         coverage = CodeCoverage()
         coverage.travis_instance = travis
+        coverage.enabled = False
         coverage.save()
 
         pylint = PylintScan()

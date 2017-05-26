@@ -17,6 +17,11 @@
             <p class="lead">
                 {{ step.step.description }}
             </p>
+
+            {% if step.step.name == 'Schema' %}
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#schema-modal">Help me create a schema</a>
+            {% endif %}
+
             {% if object.docs.enabled %}
                 <div class="row">
                     <div class="col-md-12">
@@ -54,4 +59,23 @@
             {% endif %}
         </div>
     </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="schema-modal" tabindex="-1" role="dialog" aria-labelledby="schemaModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Make a data schema</h4>
+      </div>
+      <div class="modal-body">
+        {% include "experiments_manager/experiment_detail/experiment_schema_walktrough.html" %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -54,5 +54,5 @@ def docs_generate(request, object_id, object_type):
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
     send_message(exp_or_package.owner.user.username, MessageStatus.INFO,
                  'Task to regenerate documentation started.')
-    task_generate_docs.delay(object_type, object_id)
+    task_generate_docs(object_type, object_id)
     return JsonResponse({})

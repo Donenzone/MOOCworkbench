@@ -41,10 +41,12 @@
                                 <td>Language</td>
                                 <td>{{ object.language }}</td>
                             </tr>
+                            {% if object.docs.enabled %}
                             <tr>
                                 <td>Documentation</td>
-                                <td>Read Package Documentation</td>
+                                <td><a href="{% url 'docs_view' object.pk object.get_object_type %}" target="_blank">Read Package Documentation</a></td>
                             </tr>
+                            {% endif %}
                         </table>
                     </div>
                 </div>

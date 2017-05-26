@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class SphinxHelper(object):
     GITHUB_REPO_FOLDER = 'github_repositories'
     UNDOC_PICKLE_LOCATION = '_build/html/undoc.pickle'
+    HTML_DEFAULT_FOLDER = 'docs/_build/html'
 
     def __init__(self, exp_or_package, folders, github_helper):
         """
@@ -45,7 +46,7 @@ class SphinxHelper(object):
         self.create_gh_pages_branch()
         self.git_helper.switch_to_branch('master')
         self.create_venv_and_gen_docs()
-        html_folder = os.path.join(self.git_helper.repo_dir, 'docs/_build/html')
+        html_folder = os.path.join(self.git_helper.repo_dir, self.HTML_DEFAULT_FOLDER)
         user_dir = self.git_helper.repo_dir_of_user()
         repo_dir = self.git_helper.repo_dir
 
@@ -91,6 +92,6 @@ class SphinxHelper(object):
         except IOError as e:
             logger.error("Coverage data not found for (%s, %s): %s", self.owner, self.repo_name, e)
 
-    def get_document(self, document_name):
+    def get_document(self, document_name=''):
         datadir = 'https://{0}.github.io/{1}/{2}.html'.format(self.github_helper.owner, self.github_helper.repo_name, document_name)
         return datadir

@@ -117,16 +117,13 @@ class PythonHelper(LanguageHelper):
         self.exp_or_package.save()
 
     def generate_documentation(self):
-        git_helper = GitHelper(self.github_helper)
-        git_helper.clone_or_pull_repository()
         folders = self.exp_or_package.get_docs_folder()
         sphinx_helper = SphinxHelper(self.exp_or_package, folders, self.github_helper)
         sphinx_helper.build_gh_pages()
 
     def get_document(self, document_name):
-        from experiments_manager.helper import get_steps
-        steps = get_steps(self.exp_or_package)
-        sphinx_helper = SphinxHelper(self.exp_or_package, steps, self.github_helper)
+        folders = self.exp_or_package.get_docs_folder()
+        sphinx_helper = SphinxHelper(self.exp_or_package, folders, self.github_helper)
         return sphinx_helper.get_document(document_name)
 
 

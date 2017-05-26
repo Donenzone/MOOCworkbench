@@ -62,56 +62,45 @@ def parse_rlint_results(result_line, filename):
 def run_pylint(experiment):
     git_helper = static_analysis_prepare(experiment)
     active_step = experiment.get_active_step()
-
-    # virtualenv create
     repo_dir = git_helper.repo_dir
 
-    # find python files in src/ folders
-    step_folder = os.path.join(repo_dir, active_step.location)
-    python_file_list = find_python_files_in_dir(step_folder)
+    step_folder_relative = make_relative_path(active_step.location)
+    step_folder = os.path.join(repo_dir, step_folder_relative)
+    subprocess.call(['./shell_scripts/run_pylint.sh', repo_dir, step_folder_relative], cwd=PROJECT_ROOT)
 
-    subprocess.call(['./shell_scripts/run_pylint.sh', repo_dir], cwd=PROJECT_ROOT)
+    with open(os.path.join(step_folder, 'pylint_results.json'), 'r') as pylint_file:
+        pylint_results = pylint_file.read()
+        pylint_scan_result_object = PylintScanResult()
+        pylint_scan_result_object.for_project = experiment.pylint
+        pylint_scan_result_object.save()
 
-    # run pylint on files
-    pylint_results = []
-    for python_file in python_file_list:
-        p = subprocess.run(['pylint', '--output-format=json', python_file],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE)
-        pylint_results.append(p.stdout.decode('utf-8'))
+        parse_pylint_results(pylint_results, pylint_scan_result_object)
 
-    pylint_scan_result_object = PylintScanResult()
-    pylint_scan_result_object.for_project = experiment.pylint
-    pylint_scan_result_object.save()
+        results_errors = PylintResult.objects.filter(for_result=pylint_scan_result_object, pylint_type='e').count()
+        pylint_scan_result_object.nr_of_errors = results_errors
+        results_warnings = PylintResult.objects.filter(for_result=pylint_scan_result_object, pylint_type='w').count()
+        pylint_scan_result_object.nr_of_warnings = results_warnings
+        results_other_issues = PylintResult.objects.filter(~Q(pylint_type='e'), ~Q(pylint_type='w'),
+                                                           for_result=pylint_scan_result_object).count()
+        pylint_scan_result_object.nr_of_other_issues = results_other_issues
+        pylint_scan_result_object.save()
 
-    parse_pylint_results(pylint_results, pylint_scan_result_object)
-
-    results_errors = PylintResult.objects.filter(for_result=pylint_scan_result_object, pylint_type='e').count()
-    pylint_scan_result_object.nr_of_errors = results_errors
-    results_warnings = PylintResult.objects.filter(for_result=pylint_scan_result_object, pylint_type='w').count()
-    pylint_scan_result_object.nr_of_warnings = results_warnings
-    results_other_issues = PylintResult.objects.filter(~Q(pylint_type='e'), ~Q(pylint_type='w'),
-                                            for_result=pylint_scan_result_object).count()
-    pylint_scan_result_object.nr_of_other_issues = results_other_issues
-    pylint_scan_result_object.save()
+    shutil.rmtree(repo_dir)
 
 
-def find_python_files_in_dir(dir_to_scan):
-    python_list = []
-    for file in os.listdir(dir_to_scan):
-        if file.endswith(".py"):
-            python_list.append(os.path.join(dir_to_scan, file))
-    return python_list
+def make_relative_path(location):
+    if location.startswith('/'):
+        return location[1:]
+    return location
 
 
 def parse_pylint_results(pylint_results, pylint_scan_result_object):
-    if pylint_results:
-        json_pylint = json.loads(pylint_results[0])
-        for pylint in json_pylint:
-            result = PylintResult()
-            result.for_result = pylint_scan_result_object
-            result.pylint_type = pylint['type'][0]
-            result.message = pylint['message']
-            result.line_nr = pylint['line']
-            result.file_path = pylint['path']
-            result.save()
+    json_pylint = json.loads(pylint_results)
+    for pylint in json_pylint:
+        result = PylintResult()
+        result.for_result = pylint_scan_result_object
+        result.pylint_type = pylint['type'][0]
+        result.message = pylint['message']
+        result.line_nr = pylint['line']
+        result.file_path = pylint['path']
+        result.save()

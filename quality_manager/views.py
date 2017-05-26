@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -12,6 +14,9 @@ from .mixins import MeasurementMixin
 from .helpers.what_now_helper import WhatNow
 from .helpers.helper import get_description_measure_list, get_nr_of_commits_last_week
 from .tasks import task_complete_quality_check
+
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
@@ -33,6 +38,7 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
         context['descriptions'] = get_description_measure_list()
         context['dashboard_messages'] = messages
+        logger.debug('dashboard view for %s', self.experiment)
         return render(request, self.template_name, context)
 
 

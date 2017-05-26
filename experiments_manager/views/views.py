@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 
 from django.views.generic.detail import DetailView
 from django.views import View
@@ -22,6 +23,9 @@ from ..forms import ExperimentEditForm
 from ..models import *
 from ..helper import verify_and_get_experiment, get_readme_of_experiment
 from ..mixins import ExperimentContextMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):

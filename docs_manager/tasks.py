@@ -1,7 +1,5 @@
 import logging
 
-from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.helpers.git_helper import GitHelper
 from MOOCworkbench.celery import app
 from helpers.helper import get_package_or_experiment_without_request
 from experiments_manager.consumers import send_message

@@ -224,6 +224,46 @@ LOGGING = {
                 'level': 'DEBUG',
                 'propagate': True,
         },
+        'docs_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'experiments_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'git_manager': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'marketplace': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+        },
+        'pylint_manager': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'quality_manager': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'recommendations': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'requirements_manager': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'user_manager': {
                 'handlers': ['file'],
                 'level': 'DEBUG',

@@ -1,3 +1,5 @@
+import logging
+
 from markdown2 import Markdown
 
 from django.contrib import messages
@@ -27,6 +29,9 @@ from marketplace.tasks import task_remove_package
 from marketplace.mixins import IsInternalPackageMixin, ObjectTypeIdMixin
 
 
+logger = logging.getLogger(__name__)
+
+
 class InternalPackageBaseView(ObjectTypeIdMixin, IsInternalPackageMixin):
     class Meta:
         abstract = True
@@ -42,6 +47,8 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
         context['experiment_id'] = self.kwargs['experiment_id']
         context['step_id'] = self.kwargs['step_id']
+
+        logger.debug('%s started on package creation for %d', self.request.user, self.kwargs['experiment_id'])
         return context
 
     def form_valid(self, form):
@@ -130,6 +137,7 @@ def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_publish_update_package.delay(package.pk)
+    logger.debug('%s published the package %d', request.user, package)
     return redirect(to=package.get_absolute_url())
 
 

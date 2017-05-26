@@ -1,11 +1,8 @@
-from markdownx.fields import MarkdownxFormField
-from markdownx.widgets import MarkdownxWidget
-
 from django import forms
 from django.forms import ModelForm
 from django.forms import TextInput
 
-from marketplace.models import InternalPackage, PackageResource
+from marketplace.models import InternalPackage
 
 
 class PackageNameField(forms.CharField):

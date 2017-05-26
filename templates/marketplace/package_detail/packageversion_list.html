@@ -30,14 +30,34 @@
                         </tr>
                     {% endfor %}
                 </table>
-                {% if is_internal %}
+                {% if is_internal and package.owner.pk is workbench_user.pk %}
                     <a href="{% url 'internalpackageversion_new' package.pk %}" class="btn btn-default">Add New Version</a>
-                {% else %}
+                {% elif not is_internal %}
                     <a href="{% url 'packageversion_new' package.pk %}" class="btn btn-default">Add New Version</a>
                 {% endif %}
             </div>
         </div>
     </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="version-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">View version of package</h4>
+          </div>
+          <div class="modal-body">
+                <div id="version-information">Loading...</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     {% block pagination %}
         {% if is_paginated %}
@@ -56,4 +76,13 @@
             </div>
         {% endif %}
     {% endblock %}
+
+       <script type="text/javascript">
+        $(document).ready(function() {
+            $('.version-btn').click(function() {
+                fetch_url = $(this).attr('data-url');
+                $("#version-information").load(fetch_url);
+            });
+        });
+    </script>
 {% endblock %}

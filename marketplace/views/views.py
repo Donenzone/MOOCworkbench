@@ -1,3 +1,5 @@
+from markdownx.utils import markdownify
+
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, JsonResponse
@@ -13,6 +15,7 @@ from recommendations.utils import recommend
 
 from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from .views_internalpackage import InternalPackageBaseView
+from ..tasks import task_check_for_new_package_version
 
 
 class MarketplaceIndex(View):
@@ -29,6 +32,11 @@ class ExternalPackageCreateView(CreateView):
     model = ExternalPackage
     fields = ['name', 'description', 'project_page', 'category', 'language']
     template_name = 'marketplace/package_create/package_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExternalPackageCreateView, self).get_context_data(**kwargs)
+        context['external'] = True
+        return context
 
     def form_valid(self, form):
         form.instance.owner = get_workbench_user(self.request.user)
@@ -56,6 +64,7 @@ class ExternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
         context = super(ExternalPackageDetailView, self).get_context_data(**kwargs)
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
+        task_check_for_new_package_version.delay()
         context['index_active'] = True
         return context
 
@@ -77,6 +86,7 @@ class PackageVersionListView(InternalPackageBaseView, ListView):
 
 class PackageVersionDetailView(DetailView):
     model = PackageVersion
+    template_name = 'marketplace/packageversion_detail.html'
 
     def get_queryset(self):
         qs = super(PackageVersionDetailView, self).get_queryset()
@@ -102,6 +112,11 @@ class PackageVersionCreateView(CreateView):
 class PackageResourceCreateView(CreateView):
     model = PackageResource
     fields = ['title', 'resource', 'url']
+
+    def get_context_data(self, **kwargs):
+        context = super(PackageResourceCreateView, self).get_context_data(**kwargs)
+        context['package'] = Package.objects.get(id=self.kwargs['package_id'])
+        return context
 
     def form_valid(self, form):
         package = Package.objects.get(id=self.kwargs['package_id'])
@@ -180,3 +195,11 @@ def recommend_packageresource(request, pk):
     resource = PackageResource.objects.get(id=pk)
     workbench_user = get_workbench_user(request.user)
     return recommend(resource, workbench_user)
+
+
+@login_required
+def markdownify_text(request):
+    if request.POST and 'markdown' in request.POST:
+        markdown = request.POST.get('markdown')
+        markdown = markdownify(markdown)
+        return JsonResponse({'markdown': markdown})

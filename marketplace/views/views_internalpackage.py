@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
@@ -76,14 +76,15 @@ class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
     def get(self, request, pk):
         package = get_object_or_404(InternalPackage, pk=pk)
 
-        context = {}
-        context['docs'] = package.docs
-        context['package'] = package
-        context['object_id'] = package.pk
-        context['object_type'] = package.get_object_type()
+        assert package.owner.user == self.request.user
 
-        context['edit_form'] = InternalPackageForm(instance=package)
-        context['dashboard_active'], context['is_internal'] = True, True
+        context = {'docs': package.docs,
+                   'package': package,
+                   'object_id': package.pk,
+                   'object_type': package.get_object_type(),
+                   'edit_form': InternalPackageForm(instance=package),
+                   'dashboard_active': True,
+                   'is_internal': True}
         return render(request, 'marketplace/package_detail/internalpackage_dashboard.html', context)
 
 
@@ -95,6 +96,7 @@ class InternalPackageUpdateView(UpdateView):
         return reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['pk']})
 
     def form_valid(self, form):
+        assert form.instance.owner.user == self.request.user
         messages.add_message(self.request, messages.SUCCESS, 'Package successfully updated')
         return super(InternalPackageUpdateView, self).form_valid(form)
 
@@ -104,7 +106,13 @@ class InternalPackageVersionCreateView(CreateView):
     fields = ['version_nr', 'changelog', 'pre_release']
     template_name = 'marketplace/package_detail/packageversion_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(InternalPackageVersionCreateView, self).get_context_data(**kwargs)
+        context['package'] = InternalPackage.objects.get(id=self.kwargs['package_id'])
+        return context
+
     def form_valid(self, form):
+        assert form.instance.owner.user == self.request.user
         package = InternalPackage.objects.get(id=self.kwargs['package_id'])
         form.instance.package = package
         form.instance.added_by = get_workbench_user(self.request.user)
@@ -122,7 +130,7 @@ def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_publish_update_package.delay(package.pk)
-    return JsonResponse({"publish": "started"})
+    return redirect(to=package.get_absolute_url())
 
 
 @login_required

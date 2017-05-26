@@ -9,28 +9,17 @@
 
 {% block content %}
 
-<h2>Create New Package</h2>
-{% if form.errors %}
-    {% for field in form %}
-        {% for error in field.errors %}
-            <div class="alert alert-danger">
-                <strong>{{ error|escape }}</strong>
-            </div>
-        {% endfor %}
-    {% endfor %}
-    {% for error in form.non_field_errors %}
-        <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
+    <h2>Create New Package</h2>
+    {% if not external %}
+        <p class="lead">When you create the new package, a new GitHub repository is created for your module and the
+            package is added to the Packages section in the workbench.</p>
+    {% endif %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form|bootstrap }}
+        <div class='input-field'>
+            <button type="submit" value="Save" class="btn btn-primary">Create New Package</button>
         </div>
-    {% endfor %}
-{% endif %}
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form|bootstrap }}
-    <div class='input-field'>
-        <p>When you create the new package, a new GitHub repository is created for your module and the package is added to the MOOC Marketplace in the workbench.</p>
-      <button type="submit" value="Save" class="btn btn-primary">Create New Package</button>
-    </div>
-</form>
+    </form>
 
 {% endblock %}

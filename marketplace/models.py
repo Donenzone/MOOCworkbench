@@ -94,7 +94,7 @@ def update_recommendations(content_type, content_object):
 
 
 class ExternalPackage(Package):
-    project_page = models.URLField()
+    project_page = models.URLField(help_text='URL to the project page of the package, for example to the PyPi location')
 
     def __str__(self):
         return self.name
@@ -159,8 +159,8 @@ def add_package_config(sender, instance, created, **kwargs):
 class PackageResource(TimeStampedModel):
     package = models.ForeignKey(to=Package)
     title = models.CharField(max_length=255)
-    resource = MarkdownxField()
-    url = models.URLField(null=True, blank=True)
+    resource = models.TextField(help_text='Markdown allowed')
+    url = models.URLField(null=True, blank=True, help_text='URL to resource (optional)')
     added_by = models.ForeignKey(to=WorkbenchUser)
     recommended = models.IntegerField(default=0)
 
@@ -181,7 +181,7 @@ class PackageResource(TimeStampedModel):
         return "{0} by {1}".format(self.title, self.added_by)
 
     def get_absolute_url(self):
-        return self.package.get_absolute_url()
+        return reverse('packageresource_detail', kwargs={'pk': self.pk})
 
     def get_activity_message(self):
         return "New resource '{0}' by {1} for package {2}".format(self.title, self.added_by, self.package)
@@ -207,6 +207,9 @@ class PackageVersion(TimeStampedModel):
     def get_activity_message(self):
         return "{0} was updated to version {1}".format(self.package, self.version_nr)
 
+    def get_absolute_url(self):
+        return reverse('packageversion_list', kwargs={'pk': self.package.pk})
+
 
 @receiver(post_save, sender=PackageVersion)
 def send_notification(sender, instance, created, **kwargs):
@@ -218,19 +221,18 @@ def send_notification(sender, instance, created, **kwargs):
 
 
 def update_all_versions():
-    for package in Package.objects.all():
+    for package in ExternalPackage.objects.all():
         get_latest_version(package)
 
 
 def get_latest_version(package):
-    if not package.internal_package:
-        pypi = xmlrpc.client.ServerProxy(PYPI_URL)
-        release = pypi.package_releases(package.package_name)
-        if len(release) != 0:
-            release = release[0]
-            newest_release = package.get_latest_package_version()
-            if newest_release is None or newest_release.check_if_version_is_newer(release):
-                url = '{0}/{1}/{2}'.format(PYPI_URL, package.package_name, release)
-                newer_release = PackageVersion(package=package, version_nr=release, changelog="Auto-added", url=url)
-                newer_release.save()
+    pypi = xmlrpc.client.ServerProxy(PYPI_URL)
+    release = pypi.package_releases(package.name)
+    if len(release) != 0:
+        release = release[0]
+        newest_release = package.get_latest_package_version()
+        if newest_release is None or newest_release.check_if_version_is_newer(release):
+            url = '{0}/{1}/{2}'.format(PYPI_URL, package.name, release)
+            newer_release = PackageVersion(package=package, version_nr=release, changelog="Auto-added", url=url)
+            newer_release.save()
 

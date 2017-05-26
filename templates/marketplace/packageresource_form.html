@@ -1,17 +1,54 @@
-{% extends 'base.html' %}
+{% extends 'marketplace/package_detail/package_detail.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
 {% block content %}
 
-<h2>Add Package Resource</h2>
-<p>Add some useful URL, information or other tools which help with this package.</p>
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Add package resource" "packageresource_new" package.id %}
+{% endblock %}
 
-<form action="" method="post">{% csrf_token %}
-    {{ form|bootstrap }}
-    <div class='input-field'>
-      <button type="submit" value="Save" class="btn btn-primary">Save</button>
+    <h2>Add Package Resource</h2>
+    <p class="lead">A resource can be a guide you've written yourself, a blog post on the web about the package or other useful information regarding this package.</p>
+
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#resource" aria-controls="home" role="tab" data-toggle="tab">Add
+            New Resource</a></li>
+        <li role="presentation"><a href="#preview" id="preview-btn" aria-controls="profile" role="tab" data-toggle="tab">Preview</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="resource">
+            <form action="" method="post">{% csrf_token %}
+                {{ form|bootstrap }}
+                <div class='input-field'>
+                    <button type="submit" value="Save" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+
+
+        <div role="tabpanel" class="tab-pane active" id="preview">
+            <div id="content"></div>
+        </div>
     </div>
-</form>
 
-{{ form.media }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#preview-btn').click(function() {
+                resource_text = $('#id_resource').val();
+                $.post({
+                    url: '{% url "markdownify" %}',
+                    data: {markdown: resource_text, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    success: function(data) {
+                        $('#content').html(data.markdown)
+                    }
+                })
+            });
+        });
+    </script>
 
 {% endblock %}

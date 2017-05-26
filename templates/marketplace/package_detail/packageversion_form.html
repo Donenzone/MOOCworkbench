@@ -1,6 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'marketplace/package_detail/package_detail.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
 {% block content %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Add new package version" "internalpackageversion_new" package.id %}
+{% endblock %}
 
 <h2>Add Package Version</h2>
 

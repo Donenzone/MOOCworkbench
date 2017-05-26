@@ -9,6 +9,14 @@ from ..helpers.git_helper import GitHelper
 from ..models import GitRepository
 
 
+class PackageCreationProgress(object):
+    STEP_CREATING_GITHUB_REPO = 2
+    STEP_CLONING_REPO = 3
+    STEP_FILTERING_SUBTREE = 4
+    STEP_CREATING_BOILERPLATE_CODE = 5
+    STEP_CLEAN_UP = 6
+
+
 class GitRepoInit(object):
     TEMPLATE_FOLDER = 'codetemplates/'
 
@@ -44,23 +52,28 @@ class PackageGitRepoInit(GitRepoInit):
         git_helper = self.clone_basis_for_module_and_return_git_helper()
         # take code from module and commit it to new repo
         self.move_code_from_base_to_new(git_helper)
-        send_exp_package_creation_status_update(self.username, 2)
+        send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_CREATING_GITHUB_REPO)
 
         # clone the new repository
         module_git_helper = self.clone_new_module_repo()
-        send_exp_package_creation_status_update(self.username, 3)
+        send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_CLONING_REPO)
         # move files of subtree to own package folder
         self.move_module_into_folder(module_git_helper, self.github_helper.repo_name)
-        send_exp_package_creation_status_update(self.username, 4)
+        send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_FILTERING_SUBTREE)
 
         # init the cookiecutter package template
         self.create_cookiecutter_boilerplate(module_git_helper)
-        send_exp_package_creation_status_update(self.username, 5)
+        send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_CREATING_BOILERPLATE_CODE)
 
         # remove the temp repo folders in github_repositories/
         self.clean_up_github_folders(git_helper)
         self.clean_up_github_folders(module_git_helper)
-        send_exp_package_creation_status_update(self.username, 6)
+        send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_CLEAN_UP)
+
+        language_helper = self.internal_package.language_helper()
+        req_file_loc = language_helper.get_requirements_file_location()
+        requirements_file = self.github_helper.view_file(req_file_loc)
+        language_helper.parse_requirements(requirements_file)
 
         return git_repo_obj
 

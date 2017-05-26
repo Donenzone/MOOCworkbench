@@ -8,7 +8,7 @@ from marketplace.views.views_internalpackage import *
 urlpatterns = [
     url(r'^$', login_required(MarketplaceIndex.as_view()), name="marketplace_index"),
     url(r'^list/$', login_required(PackageListView.as_view()), name="package_list"),
-    url(r'^new/$', login_required(ExternalPackageCreateView.as_view(success_url='/marketplace')), name="package_new"),
+    url(r'^new/$', login_required(ExternalPackageCreateView.as_view(success_url='/packages')), name="package_new"),
     url(r'^new-internal-package/(?P<experiment_id>\d+)/(?P<step_id>\d+)$', login_required(InternalPackageCreateView.as_view()), name="internalpackage_create"),
     url(r'^new/status$', package_status_create, name="package_status_create"),
     url(r'^view/(?P<pk>\d+)/$', package_detail, name="package_detail"),
@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'^remove-publish/(?P<pk>\d+)/$', internalpackage_remove, name="internalpackage_remove"),
     url(r'^resource/(?P<pk>\d+)/$', login_required(PackageResourceDetailView.as_view()), name="packageresource_detail"),
     url(r'^resource/recommend/(?P<pk>\d+)/$', recommend_packageresource, name="packageresource_recommend"),
+    url(r'^markdownify/$', markdownify_text, name="markdownify"),
 ]

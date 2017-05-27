@@ -48,7 +48,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         context['experiment_id'] = self.kwargs['experiment_id']
         context['step_id'] = self.kwargs['step_id']
 
-        logger.debug('%s started on package creation for %d', self.request.user, self.kwargs['experiment_id'])
+        logger.debug('%s started on package creation for %s', self.request.user, self.kwargs['experiment_id'])
         return context
 
     def form_valid(self, form):

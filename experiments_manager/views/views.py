@@ -108,7 +108,7 @@ def index(request):
 
 
 @login_required
-def complete_step_and_go_to_next(request, experiment_id):
+def complete_step_and_go_to_next(request, experiment_id, create_package):
     experiment = verify_and_get_experiment(request, experiment_id)
     active_step = ChosenExperimentSteps.objects.filter(experiment=experiment, active=True)
     if active_step:
@@ -117,13 +117,19 @@ def complete_step_and_go_to_next(request, experiment_id):
         active_step.completed = True
         active_step.completed_at = datetime.now()
         active_step.save()
+        completed_step_id = active_step.pk
         next_step_nr = active_step.step_nr + 1
         next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)
+
         if next_step.count() != 0:
             next_step = next_step[0]
             next_step.active = True
             next_step.save()
-            return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+
+            if int(create_package) == 1:
+                return redirect(to=reverse('internalpackage_create', kwargs={'experiment_id': experiment_id,'step_id': completed_step_id}))
+            else:
+                return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
     return redirect(to=reverse('experiment_publish', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
 
 

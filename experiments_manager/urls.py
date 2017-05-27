@@ -19,7 +19,7 @@ urlpatterns = [
         name="experiment_first_time"),
 
     url(r'^step/files$', experiments_manager.views.views.FileListForStep.as_view(), name="file_list_for_step"),
-    url(r'^next-step/(?P<experiment_id>\d+)$', experiments_manager.views.views.complete_step_and_go_to_next,
+    url(r'^next-step/(?P<experiment_id>\d+)/(?P<create_package>\d+)$', experiments_manager.views.views.complete_step_and_go_to_next,
         name="complete_step_and_go_to_next"),
     url(r'^(?P<pk>\d+)/(?P<slug>[-\w]+)$', login_required(experiments_manager.views.views.ExperimentDetailView.as_view()),
         name='experiment_detail'),

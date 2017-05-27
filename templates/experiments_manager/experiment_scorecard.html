@@ -109,10 +109,10 @@
                 </div>
                 <div class="modal-footer">
                     <p>
-                        <a href="{% url 'complete_step_and_go_to_next' experiment.id %}" class="btn btn-default">Do not create a package</a>
+                        <a href="{% url 'complete_step_and_go_to_next' experiment.id 0 %}" class="btn btn-default">Do not create a package</a>
                     </p>
                     <p>
-                        <a href="{% url 'internalpackage_create' experiment.id completed_step.id %}" class="btn btn-primary">Yes,
+                        <a href="{% url 'complete_step_and_go_to_next' experiment.id 1 %}" class="btn btn-primary">Yes,
                             create a package from the code in this step and publish it on the Marketplace</a>
                     </p>
                 </div>

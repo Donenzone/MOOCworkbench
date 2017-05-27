@@ -40,12 +40,12 @@ services:
     depends_on:
       - web
 
-  pypi_server:
+  pypi:
     image: 'websource'
     env_file: '.env'
     ports:
       - '8001:8001'
-    command: 'pypi-server -p 8001 /workbench/packages &'
+    command: 'pypi-server -p 8001 packages/'
     volumes_from:
       - web
     depends_on:

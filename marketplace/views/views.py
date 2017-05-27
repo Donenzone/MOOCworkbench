@@ -13,9 +13,10 @@ from helpers.helper_mixins import ExperimentPackageTypeMixin
 from user_manager.models import get_workbench_user
 from recommendations.utils import recommend
 
-from marketplace.models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
+from ..models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
 from .views_internalpackage import InternalPackageBaseView
 from ..tasks import task_check_for_new_package_version
+from ..mixins import IsInternalPackageMixin, ObjectTypeIdMixin
 
 
 class MarketplaceIndex(View):
@@ -125,7 +126,7 @@ class PackageResourceCreateView(CreateView):
         return super(PackageResourceCreateView, self).form_valid(form)
 
 
-class PackageResourceDetailView(DetailView):
+class PackageResourceDetailView(ObjectTypeIdMixin, IsInternalPackageMixin, DetailView):
     model = PackageResource
     template_name = 'marketplace/packageresource_detail.html'
 

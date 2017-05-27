@@ -2,7 +2,7 @@
 {% load django_bootstrap_breadcrumbs %}
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Package Resources" "packageresource_list" package_id %}
+    {% breadcrumb "Package Resources" "packageresource_list" package.id %}
 {% endblock %}
 
 

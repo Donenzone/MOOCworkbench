@@ -18,13 +18,24 @@
 
                     {% for experiment in experiments %}
                         <p class="lead"><a
-                                href="{% url "experiment_detail" experiment.id experiment.slug %}">{{ experiment.title }}</a>
+                                href="{{ experiment.get_absolute_url }}">{{ experiment.title }}</a>
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">Your Recent Packages</div>
+                <div class="panel-body">
+
+                    {% for package in packages %}
+                        <p class="lead"><a
+                                href="{{ package.get_absolute_url }}">{{ package.name }}</a>
                         </p>
                     {% endfor %}
                 </div>
             </div>
 
-            <a href="{% url 'experiment_new' %}" class='btn btn-primary'>Create New Experiment</a>
+            <p><a href="{% url 'experiment_new' %}" class='btn btn-primary'>Create New Experiment</a></p>
         </div>
     </div>
 {% endblock %}

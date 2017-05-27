@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user).order_by('-created')[:5]
+    packages = InternalPackage.objects.filter(owner=workbench_user).order_by('-created')[:5]
     logger.debug('%s accessed index', workbench_user)
     recent_versions = list(PackageVersion.objects.all().order_by('-created')[:5])
     recent_resources = list(PackageResource.objects.all().order_by('-created')[:5])
@@ -32,8 +33,9 @@ def index(request):
     recent_external = list(ExternalPackage.objects.all().order_by('-created')[:5])
     recent_experiments = list(Experiment.objects.filter(public=True).order_by('created')[:5])
     total_list = recent_versions + recent_resources + recent_internal + recent_external + recent_experiments
-    total_list = sorted(total_list, key=lambda x: x.created)
+    total_list = reversed(sorted(total_list, key=lambda x: x.created))
     return render(request, 'index.html', {'experiments': experiments,
+                                          'packages': packages,
                                           'tasks': get_available_tasks(workbench_user),
                                           'activities': total_list})
 

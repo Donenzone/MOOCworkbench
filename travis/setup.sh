@@ -8,4 +8,6 @@ EMAIL_HOST = ""
 EMAIL_HOST_USER = "user"
 EMAIL_HOST_PASSWORD = "password"
 EMAIL_PORT = 587
-DEFAULT_FROM_EMAIL = ""'> MOOCworkbench/production_settings.py
+DEFAULT_FROM_EMAIL = ""
+REDIS_HOST = "localhost"'> MOOCworkbench/production_settings.py
+

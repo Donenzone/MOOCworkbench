@@ -14,7 +14,7 @@ import logging
 import os
 from os.path import dirname, abspath, basename, normpath, join
 
-from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG, GITHUB_WEBHOOK_KEY
+from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG, GITHUB_WEBHOOK_KEY, REDIS_HOST
 from .production_settings import EMAIL_BACKEND, EMAIL_HOST, EMAIL_HOST_PASSWORD,\
     EMAIL_HOST_USER,EMAIL_PORT,\
     EMAIL_USE_TLS, DEFAULT_FROM_EMAIL
@@ -32,7 +32,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)],
+            "hosts": [(REDIS_HOST, 6379)],
         },
         "ROUTING": "MOOCworkbench.routing.channel_routing",
     },

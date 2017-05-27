@@ -51,6 +51,7 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
             context['final_step'] = experiment.get_active_step().step_nr == experiment.chosenexperimentsteps_set.count()
             context['recommendations'] = get_recommendations(active_step)
         context['index_active'] = True
+        logger.debug('%s viewed index for %s', self.request.user, experiment)
         return context
 
 
@@ -125,7 +126,8 @@ def complete_step_and_go_to_next(request, experiment_id, create_package):
             next_step = next_step[0]
             next_step.active = True
             next_step.save()
-
+            logger.debug('%s completed the step %s and moved on to %s for experiment %s', request.user, active_step,
+                         next_step, experiment)
             if int(create_package) == 1:
                 return redirect(to=reverse('internalpackage_create', kwargs={'experiment_id': experiment_id,'step_id': completed_step_id}))
             else:

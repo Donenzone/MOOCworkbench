@@ -35,7 +35,7 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
         context['descriptions'] = get_description_measure_list()
         context['dashboard_messages'] = messages
-        logger.debug('dashboard view for %s', self.experiment)
+        logger.debug('%s dashboard view for %s', request.user, self.experiment)
         return render(request, self.template_name, context)
 
 

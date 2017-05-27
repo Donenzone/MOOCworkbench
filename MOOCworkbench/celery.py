@@ -1,11 +1,15 @@
 from __future__ import absolute_import, unicode_literals
 import os
+
 from celery import Celery
+
+from MOOCworkbench.production_settings import REDIS_HOST
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MOOCworkbench.settings')
+broker_host = 'redis://{0}:6379/0'.format(REDIS_HOST)
 
-app = Celery('MOOCworkbench', broker='redis://redis:6379/0')
+app = Celery('MOOCworkbench', broker='redis://localhost:6379/0')
 
 # Using a string here means the worker don't have to serialize
 # the configuration object to child processes.

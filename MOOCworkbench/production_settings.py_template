@@ -10,3 +10,5 @@ EMAIL_HOST_USER = '{{email}}'
 EMAIL_HOST_PASSWORD = '{{password}}'
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = '{{defaultfromemail}}'
+
+REDIS_HOST = 'redis'

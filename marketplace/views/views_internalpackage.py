@@ -196,6 +196,7 @@ def internalpackage_install(request, pk):
     experiment = verify_and_get_experiment(request, experiment_id)
     result = add_internalpackage_to_experiment(internal_package, experiment)
     if result:
+        logger.debug('%s installed the package %s in experiment %s', request.user, internal_package, experiment)
         messages.add_message(request, messages.SUCCESS, 'Added package to your experiment')
         return JsonResponse({'added': True})
     else:

@@ -137,7 +137,7 @@ def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_publish_update_package.delay(package.pk)
-    logger.debug('%s published the package %d', request.user, package)
+    logger.debug('%s published the package %s', request.user, package)
     return redirect(to=package.get_absolute_url())
 
 

@@ -1,6 +1,5 @@
-![build](https://travis-ci.org/jlmdegoede/MOOCworkbench.svg?branch=master)
+[![Build Status](https://travis-ci.org/jlmdegoede/MOOCworkbench.svg?branch=master)](https://travis-ci.org/jlmdegoede/MOOCworkbench)
 [![Coverage Status](https://coveralls.io/repos/github/jlmdegoede/MOOCworkbench/badge.svg?branch=master)](https://coveralls.io/github/jlmdegoede/MOOCworkbench?branch=master)
-[![Code Health](https://landscape.io/github/jlmdegoede/MOOCworkbench/master/landscape.svg?style=flat)](https://landscape.io/github/jlmdegoede/MOOCworkbench/master)
 
 # MOOC workbench
 A workbench that helps to improve the reproducibility and quality of MOOC experiments. This is a Web application that allows for the creation of experiments, and that provides services for your experiments, such as cookiecutter templates meant for data science, automatic configuration of static code analysis, continuous integration, testing and documentation generation.

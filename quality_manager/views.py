@@ -11,7 +11,6 @@ from experiments_manager.models import ChosenExperimentSteps
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
 from .mixins import MeasurementMixin
-from .helpers.what_now_helper import WhatNow
 from .helpers.helper import get_description_measure_list, get_nr_of_commits_last_week
 from .tasks import task_complete_quality_check
 
@@ -24,9 +23,7 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
     def get(self, request, experiment_id):
         context = super(DashboardView, self).get(request, experiment_id)
-        what_now = WhatNow(self.experiment)
         active_step = self.experiment.get_active_step()
-        context['what_now_list'] = what_now.what_to_do_now()
         context['object_type'] = ExperimentPackageTypeMixin.EXPERIMENT_TYPE
         context['active_step_id'] = 0 if not active_step else active_step.id
         context['dashboard_active'] = True

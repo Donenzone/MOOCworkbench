@@ -1,5 +1,7 @@
 {% extends 'marketplace/package_detail/package_detail.html' %}
 {% load django_bootstrap_breadcrumbs %}
+{% block title %}Package Dependencies{% endblock %}
+
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Dependencies" "packageresource_list" package.id %}

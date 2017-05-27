@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
+import logging
 import os
 from os.path import dirname, abspath, basename, normpath, join
 
@@ -193,6 +194,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "bower_components"),
 ]
 
+
+from helpers.constants import LOG_FMT
+logging.basicConfig(level=logging.DEBUG, format=LOG_FMT)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -201,48 +206,57 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        },
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         },
     },
     'loggers': {
         'build_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'cookiecutter_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'coverage_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'dataschema_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'docs_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'experiments_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'git_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'marketplace': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'pylint_manager': {
             'handlers': ['file'],
@@ -265,9 +279,9 @@ LOGGING = {
             'propagate': True,
         },
         'user_manager': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }

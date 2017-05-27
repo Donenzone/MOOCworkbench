@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load django_bootstrap_breadcrumbs %}
-
+{% block title %}Packages{% endblock %}
 {% block marketplace_active %}active{% endblock %}
 
 {% block breadcrumbs %}
@@ -77,6 +77,7 @@
 
         <a href="{% url 'package_new' %}" class='btn btn-primary'>Create New External Package</a>
         <a href="{% url "internalpackage_list" %}" class="btn btn-default">View your packages</a>
+        <a href="{% url 'package_list' %}" class='btn btn-default'>View all packages</a>
 
     </div>
 {% endblock %}

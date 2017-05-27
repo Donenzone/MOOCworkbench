@@ -1,5 +1,6 @@
 {% extends 'marketplace/marketplace_index.html' %}
 {% load django_bootstrap_breadcrumbs %}
+{% block title %}Package List{% endblock %}
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Package List" "package_list" %}
@@ -7,13 +8,22 @@
 
 
 {% block content %}
-  <h2>Packages</h2>
-  <ul>
+    <h2>Package List</h2>
     {% for package in object_list %}
-      <li><b><a href="{% url 'package_detail' package.pk %}">{{ package.name }}</a></li>
+        <p class="lead"><a href="{% url 'package_detail' package.pk %}">{{ package.name }}</a></p>
     {% endfor %}
-  </ul>
 
-  <h2>Submit your package</h2>
-  <a href="{% url 'package_new' %}" class='btn btn-primary'>Create New Package</a>
+    {% block pagination %}
+            {% if is_paginated %}
+                <ul class="pagination">
+                {% for page in page_obj.paginator.page_range %}
+                    <li {% if page == page_obj.number %}class="active"{% endif %}><a href="{{ request.path }}?page={{ page }}">{{ page }}</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+    {% endblock %}
+
+    <p><a href="{% url 'package_new' %}" class='btn btn-primary'>Create New Package</a></p>
+
+
 {% endblock %}

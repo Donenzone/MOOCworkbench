@@ -131,9 +131,8 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('marketplace.views.task_create_package_from_experiment')
+    @patch('marketplace.views.views_internalpackage.task_create_package_from_experiment')
     def test_create_internal_package_post(self, mock_package_repo_init):
-
         internal_package_data = {'name': 'mynewpackage',
                                  'description': 'Desc',
                                  'category': '1',
@@ -185,9 +184,9 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.context['object_type'], ExperimentPackageTypeMixin.PACKAGE_TYPE)
         self.assertIsNotNone(response.context['edit_form'])
 
-    @patch('marketplace.views.InternalPackageDetailView.readme_file_of_package')
+    @patch('marketplace.views.views_internalpackage.InternalPackageDetailView.readme_file_of_package')
     @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
-    @patch('marketplace.views.get_files_for_repository')
+    @patch('marketplace.views.views_internalpackage.get_files_for_repository')
     def test_internal_package_detail(self, mock_get_files, mock_file_list, mock_readme):
         mock_readme.return_value = 'Test readme'
         mock_file_list.return_value = ['file']
@@ -257,8 +256,8 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('marketplace.views.create_tag_for_package_version')
-    @patch('marketplace.views.update_setup_py_with_new_version')
+    @patch('marketplace.views.views_internalpackage.create_tag_for_package_version')
+    @patch('marketplace.views.views_internalpackage.update_setup_py_with_new_version')
     def test_internalpackageversion_create_post(self, mock_tag, mock_update_setup_py):
         """
         Test to ensure that creating a new packageversion for an internalpackage is possible.
@@ -272,8 +271,8 @@ class MarketplaceTestCase(TestCase):
         self.assertTrue(new_package_version)
         self.assertTrue(new_package_version[0].pre_release)
 
-    @patch('marketplace.views.create_tag_for_package_version')
-    @patch('marketplace.views.update_setup_py_with_new_version')
+    @patch('marketplace.views.views_internalpackage.create_tag_for_package_version')
+    @patch('marketplace.views.views_internalpackage.update_setup_py_with_new_version')
     def test_internalpackageversion_create_post_no_version_nr(self, mock_tag, mock_update_setup_py):
         """
         Test creating new internal package version with missing version_nr,
@@ -287,8 +286,8 @@ class MarketplaceTestCase(TestCase):
         new_package_version = PackageVersion.objects.filter(id=2)
         self.assertFalse(new_package_version)
 
-    @patch('marketplace.views.create_tag_for_package_version')
-    @patch('marketplace.views.update_setup_py_with_new_version')
+    @patch('marketplace.views.views_internalpackage.create_tag_for_package_version')
+    @patch('marketplace.views.views_internalpackage.update_setup_py_with_new_version')
     def test_internalpackageversion_create_post(self, mock_tag, mock_update_setup_py):
         """
         Test creating new internal package version with missing pre_release bool,

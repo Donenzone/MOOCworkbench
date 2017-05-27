@@ -46,6 +46,7 @@ class ExternalPackageCreateView(CreateView):
 
 class PackageListView(ListView):
     model = Package
+    paginate_by = 10
 
 
 @login_required

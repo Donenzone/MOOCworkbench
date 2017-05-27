@@ -50,8 +50,7 @@ class DocsManagerTestCase(TestCase):
         """
         response = self.client.get(reverse('docs_view', kwargs={'object_id': 1,
                                                                 'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.context['document'])
+        self.assertEqual(response.status_code, 302)
 
     @patch('git_manager.helpers.language_helper.GitHubHelper')
     @patch('git_manager.helpers.language_helper.SphinxHelper')
@@ -65,8 +64,7 @@ class DocsManagerTestCase(TestCase):
         response = self.client.get(reverse('docs_view', kwargs={'object_id': 1,
                                                                 'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE,
                                                                 'page_slug': 'test'}))
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.context['document'])
+        self.assertEqual(response.status_code, 302)
 
     def test_doc_status_view(self):
         """

@@ -1,7 +1,6 @@
 import logging
 import math
 
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -14,7 +13,7 @@ from feedback.views import get_available_tasks
 from marketplace.models import PackageVersion, PackageResource, InternalPackage, ExternalPackage, Package
 
 from .models import get_workbench_user, WorkbenchUser
-from .forms import WorkbenchUserForm, UserLoginForm
+from .forms import WorkbenchUserForm
 from .forms import RegisterForm
 
 

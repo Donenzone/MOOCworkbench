@@ -1,5 +1,6 @@
 {% extends 'marketplace/package_detail/package_detail.html' %}
 {% load django_bootstrap_breadcrumbs %}
+{% block title %}Version history of {{ package }}{% endblock %}
 {% block breadcrumbs %}
     {{ block.super }}
     {% breadcrumb "Version history" "packageresource_list" %}

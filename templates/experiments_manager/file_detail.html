@@ -1,5 +1,6 @@
 {% extends "experiments_manager/experiment_detail/experiment_detail.html" %}
 {% load django_bootstrap_breadcrumbs %}
+{% block title %}View file {{ file_name }}{% endblock %}
 
 {% block breadcrumbs %}
     {{ block.super }}

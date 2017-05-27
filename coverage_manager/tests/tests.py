@@ -105,8 +105,8 @@ class CoverageManagerTestCase(TestCase):
         with existing CodeCoverage instance
         :return: 
         """
-        travis_instance = self.enable_travis_for_experiment()
-        code_coverage = CodeCoverage.objects.create(travis_instance=travis_instance, enabled=False)
+        self.enable_travis_for_experiment()
+        code_coverage = CodeCoverage.objects.get(id=1)
 
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
@@ -161,7 +161,7 @@ class CoverageManagerTestCase(TestCase):
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_disable'), data=coverage_data)
         json_response = json.loads(str(response.content, encoding='utf8'))
-        self.assertFalse(json_response['disabled'])
+        self.assertTrue(json_response['disabled'])
 
     def test_coveralls_status(self):
         response = self.client.get(reverse('coveralls_status', kwargs={'object_id': 1,

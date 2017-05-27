@@ -61,9 +61,8 @@ class GitManagerTestCases(TestCase):
         self.assertIsNotNone(github_helper)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_github_object')
-    def test_init_github_helper_create(self, mock_web_hook, mock_github):
+    def test_init_github_helper_create(self, mock_github):
         mock_github.return_value = GithubMock()
-        mock_web_hook.return_value = True
         github_helper = GitHubHelper(self.user, 'test', create=True)
         self.assertIsNotNone(github_helper)
         self.assertEqual(github_helper.github_repository.repo_name, 'newly_created_repo')

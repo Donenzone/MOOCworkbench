@@ -40,6 +40,17 @@ services:
     depends_on:
       - web
 
+  pypi_server:
+    image: 'websource'
+    env_file: '.env'
+    ports:
+      - '8001:8001'
+    command: 'pypi-server -p 8001 /workbench/packages &'
+    volumes_from:
+      - web
+    depends_on:
+      - web
+
   redis:
     container_name: 'redis'
     image: 'redis:3.2.0'

@@ -119,7 +119,7 @@ class InternalPackageVersionCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        assert form.instance.owner.user == self.request.user
+        assert form.instance.added_by.user == self.request.user
         package = InternalPackage.objects.get(id=self.kwargs['package_id'])
         form.instance.package = package
         form.instance.added_by = get_workbench_user(self.request.user)

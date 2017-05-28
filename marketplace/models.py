@@ -152,7 +152,7 @@ def add_package_config(sender, instance, created, **kwargs):
 
         instance.save()
 
-        package_version = PackageVersion(package=instance, version_nr='0.1', changelog='Initial version', added_by=instance.owner, url='')
+        package_version = PackageVersion(package=instance, version_nr='0.0.1', changelog='Initial version', added_by=instance.owner, url='')
         package_version.save()
 
 

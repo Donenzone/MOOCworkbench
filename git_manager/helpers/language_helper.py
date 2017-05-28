@@ -11,6 +11,7 @@ from requirements_manager.models import Requirement
 from requirements_manager.helper import delete_existing_requirements
 from pylint_manager.utils import run_rlint, run_pylint
 from marketplace.utils import internalpackage_publish_update, internalpackage_remove
+from helpers.constants import EXTRA_INDEX_URL
 
 from .git_helper import GitHelper
 from .github_helper import GitHubHelper
@@ -72,7 +73,7 @@ class PythonHelper(LanguageHelper):
             self.exp_or_package.save()
 
     def build_requirements_file(self):
-        requirements_txt = ''
+        requirements_txt = '--extra-index-url {0}\n'.format(EXTRA_INDEX_URL)
         for requirement in self.exp_or_package.requirements.all():
             requirements_txt += '{0}\n'.format(str(requirement))
         return requirements_txt

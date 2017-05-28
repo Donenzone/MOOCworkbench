@@ -16,8 +16,10 @@ from requirements_manager.tasks import task_update_requirements
 from dataschema_manager.tasks import task_read_data_schema
 from docs_manager.tasks import task_generate_docs
 from quality_manager.tasks import task_complete_quality_check
-from git_manager.helpers.helper import get_experiment_from_repo_name
+from git_manager.helpers.helper import get_exp_or_package_from_repo_name
 from helpers.constants import DOCS_COMMIT_MESSAGE
+from experiments_manager.models import Experiment
+from marketplace.models import InternalPackage
 
 from .helpers.github_helper import GitHubHelper
 from .tasks import task_process_git_push
@@ -94,13 +96,16 @@ def webhook_receive(request):
 
 
 def run_post_push_tasks(repository_name, sha_list):
-    experiment = get_experiment_from_repo_name(repository_name)
-    logger.debug('received and processing git commit for %s', experiment)
-    task_update_requirements.delay(repository_name)
-    task_read_data_schema.delay(repository_name)
-    task_process_git_push.delay(repository_name, sha_list)
-    active_step = experiment.get_active_step()
-    task_generate_docs.delay(experiment.get_object_type(), experiment.pk)
-    if active_step:
-        task_complete_quality_check.delay(active_step.id)
-
+    exp_or_package = get_exp_or_package_from_repo_name(repository_name)
+    logger.debug('received and processing git commit for %s', exp_or_package)
+    if isinstance(exp_or_package, Experiment):
+        task_update_requirements.delay(repository_name)
+        task_read_data_schema.delay(repository_name)
+        task_process_git_push.delay(repository_name, sha_list)
+        active_step = exp_or_package.get_active_step()
+        task_generate_docs.delay(exp_or_package.get_object_type(), exp_or_package.pk)
+        if active_step:
+            task_complete_quality_check.delay(active_step.id)
+    elif isinstance(exp_or_package, InternalPackage):
+        task_generate_docs.delay(exp_or_package.get_object_type(), exp_or_package.pk)
+        task_update_requirements.delay(repository_name)

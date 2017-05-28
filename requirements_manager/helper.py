@@ -19,6 +19,8 @@ def add_internalpackage_to_experiment(internal_package, experiment):
     if not experiment.requirements.filter(package_name=new_requirement.package_name):
         experiment.requirements.add(new_requirement)
         experiment.save()
+        from .tasks import task_write_requirements_file
+        task_write_requirements_file.delay(experiment.pk, experiment.get_object_type())
         return True
     return False
 

@@ -30,10 +30,14 @@ def get_file_from_code_template(type, file_name, folder=None):
     return contents
 
 
-def get_experiment_from_repo_name(repo_name):
+def get_exp_or_package_from_repo_name(repo_name):
     git_repo = GitRepository.objects.filter(name=repo_name)
     if git_repo:
         git_repo = git_repo[0]
-        experiment = git_repo.experiment_set.first()
-        return experiment
+        if git_repo.experiment_set:
+            experiment = git_repo.experiment_set.first()
+            return experiment
+        elif git_repo.internalpackage_set:
+            package = git_repo.internalpackage_set.first()
+            return package
 

@@ -1,3 +1,3 @@
 #!/bin/bash
 cd "$1"
-python setup.py sdist
+python3 setup.py sdist

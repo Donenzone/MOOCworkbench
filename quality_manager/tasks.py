@@ -1,3 +1,5 @@
+import logging
+
 from MOOCworkbench.celery import app
 
 from experiments_manager.models import ChosenExperimentSteps
@@ -11,14 +13,35 @@ from .measurements.docs_measurement import DocsMeasurement
 from .measurements.pylint_measurement import PylintMeasurement
 
 
+logger = logging.getLogger(__name__)
+
+
 @app.task
 def task_complete_quality_check(step_id):
-    task_version_control_quality_check(step_id)
-    task_requirements_quality_check(step_id)
-    task_test_quality_check(step_id)
-    task_ci_quality_check(step_id)
-    task_docs_coverage_check(step_id)
-    task_pylint_static_quality_check(step_id)
+    try:
+        task_version_control_quality_check(step_id)
+    except Exception as e:
+        logger.error("task vcs failed  %s", e)
+    try:
+        task_requirements_quality_check(step_id)
+    except Exception as e:
+        logger.error("task task_requirements_quality_check failed  %s", e)
+    try:
+        task_test_quality_check(step_id)
+    except Exception as e:
+        logger.error("task task_test_quality_check failed  %s", e)
+    try:
+        task_ci_quality_check(step_id)
+    except Exception as e:
+        logger.error("task task_ci_quality_check failed  %s", e)
+    try:
+        task_docs_coverage_check(step_id)
+    except Exception as e:
+        logger.error("task task_docs_coverage_check failed  %s", e)
+    try:
+        task_pylint_static_quality_check(step_id)
+    except Exception as e:
+        logger.error("task task_pylint_static_quality_check failed  %s", e)
 
 
 @app.task

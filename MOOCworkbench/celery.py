@@ -9,7 +9,7 @@ from MOOCworkbench.production_settings import REDIS_HOST
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MOOCworkbench.settings')
 broker_host = 'redis://{0}:6379/0'.format(REDIS_HOST)
 
-app = Celery('MOOCworkbench', broker='redis://localhost:6379/0')
+app = Celery('MOOCworkbench', broker=broker_host)
 
 # Using a string here means the worker don't have to serialize
 # the configuration object to child processes.

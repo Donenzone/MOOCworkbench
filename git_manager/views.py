@@ -89,4 +89,4 @@ def webhook_receive(request):
 
 
 def run_post_push_tasks(repository_name, sha_list):
-    task_process_git_push(repository_name, sha_list)
+    task_process_git_push.delay(repository_name, sha_list)

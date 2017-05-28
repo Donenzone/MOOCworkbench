@@ -11,7 +11,7 @@ from requirements_manager.models import Requirement
 from requirements_manager.helper import delete_existing_requirements
 from pylint_manager.utils import run_rlint, run_pylint
 from marketplace.utils import internalpackage_publish_update, internalpackage_remove
-from helpers.constants import EXTRA_INDEX_URL
+from helpers.constants import EXTRA_INDEX_URL, REQUIREMENT_COMMIT_MESSAGE
 
 from .git_helper import GitHelper
 from .github_helper import GitHubHelper
@@ -83,7 +83,7 @@ class PythonHelper(LanguageHelper):
 
     def write_requirements_file(self):
         requirements_txt = self.build_requirements_file()
-        self.github_helper.update_file('requirements.txt', 'Updated requirements.txt file by MOOC workbench',
+        self.github_helper.update_file('requirements.txt', REQUIREMENT_COMMIT_MESSAGE,
                                        requirements_txt)
 
     def update_requirements(self):

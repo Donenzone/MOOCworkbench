@@ -17,7 +17,7 @@ from dataschema_manager.tasks import task_read_data_schema
 from docs_manager.tasks import task_generate_docs
 from quality_manager.tasks import task_complete_quality_check
 from git_manager.helpers.helper import get_exp_or_package_from_repo_name
-from helpers.constants import DOCS_COMMIT_MESSAGE
+from helpers.constants import WORKBENCH_COMMIT_MESSAGES
 from experiments_manager.models import Experiment
 from marketplace.models import InternalPackage
 
@@ -85,7 +85,7 @@ def webhook_receive(request):
         sha_hash_list = []
         if 'commits' in event:
             commit_message = event['head_commit']['message']
-            if commit_message != DOCS_COMMIT_MESSAGE:
+            if commit_message not in WORKBENCH_COMMIT_MESSAGES:
                 for commit in event['commits']:
                     sha_hash_list.append(commit['id'])
                 run_post_push_tasks(repo_name, sha_hash_list)

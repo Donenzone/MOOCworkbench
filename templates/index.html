@@ -18,7 +18,7 @@
 
                     {% for experiment in experiments %}
                         <p class="lead"><a
-                                href="{{ experiment.get_absolute_url }}">{{ experiment.title }}</a>
+                                href="{{ experiment.get_absolute_url }}">{{ experiment.title|truncatechars:20 }}</a>
                         </p>
                     {% endfor %}
                 </div>
@@ -29,7 +29,7 @@
 
                     {% for package in packages %}
                         <p class="lead"><a
-                                href="{{ package.get_absolute_url }}">{{ package.name }}</a>
+                                href="{{ package.get_absolute_url }}">{{ package.name|truncatechars:20 }}</a>
                         </p>
                     {% endfor %}
                 </div>

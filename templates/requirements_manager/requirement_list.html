@@ -26,7 +26,7 @@
         <tbody>
         {% for req in object_list %}
             <tr>
-                <td><a href="#">{{ req.package_name }}</a></td>
+                <td>{% if req.package %}<a href="{{ req.package.get_absolute_url }}">{% endif %}{{ req.package_name }}{% if req.package %}</a>{% endif %}</td>
                 <td>{% if req.version %}{{ req.version }}{% endif %}</td>
                 <td>
                     <a href="#" style="display:none;"

@@ -7,6 +7,8 @@ from requirements_manager.tasks import task_update_requirements
 from dataschema_manager.tasks import task_read_data_schema
 from docs_manager.tasks import task_generate_docs
 from quality_manager.tasks import task_complete_quality_check
+from experiments_manager.models import Experiment
+from marketplace.models import InternalPackage
 
 from .helpers.helper import get_exp_or_package_from_repo_name
 from .helpers.github_helper import GitHubHelper
@@ -19,29 +21,33 @@ logger = logging.getLogger(__name__)
 @app.task
 def task_process_git_push(repository_name, sha_list):
     exp_or_package = get_exp_or_package_from_repo_name(repository_name)
-    try:
-        task_update_requirements(repository_name)
-    except Exception as e:
-        logger.error("task updating requirements failed for %s with %s", exp_or_package, e)
-    try:
-        task_read_data_schema(repository_name)
-    except Exception as e:
-        logger.error("task updating schema failed for %s with %s", exp_or_package, e)
-    try:
-        task_process_git_push(repository_name, sha_list)
-    except Exception as e:
-        logger.error("task processing git push failed for %s with %s", exp_or_package, e)
-    try:
-        task_generate_docs(exp_or_package.get_object_type(), exp_or_package.pk)
-    except Exception as e:
-        logger.error("task generating docs failed for %s with %s", exp_or_package, e)
-    try:
-        active_step = exp_or_package.get_active_step()
-        if active_step:
-            task_complete_quality_check(active_step.id)
-    except Exception as e:
-        logger.error("task complete quality check failed for %s with %s", exp_or_package, e)
-
+    logger.debug('received and processing git commit for %s', exp_or_package)
+    if isinstance(exp_or_package, Experiment):
+        try:
+            task_update_requirements(repository_name)
+        except Exception as e:
+            logger.error("task updating requirements failed for %s with %s", exp_or_package, e)
+        try:
+            task_read_data_schema(repository_name)
+        except Exception as e:
+            logger.error("task updating schema failed for %s with %s", exp_or_package, e)
+        try:
+            task_process_commit(repository_name, sha_list)
+        except Exception as e:
+            logger.error("task processing git push failed for %s with %s", exp_or_package, e)
+        try:
+            task_generate_docs(exp_or_package.get_object_type(), exp_or_package.pk)
+        except Exception as e:
+            logger.error("task generating docs failed for %s with %s", exp_or_package, e)
+        try:
+            active_step = exp_or_package.get_active_step()
+            if active_step:
+                task_complete_quality_check(active_step.id)
+        except Exception as e:
+            logger.error("task complete quality check failed for %s with %s", exp_or_package, e)
+    elif isinstance(exp_or_package, InternalPackage):
+        task_generate_docs.delay(exp_or_package.get_object_type(), exp_or_package.pk)
+        task_update_requirements.delay(repository_name)
 
 
 @app.task

@@ -5,7 +5,7 @@ from cookiecutter_manager.models import CookieCutterTemplate
 from experiments_manager.consumers import send_exp_package_creation_status_update
 
 from ..helpers.github_helper import GitHubHelper
-from ..helpers.git_helper import GitHelper
+from ..helpers.git_helper import GitHelper, clean_up_after_git_helper
 from ..models import GitRepository
 
 
@@ -66,8 +66,8 @@ class PackageGitRepoInit(GitRepoInit):
         send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_CREATING_BOILERPLATE_CODE)
 
         # remove the temp repo folders in github_repositories/
-        self.clean_up_github_folders(git_helper)
-        self.clean_up_github_folders(module_git_helper)
+        clean_up_after_git_helper(git_helper)
+        clean_up_after_git_helper(module_git_helper)
         send_exp_package_creation_status_update(self.username, PackageCreationProgress.STEP_CLEAN_UP)
 
         language_helper = self.internal_package.language_helper()
@@ -122,6 +122,3 @@ class PackageGitRepoInit(GitRepoInit):
             git_helper.move_repo_contents_to_folder('R')
         git_helper.repo.index.commit('Moved module into own folder')
         git_helper.push()
-
-    def clean_up_github_folders(self, git_helper):
-        shutil.rmtree(git_helper.repo_dir)

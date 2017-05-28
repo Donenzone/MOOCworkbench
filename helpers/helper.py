@@ -1,3 +1,5 @@
+import shutil
+
 from MOOCworkbench.settings import ALLOWED_HOSTS
 from MOOCworkbench.settings import BASE_DIR
 
@@ -42,3 +44,4 @@ def get_absolute_path():
 
 def get_absolute_url(to):
     return 'https://{0}{1}'.format(ALLOWED_HOSTS[0], to)
+

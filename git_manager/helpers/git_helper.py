@@ -3,6 +3,7 @@ import os
 import shutil
 
 from django.conf import settings
+from django.utils.crypto import get_random_string
 
 from git import Repo
 
@@ -13,6 +14,7 @@ class GitHelper(object):
 
     def __init__(self, github_helper):
         self.github_helper = github_helper
+        self.temporary_key = get_random_string(5)
 
         if os.path.isdir(self.repo_dir):
             self.repo = Repo(self.repo_dir)
@@ -21,11 +23,12 @@ class GitHelper(object):
     def repo_dir(self):
         return os.path.join(settings.PROJECT_ROOT, self.BASE_REPO_DIR,
                             self.github_helper.github_repository.owner.login,
+                            self.temporary_key,
                             self.github_helper.github_repository.name)
 
     def repo_dir_of_user(self):
         return os.path.join(settings.PROJECT_ROOT, self.BASE_REPO_DIR,
-                            self.github_helper.github_repository.owner.login)
+                            self.github_helper.github_repository.owner.login, self.temporary_key)
 
     def clone_or_pull_repository(self):
         clone_url = self.github_helper.get_clone_url()
@@ -81,3 +84,11 @@ class GitHelper(object):
                 shutil.move(file_path, new_folder_path)
                 self.repo.git.rm(file)
         self.repo.git.add(folder_name)
+
+
+def clean_up_after_git_helper(git_helper):
+    repo_dir = git_helper.repo_dir
+    key_dir = git_helper.repo_dir_of_user()
+    git_helper = None
+    shutil.rmtree(repo_dir)
+    shutil.rmtree(key_dir)

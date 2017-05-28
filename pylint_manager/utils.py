@@ -8,7 +8,7 @@ from rpy2.robjects.packages import importr
 
 from django.db.models import Q
 
-from git_manager.helpers.git_helper import GitHelper
+from git_manager.helpers.git_helper import GitHelper, clean_up_after_git_helper
 from git_manager.helpers.github_helper import GitHubHelper
 from MOOCworkbench.settings import PROJECT_ROOT
 
@@ -44,7 +44,7 @@ def run_rlint(experiment):
         if pylint_result:
             pylint_result.for_result = pylint_scan_result_object
             pylint_result.save()
-    shutil.rmtree(repo_dir)
+    clean_up_after_git_helper(git_helper)
     os.chdir(old_active_dir)
 
 
@@ -85,7 +85,7 @@ def run_pylint(experiment):
         pylint_scan_result_object.nr_of_other_issues = results_other_issues
         pylint_scan_result_object.save()
 
-    shutil.rmtree(repo_dir)
+    clean_up_after_git_helper(git_helper)
 
 
 def make_relative_path(location):

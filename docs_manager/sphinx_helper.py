@@ -7,7 +7,7 @@ from os.path import isfile, isdir
 
 from helpers.constants import DOCS_COMMIT_MESSAGE
 from MOOCworkbench.settings import PROJECT_ROOT
-from git_manager.helpers.git_helper import GitHelper
+from git_manager.helpers.git_helper import GitHelper, clean_up_after_git_helper
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +31,7 @@ class SphinxHelper(object):
         self.docs_src_location = exp_or_package.template.docs_src_location
         if not self.docs_src_location:
             self.docs_src_location = 'docs/'
-        self.path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name, self.docs_src_location)
-        self.base_path = os.path.join(self.GITHUB_REPO_FOLDER, self.owner, self.repo_name)
+        self.path = os.path.join(self.git_helper.repo_dir,  self.docs_src_location)
         self.folders = folders
 
     def create_gh_pages_branch(self):
@@ -71,8 +70,7 @@ class SphinxHelper(object):
         self.git_helper.commit(DOCS_COMMIT_MESSAGE)
         self.git_helper.push()
 
-        self.git_helper = None
-        shutil.rmtree(repo_dir)
+        clean_up_after_git_helper(self.git_helper)
 
     def get_coverage_data(self):
         self.git_helper.clone_or_pull_repository()
@@ -92,11 +90,12 @@ class SphinxHelper(object):
                         classes = module_info[1]['classes']
                         total_undocumented_classes += len(classes)
 
-            shutil.rmtree(self.git_helper.repo_dir)
+            clean_up_after_git_helper(self.git_helper)
             return coverage_list, total_undocumented_functions, total_undocumented_classes
         except IOError as e:
             logger.error("Coverage data not found for (%s, %s): %s", self.owner, self.repo_name, e)
 
     def get_document(self, document_name=''):
-        datadir = 'https://{0}.github.io/{1}/{2}.html'.format(self.github_helper.owner, self.github_helper.repo_name, document_name)
+        datadir = 'https://{0}.github.io/{1}/{2}.html'.format(self.github_helper.owner, self.github_helper.repo_name,
+                                                              document_name)
         return datadir

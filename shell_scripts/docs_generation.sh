@@ -6,3 +6,4 @@ pip3 install -r requirements.txt
 pip3 install sphinx
 cd docs/
 make html
+make coverage

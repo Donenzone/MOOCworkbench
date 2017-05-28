@@ -2,7 +2,8 @@
 
   {% if docs.enabled %}
     <p>
-      You've already enabled automatic documentation generation. You can now write reStructredText directly into your source files and it will appear in the documentation.
+      You've already enabled automatic documentation generation. You can now write reStructredText directly into your source files and the workbench will publish it automatically on GitHub.</p>
+      <p>Please note: if you add new files, run <b>make documentation</b> or <b>sphinx-apidoc -o docs [path_to_your_files]</b> to add these files to the documentation.
     </p>
 
     <p><a href="#" class="btn btn-primary" id="generate-docs">Generate and publish documentation</a></p>

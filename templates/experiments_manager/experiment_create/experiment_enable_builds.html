@@ -81,8 +81,9 @@
                     <li>Then, create a virtual environment:
                         <pre>make create_environment</pre>
                     </li>
-                    <li>Activate the environment with:
+                    <li>Activate the environment with (depending upon your environment):
                         <pre>source activate {{ reposlug }}</pre>
+                        <pre>workon {{ reposlug }}</pre>
                     </li>
                     <li>Install the dependencies:
                         <pre>make requirements</pre>
@@ -99,10 +100,10 @@
                         <pre>git clone git@github.com:{{ github_username }}/{{ reposlug }}.git</pre>
                     </li>
                     <li>Set up a new virtual environment for your project:
-                        <pre>virtualenv -p python3 ~/.venv{{ reposlug|lower }}</pre>
+                        <pre>virtualenv -p python3 .venv{{ reposlug|lower }}</pre>
                     </li>
                     <li>Activate your virtual environment:
-                        <pre>source ~/.venv{{ reposlug|lower }}/bin/activate</pre>
+                        <pre>source .venv{{ reposlug|lower }}/bin/activate</pre>
                     </li>
                     <li>Make your new repository folder active:
                         <pre>cd {{ reposlug }}</pre>

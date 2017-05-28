@@ -79,7 +79,7 @@ def build_status(request, object_id, object_type):
         context['configured'] = context['current_config'].enabled
         github_helper = get_github_helper(request, exp_or_package)
         context['reposlug'] = exp_or_package.git_repo.name
-        context['username'] = github_helper.github_repository.owner.login
+        context['github_username'] = github_helper.github_repository.owner.login
 
     logger.debug('build status for %s with config %s', exp_or_package, context)
     return render(request, 'build_manager/build_status.html', context)

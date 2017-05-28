@@ -93,5 +93,6 @@ def step_four_experiment_first_time(request, pk):
     context['github_username'] = gh_helper.owner
     context['reposlug'] = experiment.git_repo.name
     context['travis'] = experiment.travis
-    context['coverage_configured'] = experiment.docs.enabled
+    if experiment.travis.codecoverage_set:
+        context['coverage_configured'] = experiment.travis.codecoverage_set.first().enabled
     return render(request, 'experiments_manager/experiment_create/experiment_enable_builds.html', context)

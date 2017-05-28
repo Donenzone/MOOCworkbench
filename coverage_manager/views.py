@@ -25,7 +25,6 @@ def coveralls_enable(request):
         github_helper = get_github_helper(request, experiment)
         coveralls_helper = CoverallsHelper(github_helper.owner, github_helper.repo_name)
         if coveralls_helper.coverage_enabled_check():
-            existing_config.badge_url = coveralls_helper.get_badge_url()
             existing_config.save()
             logger.debug('enabled coveralls for: %s', experiment)
             return JsonResponse({'enabled': True})

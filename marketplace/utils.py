@@ -13,17 +13,16 @@ PACKAGES_DIR = os.path.join(settings.PROJECT_ROOT, 'packages')
 
 def internalpackage_publish_update(package):
     # clone/pull repository
-    github_helper = GitHubHelper(package.owner, package.git_repo.name)
-    git_helper = GitHelper(github_helper)
-    git_helper.clone_or_pull_repository()
-
     # copy repository to packages
-    dst_dir = os.path.join(PACKAGES_DIR, package.git_repo.name)
-    if os.path.exists(dst_dir):
-        shutil.rmtree(dst_dir)
-    shutil.copytree(git_helper.repo_dir, dst_dir)
-    zip_name = '{0}.zip'.format(package.git_repo.name)
-    subprocess.call(['./shell_scripts/publish_package.sh', PACKAGES_DIR, package.git_repo.name, zip_name])
+    package_location = os.path.join(PACKAGES_DIR, package.git_repo.name)
+    if not os.path.exists(package_location):
+        github_helper = GitHubHelper(package.owner, package.git_repo.name)
+        git_helper = GitHelper(github_helper)
+        git_helper.clone_or_pull_repository()
+        shutil.copytree(git_helper.repo_dir, package_location)
+    else:
+        subprocess.call(['git', 'pull'], cwd=package_location)
+    subprocess.call(['./shell_scripts/publish_package.sh', package_location])
 
 
 def internalpackage_rename(package, old_name):

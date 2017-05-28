@@ -126,6 +126,7 @@ class InternalPackageVersionCreateView(CreateView):
         response = super(InternalPackageVersionCreateView, self).form_valid(form)
         create_tag_for_package_version(form.instance.id)
         update_setup_py_with_new_version(form.instance.id)
+        task_publish_update_package.delay(package.pk)
         return response
 
     def get_success_url(self):

@@ -5,6 +5,7 @@ import shutil
 import pickle
 from os.path import isfile, isdir
 
+from helpers.constants import DOCS_COMMIT_MESSAGE
 from MOOCworkbench.settings import PROJECT_ROOT
 from git_manager.helpers.git_helper import GitHelper
 
@@ -67,7 +68,7 @@ class SphinxHelper(object):
         subprocess.call(['touch', '.nojekyll'], cwd=repo_dir)
         shutil.rmtree(os.path.join(user_dir, 'html/'))
         subprocess.call(['git', 'add', '.'], cwd=repo_dir)
-        self.git_helper.commit('Updated docs')
+        self.git_helper.commit(DOCS_COMMIT_MESSAGE)
         self.git_helper.push()
 
         self.git_helper = None

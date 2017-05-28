@@ -17,6 +17,7 @@ from dataschema_manager.tasks import task_read_data_schema
 from docs_manager.tasks import task_generate_docs
 from quality_manager.tasks import task_complete_quality_check
 from git_manager.helpers.helper import get_experiment_from_repo_name
+from helpers.constants import DOCS_COMMIT_MESSAGE
 
 from .helpers.github_helper import GitHubHelper
 from .tasks import task_process_git_push
@@ -81,9 +82,11 @@ def webhook_receive(request):
         repo_name = event['repository']['name']
         sha_hash_list = []
         if 'commits' in event:
-            for commit in event['commits']:
-                sha_hash_list.append(commit['id'])
-            run_post_push_tasks(repo_name, sha_hash_list)
+            commit_message = event['head_commit']['message']
+            if commit_message != DOCS_COMMIT_MESSAGE:
+                for commit in event['commits']:
+                    sha_hash_list.append(commit['id'])
+                run_post_push_tasks(repo_name, sha_hash_list)
         return HttpResponse('success')
 
     # In case we receive an event that's not ping or push

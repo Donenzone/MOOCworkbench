@@ -24,6 +24,8 @@ class TestMeasurement(MeasurementAbstraction):
                 self.result.result = ExperimentMeasureResult.MEDIUM
             elif code_coverage >= 80:
                 self.result.result = ExperimentMeasureResult.HIGH
+        else:
+            self.result.result = ExperimentMeasureResult.LOW
 
     def measure_code_coverage(self):
         coveralls = CoverallsHelper(user=self.github_helper.owner, repo_name=self.github_helper.repo_name)

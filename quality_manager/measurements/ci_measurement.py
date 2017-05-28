@@ -9,11 +9,13 @@ class CiEnabledMeasurement(MeasurementAbstraction):
         self.measurement = ExperimentMeasure.objects.get(name='Use of CI')
 
     def measure(self):
-        is_travis_enabled = TravisInstance.objects.filter(experiment=self.experiment)
-        if is_travis_enabled:
-            self.result.result = ExperimentMeasureResult.HIGH
-        else:
-            self.result.result = ExperimentMeasureResult.LOW
+        travis_instance = TravisInstance.objects.filter(experiment=self.experiment)
+        if travis_instance:
+            travis_instance = travis_instance[0]
+            if travis_instance.enabled:
+                self.result.result = ExperimentMeasureResult.HIGH
+            else:
+                self.result.result = ExperimentMeasureResult.LOW
 
     def save_and_get_result(self):
         self.result.measurement = self.measurement

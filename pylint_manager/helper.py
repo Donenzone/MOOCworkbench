@@ -11,6 +11,8 @@ def last_scan_results_for_experiment(experiment):
 
 def return_results_for_file(experiment, file_path):
     pylint_scan = last_scan_results_for_experiment(experiment)
+    if '/' in file_path:
+        file_path = file_path.split('/')[-1]
     pylint_results = PylintResult.objects.filter(for_result=pylint_scan, file_path__contains=file_path)
     return pylint_results
 

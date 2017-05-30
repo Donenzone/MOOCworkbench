@@ -1,3 +1,4 @@
+"""Views for build_manager, that manages CI config for experiments"""
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -7,14 +8,17 @@ from travispy.errors import TravisError
 
 from build_manager.travis_ci_helper import TravisCiHelper
 from git_manager.helpers.helper import get_github_helper
+from helpers.helper import get_package_or_experiment
 
-from .helper import get_exp_or_package_from_request
+from .helper import get_exp_or_package_from_request, enable_travis
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 @login_required
 def enable_ci_builds(request):
+    """Enable CI builds for experiment
+    Expects object_id and object_type in request.POST"""
     exp_or_package = get_exp_or_package_from_request(request)
 
     existing_config = exp_or_package.travis
@@ -29,6 +33,8 @@ def enable_ci_builds(request):
 
 @login_required
 def disable_ci_builds(request):
+    """Disable CI builds for experiment
+    Expects object_id and object_type in request.POST"""
     exp_or_package = get_exp_or_package_from_request(request)
 
     current_config = exp_or_package.travis
@@ -46,6 +52,7 @@ def disable_ci_builds(request):
 
 @login_required
 def build_experiment_now(request):
+    """Start a build for an experiment in CI now"""
     exp_or_package = get_exp_or_package_from_request(request)
 
     github_helper = get_github_helper(request, exp_or_package)
@@ -59,6 +66,7 @@ def build_experiment_now(request):
 
 @login_required
 def build_status(request, object_id, object_type):
+    """Get the build status for an experiment"""
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
     context = {}
     current_config = exp_or_package.travis
@@ -78,6 +86,8 @@ def build_status(request, object_id, object_type):
 
 @login_required
 def get_log_from_last_build(request, object_id, object_type):
+    """Get log from last build given object_id and object_type
+    If no log exists, return error message"""
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
     github_helper = get_github_helper(request, exp_or_package)
     travis_helper = TravisCiHelper(github_helper)
@@ -85,11 +95,5 @@ def get_log_from_last_build(request, object_id, object_type):
         log = travis_helper.get_log_for_last_build()
         logger.debug('fetched log for last build for %s', exp_or_package)
         return JsonResponse({'log': log})
-    except TravisError as e:
+    except TravisError:
         return JsonResponse({'log': 'Failed to retrieve log'})
-
-
-def enable_travis(request, exp_or_package):
-    github_helper = get_github_helper(request, exp_or_package)
-    travis_ci_helper = TravisCiHelper(github_helper)
-    travis_ci_helper.enable_travis_for_repository()

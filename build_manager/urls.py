@@ -1,3 +1,5 @@
+"""Internal URLs for build_manager app"""
+
 from django.conf.urls import url
 
 from build_manager.views import (build_experiment_now, build_status,

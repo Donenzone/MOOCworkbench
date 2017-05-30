@@ -16,6 +16,7 @@ from user_manager.models import WorkbenchUser
 
 
 class CoverageManagerTestCase(TestCase):
+    """Test cases for the Coverage Manager views"""
     def setUp(self):
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)
@@ -27,7 +28,8 @@ class CoverageManagerTestCase(TestCase):
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
-        self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
+        self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user,
+                                                     github_url='https://github')
         schema = DataSchema(name='main')
         schema.save()
         self.experiment = Experiment.objects.create(title='Experiment',
@@ -50,7 +52,6 @@ class CoverageManagerTestCase(TestCase):
     def test_enable_coverage_without_travis(self):
         """
         Try to enable code coverage without having an enabled travis instance.
-        :return: 
         """
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
@@ -64,13 +65,10 @@ class CoverageManagerTestCase(TestCase):
         """
         Test if code coverage can be enabled when Travis builds are enabled
         and when CoverallsHelper checks for enabled and returns True
-        :return: 
         """
         travis_instance = self.enable_travis_for_experiment()
-
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
-
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
@@ -83,13 +81,10 @@ class CoverageManagerTestCase(TestCase):
         """
         Test if code coverage can be enabled when Travis builds are enabled
         and when CoverallsHelper checks for enabled and returns False
-        :return: 
         """
         travis_instance = self.enable_travis_for_experiment()
-
         mock_coverage_check.return_value = False
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
-
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
@@ -102,14 +97,11 @@ class CoverageManagerTestCase(TestCase):
         """
         Test if code coverage can be enabled when Travis builds are enabled
         with existing CodeCoverage instance
-        :return: 
         """
         self.enable_travis_for_experiment()
         code_coverage = CodeCoverage.objects.get(id=1)
-
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
-
         coverage_data = {'object_id': 1}
         response = self.client.post(reverse('coveralls_enable'), data=coverage_data)
         self.assertEqual(response.status_code, 200)
@@ -122,14 +114,12 @@ class CoverageManagerTestCase(TestCase):
     def test_enable_coverage_with_travis_badge(self, mock_get_badge, mock_coverage_check, mock_github_helper):
         """
         Test if code coverage can be enabled when Travis builds are enabled
-        :return: 
         """
         travis_instance = self.enable_travis_for_experiment()
 
         mock_get_badge.return_value = 'http://test.test'
         mock_coverage_check.return_value = True
         mock_github_helper.return_value = get_mock_github_owner_and_repo_name()
-
         coverage_data = {'object_id': 1}
         self.client.post(reverse('coveralls_enable'), data=coverage_data)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
@@ -139,13 +129,11 @@ class CoverageManagerTestCase(TestCase):
         """
         Test if disabling code coverage works, by first enabling
         code coverage and then calling the view to disable it
-        :return: 
         """
         travis_instance = self.enable_travis_for_experiment()
         self.test_enable_coverage_with_travis_true_coverage_enabled()
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
         self.assertTrue(code_coverage.enabled)
-
         coverage_data = {'object_id': 1}
         self.client.post(reverse('coveralls_disable'), data=coverage_data)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
@@ -154,7 +142,6 @@ class CoverageManagerTestCase(TestCase):
     def test_disable_coverage_never_enabled(self):
         """
         Test to disable code coverage, when it was never enabled.
-        :return: 
         """
         self.enable_travis_for_experiment()
         coverage_data = {'object_id': 1}
@@ -163,6 +150,7 @@ class CoverageManagerTestCase(TestCase):
         self.assertTrue(json_response['disabled'])
 
     def test_coveralls_status(self):
+        """Test the status view for coveralls, when coveralls is not configured yet"""
         response = self.client.get(reverse('coveralls_status', kwargs={'object_id': 1,
                                                                        'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
@@ -170,9 +158,10 @@ class CoverageManagerTestCase(TestCase):
         self.assertFalse(response.context['coverage_configured'])
 
     def test_coveralls_status_enabled(self):
+        """Test if coveralls is enabled, first enable coverage,
+        then check if the status says its enabled"""
         travis_instance = self.enable_travis_for_experiment()
         self.test_enable_coverage_with_travis_true_coverage_enabled()
-
         response = self.client.get(reverse('coveralls_status', kwargs={'object_id': 1,
                                                                        'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
@@ -183,5 +172,6 @@ class CoverageManagerTestCase(TestCase):
 
 
 def get_mock_github_owner_and_repo_name():
-    Foo = namedtuple('Foo', ['owner', 'repo_name'])
+    """Mock object for GitHub helper with owner and repo_name attributes"""
+    Foo = namedtuple('Foo', ['owner', 'repo_name'])  # pylint: disable=invalid-name
     return Foo(owner='test', repo_name='test')

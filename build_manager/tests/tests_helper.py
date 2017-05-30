@@ -7,7 +7,8 @@ from ..travis_ci_helper import TravisCiHelper
 
 class TravisCiHelperTestCases(TestCase):
     """Tests for the TravisCiHelper in the build_manager app
-    Make sure that the env contains a valid GITHUB_TOKEN for a GitHub repository"""
+    Make sure that the env contains a valid GITHUB_TOKEN for a GitHub repository
+    (this test can sometimes fail because Travis acts up and returns random 403s)"""
     def setUp(self):
         socialtoken = os.environ.get('GITHUB_TOKEN')
         self.github_helper = GitHubHelperReplacement(socialtoken, 'Workbench-Python-Experiment')

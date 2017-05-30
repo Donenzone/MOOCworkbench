@@ -1,3 +1,4 @@
+"""View functions for coverage_manager app"""
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -5,17 +6,18 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from coverage_manager.helpers.coveralls_helper import CoverallsHelper
-from coverage_manager.models import CodeCoverage
-from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.helper import get_github_helper
 from helpers.helper import get_package_or_experiment
 
-logger = logging.getLogger(__name__)
+from .helpers.coveralls_helper import CoverallsHelper, get_experiment_from_request_post, enable_coveralls
+from .models import CodeCoverage
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 @login_required
 def coveralls_enable(request):
+    """Enable coveralls for an experiment"""
     experiment = get_experiment_from_request_post(request)
     travis_instance = experiment.travis
 
@@ -27,16 +29,15 @@ def coveralls_enable(request):
             existing_config.save()
             logger.debug('enabled coveralls for: %s', experiment)
             return JsonResponse({'enabled': True})
-        else:
-            return JsonResponse({'enabled': False, 'message': 'Invalid response from Coveralls. '
-                                                              'Are you sure you flipped the switch on Coveralls?'})
-    else:
-        logger.debug('tried to enable coveralls, travis was not enabled: %s, %s', experiment, travis_instance)
-        return JsonResponse({'enabled': False, 'message': 'First enable Travis CI builds!'})
+        return JsonResponse({'enabled': False, 'message': 'Invalid response from Coveralls. '
+                                                          'Are you sure you flipped the switch on Coveralls?'})
+    logger.debug('tried to enable coveralls, travis was not enabled: %s, %s', experiment, travis_instance)
+    return JsonResponse({'enabled': False, 'message': 'First enable Travis CI builds!'})
 
 
 @login_required
 def coveralls_disable(request):
+    """Disable coveralls for an experiment"""
     experiment = get_experiment_from_request_post(request)
     travis_instance = experiment.travis
 
@@ -55,6 +56,8 @@ def coveralls_disable(request):
 @login_required
 @csrf_exempt
 def coveralls_filecoverage(request):
+    """Get file coverage percentage for a specific file
+    Make sure filename parameter is present in request.POST"""
     experiment = get_experiment_from_request_post(request)
     assert 'filename' in request.POST
     coverage = -1
@@ -69,6 +72,8 @@ def coveralls_filecoverage(request):
 
 @login_required
 def coveralls_status(request, object_id, object_type):
+    """Get coveralls status for an experiment given an object_id (pk) and an object_type
+    (ExperimentPackageType). Status is present in context dictionary."""
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
     travis_instance = exp_or_package.travis
     context = {}
@@ -81,34 +86,3 @@ def coveralls_status(request, object_id, object_type):
         context['coverage_configured'] = context['current_config'].enabled
     logger.debug('fetched coveralls status %s: %s', exp_or_package, context)
     return render(request, 'coverage_manager/coverage_status.html', context)
-
-
-def coveralls_create(travis_instance):
-    new_coveralls = CodeCoverage(travis_instance=travis_instance)
-    new_coveralls.save()
-
-    return new_coveralls
-
-
-def get_experiment_from_request_post(request):
-    assert 'object_id' in request.POST
-    experiment_id = request.POST['object_id']
-    return verify_and_get_experiment(request, experiment_id)
-
-
-def enable_coveralls(travis_instance):
-    """
-    Checks if code coverage object exists. If so, sets the enabled 
-    property to true, else creates a new one with default settings
-    (where enabled is automatically true)
-    :param travis_instance: The travis instance to check for
-    :return: None
-    """
-    coverage_config = CodeCoverage.objects.filter(travis_instance=travis_instance)
-    if coverage_config:
-        coverage_config = coverage_config[0]
-        coverage_config.enabled = True
-        coverage_config.save()
-    else:
-        coverage_config = coveralls_create(travis_instance)
-    return coverage_config

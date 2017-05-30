@@ -1,3 +1,4 @@
+"""Url views for coverage_manager app"""
 from django.conf.urls import url
 
 from coverage_manager.views import (coveralls_disable, coveralls_enable,

@@ -1,3 +1,4 @@
+"""Database models for cookiecutter manager"""
 from django.db import models
 
 from experiments_manager.models import ExperimentStep
@@ -5,6 +6,8 @@ from marketplace.models import Language
 
 
 class CookieCutterLocationToStepMapping(models.Model):
+    """In order to add a Cookiecutter template, add a mapping from the Experiment Steps to
+    the location in the new cookiecutter template"""
     location = models.CharField(max_length=100)
     main_module = models.CharField(max_length=100)
     step = models.ForeignKey(to=ExperimentStep)
@@ -14,6 +17,10 @@ class CookieCutterLocationToStepMapping(models.Model):
 
 
 class CookieCutterTemplate(models.Model):
+    """A CookieCutter template, can be added for an experiment or an internal package,
+    location points to a remote git repository, and doc_src_location to location
+    of docs source files
+    :param location: URL to git repository of cookiecutter template"""
     EXPERIMENT = 'e'
     PACKAGE = 'p'
     MEANT_FOR_CHOICES = (

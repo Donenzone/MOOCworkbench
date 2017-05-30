@@ -5,12 +5,11 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from coverage_manager.models import CodeCoverage
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
+from coverage_manager.models import CodeCoverage
 from experiments_manager.helper import verify_and_get_experiment
 from git_manager.helpers.helper import get_github_helper
 from helpers.helper import get_package_or_experiment
-
 
 logger = logging.getLogger(__name__)
 
@@ -113,4 +112,3 @@ def enable_coveralls(travis_instance):
     else:
         coverage_config = coveralls_create(travis_instance)
     return coverage_config
-

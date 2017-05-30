@@ -2,8 +2,7 @@ from markdown2 import Markdown
 
 from git_manager.helpers.github_helper import GitHubHelper
 
-from .models import Experiment
-from .models import ChosenExperimentSteps
+from .models import ChosenExperimentSteps, Experiment
 
 
 def verify_and_get_experiment(request, experiment_id):

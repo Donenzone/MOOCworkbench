@@ -13,4 +13,3 @@ class RequirementSuccessUrlMixin(object):
         elif self.kwargs['object_type']  == self.PACKAGE_TYPE:
             success_url = reverse('internalpackage_dashboard', kwargs={'pk': self.kwargs['object_id']})
         return success_url
-

@@ -7,7 +7,6 @@ from django.conf import settings
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.helpers.github_helper import GitHubHelper
 
-
 PACKAGES_DIR = os.path.join(settings.PROJECT_ROOT, 'packages')
 
 

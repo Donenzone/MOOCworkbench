@@ -1,11 +1,11 @@
 import json
 
-from tableschema import Schema, Table
 import tableschema
+from tableschema import Schema, Table
 
 from git_manager.helpers.github_helper import GitHubHelper
 
-from .models import DataSchemaField, DataSchema
+from .models import DataSchema, DataSchemaField
 
 SCHEMA_FILE_LOCATION = 'schema/schema.json'
 

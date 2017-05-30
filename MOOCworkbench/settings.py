@@ -12,12 +12,15 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import logging
 import os
-from os.path import dirname, abspath, basename, normpath, join
+from os.path import abspath, basename, dirname, join, normpath
 
-from .production_settings import ALLOWED_HOSTS, SECRET_KEY, DEBUG, GITHUB_WEBHOOK_KEY, REDIS_HOST
-from .production_settings import EMAIL_BACKEND, EMAIL_HOST, EMAIL_HOST_PASSWORD,\
-    EMAIL_HOST_USER,EMAIL_PORT,\
-    EMAIL_USE_TLS, DEFAULT_FROM_EMAIL
+from helpers.constants import LOG_FMT
+
+from .production_settings import (ALLOWED_HOSTS, DEBUG, DEFAULT_FROM_EMAIL,
+                                  EMAIL_BACKEND, EMAIL_HOST,
+                                  EMAIL_HOST_PASSWORD, EMAIL_HOST_USER,
+                                  EMAIL_PORT, EMAIL_USE_TLS,
+                                  GITHUB_WEBHOOK_KEY, REDIS_HOST, SECRET_KEY)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -195,7 +198,6 @@ STATICFILES_DIRS = [
 ]
 
 
-from helpers.constants import LOG_FMT
 logging.basicConfig(level=logging.DEBUG, format=LOG_FMT)
 
 LOGGING = {

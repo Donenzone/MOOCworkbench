@@ -1,19 +1,19 @@
 import json
 from datetime import datetime
 
-from django.views import View
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.views import View
 
-from git_manager.views import get_user_repositories
 from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.views import get_user_repositories
 
 from ..forms import ExperimentForm
-from ..models import *
 from ..helper import verify_and_get_experiment
 from ..mixins import ExperimentContextMixin
+from ..models import *
 from ..tasks import initialize_repository
 
 

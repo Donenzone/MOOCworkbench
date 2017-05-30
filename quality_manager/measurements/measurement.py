@@ -1,5 +1,6 @@
-from quality_manager.models import ExperimentMeasureResult
 from abc import abstractmethod
+
+from quality_manager.models import ExperimentMeasureResult
 
 
 class MeasurementAbstraction(object):

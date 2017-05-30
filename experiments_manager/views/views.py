@@ -1,29 +1,28 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 
-from django.views.generic.detail import DetailView
-from django.views import View
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
+from django.views import View
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 
 from docs_manager.mixins import DocsMixin
 from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.mixins.repo_file_list import get_files_for_steps, _get_files_in_repository
-from quality_manager.mixins import get_most_recent_measurement
+from git_manager.mixins.repo_file_list import (_get_files_in_repository,
+                                               get_files_for_steps)
 from pylint_manager.helper import return_results_for_file
+from quality_manager.mixins import get_most_recent_measurement
 from recommendations.utils import get_recommendations
 
-from ..tables import ExperimentTable
 from ..forms import ExperimentEditForm
-from ..models import *
-from ..helper import verify_and_get_experiment, get_readme_of_experiment
+from ..helper import get_readme_of_experiment, verify_and_get_experiment
 from ..mixins import ExperimentContextMixin
-
+from ..models import *
+from ..tables import ExperimentTable
 
 logger = logging.getLogger(__name__)
 

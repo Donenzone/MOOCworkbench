@@ -1,10 +1,9 @@
-import subprocess
 import os
 import shutil
+import subprocess
 
 from django.conf import settings
 from django.utils.crypto import get_random_string
-
 from git import Repo
 
 

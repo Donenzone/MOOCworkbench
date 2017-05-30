@@ -1,22 +1,22 @@
-from markdownx.utils import markdownify
-
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DetailView, View
 from django.views.generic.list import ListView
-from django.contrib.auth.decorators import login_required
+from markdownx.utils import markdownify
 
 from experiments_manager.mixins import ActiveExperimentsList
 from helpers.helper_mixins import ExperimentPackageTypeMixin
-from user_manager.models import get_workbench_user
 from recommendations.utils import recommend
+from user_manager.models import get_workbench_user
 
-from ..models import Package, InternalPackage, ExternalPackage, PackageVersion, PackageResource
-from .views_internalpackage import InternalPackageBaseView
-from ..tasks import task_check_for_new_package_version
 from ..mixins import IsInternalPackageMixin, ObjectTypeIdMixin
+from ..models import (ExternalPackage, InternalPackage, Package,
+                      PackageResource, PackageVersion)
+from ..tasks import task_check_for_new_package_version
+from .views_internalpackage import InternalPackageBaseView
 
 
 class MarketplaceIndex(View):

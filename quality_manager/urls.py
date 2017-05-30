@@ -1,11 +1,8 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
-from quality_manager.views import DashboardView
-from quality_manager.views import NrOfCommitsView
-from quality_manager.views import VcsOverviewView
-from quality_manager.views import refresh_measurements
-
+from quality_manager.views import (DashboardView, NrOfCommitsView,
+                                   VcsOverviewView, refresh_measurements)
 
 urlpatterns = [
     url(r'^dashboard/(?P<experiment_id>\d+)/$', login_required(DashboardView.as_view()), name="dashboard"),

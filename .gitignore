@@ -1,7 +1,9 @@
 temp/
 static/
 bower_components/
-
+.env
+db.sqlite3*
+celerybeat-schedule
 MOOCworkbench/production_settings.py
 .idea/
 github_repositories/

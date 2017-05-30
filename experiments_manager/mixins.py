@@ -1,5 +1,5 @@
-from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.forms import ExperimentSelectForm
+from experiments_manager.helper import verify_and_get_experiment
 
 
 class ExperimentContextMixin(object):

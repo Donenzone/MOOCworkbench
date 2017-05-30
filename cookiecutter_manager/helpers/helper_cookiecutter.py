@@ -1,4 +1,5 @@
 import logging
+
 from cookiecutter.main import cookiecutter
 
 logger = logging.getLogger(__name__)

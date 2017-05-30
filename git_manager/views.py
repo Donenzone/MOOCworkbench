@@ -1,22 +1,21 @@
 import hmac
-from hashlib import sha1
 import json
 import logging
-
-import requests
+from hashlib import sha1
 from ipaddress import ip_address, ip_network
 
+import requests
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
+from django.http import (HttpResponse, HttpResponseForbidden,
+                         HttpResponseServerError)
+from django.utils.encoding import force_bytes
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.utils.encoding import force_bytes
 
 from helpers.constants import WORKBENCH_COMMIT_MESSAGES
 
 from .helpers.github_helper import GitHubHelper
 from .tasks import task_process_git_push
-
 
 logger = logging.getLogger(__name__)
 

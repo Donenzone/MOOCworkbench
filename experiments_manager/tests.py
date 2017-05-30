@@ -1,18 +1,17 @@
 import json
 from collections import namedtuple
-
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from unittest.mock import patch
+
+from django.contrib.auth.models import User
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 from dataschema_manager.models import DataSchema
-from experiments_manager.models import Experiment, ChosenExperimentSteps
-from experiments_manager.models import ExperimentStep
-from user_manager.models import WorkbenchUser
+from experiments_manager.models import (ChosenExperimentSteps, Experiment,
+                                        ExperimentStep)
 from git_manager.models import GitRepository
+from user_manager.models import WorkbenchUser
 
 
 class ExperimentTestCase(TestCase):

@@ -1,10 +1,12 @@
-from MOOCworkbench.celery import app
 from celery.task import periodic_task
-from git_manager.utils.repo_init import PackageGitRepoInit
-from experiments_manager.models import Experiment
-from experiments_manager.consumers import send_exp_package_creation_status_update
 
-from .models import update_all_versions, InternalPackage
+from experiments_manager.consumers import \
+    send_exp_package_creation_status_update
+from experiments_manager.models import Experiment
+from git_manager.utils.repo_init import PackageGitRepoInit
+from MOOCworkbench.celery import app
+
+from .models import InternalPackage, update_all_versions
 
 
 @periodic_task(run_every=30)

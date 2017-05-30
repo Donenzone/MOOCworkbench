@@ -1,5 +1,5 @@
-from MOOCworkbench.celery import app
 from git_manager.helpers.helper import get_exp_or_package_from_repo_name
+from MOOCworkbench.celery import app
 
 
 @app.task

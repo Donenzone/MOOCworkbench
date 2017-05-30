@@ -1,10 +1,9 @@
 from unittest.mock import patch
 
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
@@ -135,4 +134,3 @@ class DocsManagerTestCase(TestCase):
         response = self.client.get(reverse('docs_generate', kwargs={'object_id': 1,
                                                                   'object_type': ExperimentPackageTypeMixin.EXPERIMENT_TYPE}))
         self.assertEqual(response.status_code, 200)
-

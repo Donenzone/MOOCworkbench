@@ -1,11 +1,10 @@
 import base64
 
+from allauth.socialaccount.models import SocialToken
 from django.conf import settings
 from django.shortcuts import reverse
-
 from github import Github
 from github.GithubException import GithubException
-from allauth.socialaccount.models import SocialToken
 
 from user_manager.models import WorkbenchUser
 

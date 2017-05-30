@@ -1,10 +1,9 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
-from .views import write_requirements_file
-from .views import RequirementListView, RequirementCreateView
-from .views import RequirementUpdateView
-from .views import remove_experiment_requirement
+from .views import (RequirementCreateView, RequirementListView,
+                    RequirementUpdateView, remove_experiment_requirement,
+                    write_requirements_file)
 
 urlpatterns = [
     url(r'^(?P<pk>\d+)/(?P<object_type>\w+)/$', login_required(RequirementListView.as_view()), name="requirements_list"),

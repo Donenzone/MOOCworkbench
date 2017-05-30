@@ -1,21 +1,20 @@
 import logging
 import math
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
-from django.contrib import messages
 
 from experiments_manager.models import Experiment
 from feedback.views import get_available_tasks
-from marketplace.models import PackageVersion, PackageResource, InternalPackage, ExternalPackage, Package
+from marketplace.models import (ExternalPackage, InternalPackage, Package,
+                                PackageResource, PackageVersion)
 
-from .models import get_workbench_user, WorkbenchUser
-from .forms import WorkbenchUserForm
-from .forms import RegisterForm
-
+from .forms import RegisterForm, WorkbenchUserForm
+from .models import WorkbenchUser, get_workbench_user
 
 logger = logging.getLogger(__name__)
 

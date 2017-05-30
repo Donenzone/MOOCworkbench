@@ -1,8 +1,8 @@
 import logging
 
-from django.shortcuts import render
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.views import View
 
 from experiments_manager.helper import verify_and_get_experiment
@@ -10,10 +10,10 @@ from experiments_manager.mixins import ExperimentContextMixin
 from experiments_manager.models import ChosenExperimentSteps
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 
+from .helpers.helper import (get_description_measure_list,
+                             get_nr_of_commits_last_week)
 from .mixins import MeasurementMixin
-from .helpers.helper import get_description_measure_list, get_nr_of_commits_last_week
 from .tasks import task_complete_quality_check
-
 
 logger = logging.getLogger(__name__)
 

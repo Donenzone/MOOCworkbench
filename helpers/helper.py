@@ -1,11 +1,9 @@
 import shutil
 
-from MOOCworkbench.settings import ALLOWED_HOSTS
-from MOOCworkbench.settings import BASE_DIR
-
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.models import Experiment
 from marketplace.models import InternalPackage
+from MOOCworkbench.settings import ALLOWED_HOSTS, BASE_DIR
 
 from .helper_mixins import ExperimentPackageTypeMixin
 
@@ -44,4 +42,3 @@ def get_absolute_path():
 
 def get_absolute_url(to):
     return 'https://{0}{1}'.format(ALLOWED_HOSTS[0], to)
-

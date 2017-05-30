@@ -1,17 +1,16 @@
 import json
-from unittest.mock import patch
 from datetime import datetime
+from unittest.mock import patch
 
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 from dataschema_manager.models import DataSchema
-from user_manager.models import WorkbenchUser
-from experiments_manager.models import Experiment, ChosenExperimentSteps
+from experiments_manager.models import ChosenExperimentSteps, Experiment
 from git_manager.models import GitRepository
+from user_manager.models import WorkbenchUser
 
 
 class QualityManagerTestCase(TestCase):

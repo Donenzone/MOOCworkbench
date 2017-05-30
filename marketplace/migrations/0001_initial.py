@@ -3,11 +3,11 @@
 from __future__ import unicode_literals
 
 import autoslug.fields
-from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import markdownx.models
 import model_utils.fields
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

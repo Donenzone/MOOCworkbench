@@ -1,6 +1,7 @@
-from quality_manager.measurements.measurement import MeasurementAbstraction
-from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure, RawMeasureResult
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
+from quality_manager.measurements.measurement import MeasurementAbstraction
+from quality_manager.models import (ExperimentMeasure, ExperimentMeasureResult,
+                                    RawMeasureResult)
 
 
 class TestMeasurement(MeasurementAbstraction):

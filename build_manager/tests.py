@@ -1,11 +1,10 @@
 import json
 from unittest.mock import patch
 
-from django.test import TestCase
-from django.test import Client
+from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.shortcuts import reverse
-from django.contrib.auth.models import User
+from django.test import Client, TestCase
 
 from build_manager.models import TravisInstance
 from dataschema_manager.models import DataSchema

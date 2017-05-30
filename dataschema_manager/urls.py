@@ -1,11 +1,8 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
-
-from .views import DataSchemaOverview
-from .views import dataschema_new
-from .views import dataschema_edit
-from .views import dataschema_write
+from .views import (DataSchemaOverview, dataschema_edit, dataschema_new,
+                    dataschema_write)
 
 urlpatterns = [
     url(r'^new/field/(?P<experiment_id>\d+)$', dataschema_new, name="dataschemafield_new"),

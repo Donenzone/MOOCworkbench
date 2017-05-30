@@ -1,25 +1,16 @@
 import logging
 
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.shortcuts import render
 from travispy.errors import TravisError
 
 from build_manager.travis_ci_helper import TravisCiHelper
 from git_manager.helpers.helper import get_github_helper
-from helpers.helper import get_package_or_experiment
 
+from .helper import get_exp_or_package_from_request
 
 logger = logging.getLogger(__name__)
-
-
-def get_exp_or_package_from_request(request):
-    assert 'object_id' in request.POST
-    assert 'object_type' in request.POST
-    object_id = request.POST['object_id']
-    object_type = request.POST['object_type']
-    exp_or_package = get_package_or_experiment(request, object_type, object_id)
-    return exp_or_package
 
 
 @login_required

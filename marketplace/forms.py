@@ -1,6 +1,5 @@
 from django import forms
-from django.forms import ModelForm
-from django.forms import TextInput
+from django.forms import ModelForm, TextInput
 
 from marketplace.models import InternalPackage
 
@@ -18,4 +17,3 @@ class InternalPackageForm(ModelForm):
         widgets = {
             'name': TextInput(attrs={'placeholder': 'Package name'}),
         }
-

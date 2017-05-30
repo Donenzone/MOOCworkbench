@@ -1,7 +1,7 @@
 import unittest
 
-from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 

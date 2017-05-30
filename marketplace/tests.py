@@ -1,20 +1,19 @@
 from unittest.mock import patch
 
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
-from dataschema_manager.models import DataSchema
-from user_manager.models import WorkbenchUser
-from experiments_manager.models import Experiment, ChosenExperimentSteps
-from git_manager.models import GitRepository
-from marketplace.models import ExternalPackage, InternalPackage
-from marketplace.models import PackageVersion, Language, Category
-from helpers.helper import ExperimentPackageTypeMixin
-from docs_manager.models import Docs
 from build_manager.models import TravisInstance
+from dataschema_manager.models import DataSchema
+from docs_manager.models import Docs
+from experiments_manager.models import ChosenExperimentSteps, Experiment
+from git_manager.models import GitRepository
+from helpers.helper import ExperimentPackageTypeMixin
+from marketplace.models import (Category, ExternalPackage, InternalPackage,
+                                Language, PackageVersion)
+from user_manager.models import WorkbenchUser
 
 
 class MarketplaceTestCase(TestCase):

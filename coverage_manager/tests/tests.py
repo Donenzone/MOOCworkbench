@@ -1,12 +1,11 @@
-from unittest.mock import patch
-from collections import namedtuple
 import json
+from collections import namedtuple
+from unittest.mock import patch
 
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 from coverage_manager.models import CodeCoverage
 from dataschema_manager.models import DataSchema
@@ -134,7 +133,7 @@ class CoverageManagerTestCase(TestCase):
         coverage_data = {'object_id': 1}
         self.client.post(reverse('coveralls_enable'), data=coverage_data)
         code_coverage = CodeCoverage.objects.get(travis_instance=travis_instance)
-        self.assertEqual(code_coverage.badge_url, 'http://test.test')
+        self.assertTrue(code_coverage.enabled)
 
     def test_disable_coverage(self):
         """

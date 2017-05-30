@@ -1,11 +1,10 @@
 from unittest.mock import patch
 
 import requirements
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
@@ -164,6 +163,3 @@ class RequirementsManagerTestCase(TestCase):
         self.assertTrue(self.requirement_one.version in package_req_version_list)
         self.assertTrue(self.requirement_two.version in package_req_version_list)
         self.assertTrue(self.requirement_three.version in package_req_version_list)
-
-
-

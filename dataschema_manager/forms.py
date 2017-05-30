@@ -1,8 +1,7 @@
 from django import forms
-from django.forms import ModelForm
-from django.forms import TextInput, Textarea
+from django.forms import ModelForm, Textarea, TextInput
 
-from .models import DataSchemaField, DataSchemaConstraints
+from .models import DataSchemaConstraints, DataSchemaField
 
 
 class JsonTableSchemaNameField(forms.CharField):

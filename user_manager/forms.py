@@ -1,6 +1,7 @@
 from django import forms
-from .models import User, WorkbenchUser
 from django.contrib.auth.models import User
+
+from .models import User, WorkbenchUser
 
 
 class UserLoginForm(forms.Form):

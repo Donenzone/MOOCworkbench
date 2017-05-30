@@ -1,13 +1,13 @@
 import logging
-import subprocess
 import os
-import shutil
 import pickle
-from os.path import isfile, isdir
+import shutil
+import subprocess
+from os.path import isdir, isfile
 
+from git_manager.helpers.git_helper import GitHelper, clean_up_after_git_helper
 from helpers.constants import DOCS_COMMIT_MESSAGE
 from MOOCworkbench.settings import PROJECT_ROOT
-from git_manager.helpers.git_helper import GitHelper, clean_up_after_git_helper
 
 logger = logging.getLogger(__name__)
 

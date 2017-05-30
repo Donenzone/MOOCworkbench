@@ -1,7 +1,7 @@
 from django.db import models
 
-from marketplace.models import Language
 from experiments_manager.models import ExperimentStep
+from marketplace.models import Language
 
 
 class CookieCutterLocationToStepMapping(models.Model):
@@ -30,5 +30,3 @@ class CookieCutterTemplate(models.Model):
 
     def __str__(self):
         return self.name
-
-

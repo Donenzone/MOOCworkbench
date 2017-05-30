@@ -1,20 +1,19 @@
-from django.views.generic.list import ListView
-from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.db import transaction
+from django.http import JsonResponse
+from django.views.generic import CreateView, UpdateView
+from django.views.generic.list import ListView
 
-from helpers.helper_mixins import ExperimentPackageTypeMixin
-from helpers.helper import get_package_or_experiment
-from helpers.helper import get_package_or_experiment_with_context
 from experiments_manager.consumers import send_message
 from experiments_manager.helper import MessageStatus
-
+from helpers.helper import (get_package_or_experiment,
+                            get_package_or_experiment_with_context)
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.mixins import IsInternalPackageMixin
 
 from .forms import RequirementForm
-from .models import Requirement
 from .mixins import RequirementSuccessUrlMixin
+from .models import Requirement
 from .tasks import task_write_requirements_file
 
 
@@ -96,6 +95,3 @@ def write_requirements_file(request, object_id, object_type):
     task_write_requirements_file.delay(object_id, object_type)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update dependencies...')
     return JsonResponse({'success': True})
-
-
-

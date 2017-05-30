@@ -1,18 +1,17 @@
-import os
-import subprocess
 import json
-import shutil
+import os
 import re
-
-from rpy2.robjects.packages import importr
+import shutil
+import subprocess
 
 from django.db.models import Q
+from rpy2.robjects.packages import importr
 
 from git_manager.helpers.git_helper import GitHelper, clean_up_after_git_helper
 from git_manager.helpers.github_helper import GitHubHelper
 from MOOCworkbench.settings import PROJECT_ROOT
 
-from .models import PylintScan, PylintResult, PylintScanResult
+from .models import PylintResult, PylintScan, PylintScanResult
 
 
 def static_analysis_prepare(experiment):

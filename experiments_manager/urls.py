@@ -1,12 +1,11 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
-from requirements_manager.views import RequirementListView
-from dataschema_manager.views import DataSchemaOverview
-from quality_manager.views import DashboardView
-
 import experiments_manager.views.views
 import experiments_manager.views.views_create
+from dataschema_manager.views import DataSchemaOverview
+from quality_manager.views import DashboardView
+from requirements_manager.views import RequirementListView
 
 urlpatterns = [
     url(r'^$', experiments_manager.views.views.index, name="experiments_index"),

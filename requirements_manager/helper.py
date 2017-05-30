@@ -23,4 +23,3 @@ def add_internalpackage_to_experiment(internal_package, experiment):
         task_write_requirements_file.delay(experiment.pk, experiment.get_object_type())
         return True
     return False
-

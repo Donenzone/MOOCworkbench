@@ -1,4 +1,4 @@
-from .models import InternalPackage, ExternalPackage
+from .models import ExternalPackage, InternalPackage
 
 
 class IsInternalPackageMixin(object):

@@ -1,9 +1,8 @@
 from django.conf.urls import url
-from build_manager.views import build_experiment_now
-from build_manager.views import enable_ci_builds
-from build_manager.views import disable_ci_builds
-from build_manager.views import build_status
-from build_manager.views import get_log_from_last_build
+
+from build_manager.views import (build_experiment_now, build_status,
+                                 disable_ci_builds, enable_ci_builds,
+                                 get_log_from_last_build)
 
 urlpatterns = [
     url(r'^enable-builds/$', enable_ci_builds, name="enable_ci_builds"),

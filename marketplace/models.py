@@ -1,28 +1,25 @@
 import xmlrpc.client
 
 from autoslug import AutoSlugField
-from markdownx.models import MarkdownxField
-from model_utils.models import TimeStampedModel
-from notifications.signals import notify
-from markdownx.utils import markdownify
-
-from django.urls import reverse
+from django.contrib.contenttypes.models import ContentType
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
-from django.core.validators import RegexValidator
-from django.contrib.contenttypes.models import ContentType
+from django.urls import reverse
+from markdownx.utils import markdownify
+from model_utils.models import TimeStampedModel
+from notifications.signals import notify
 
-from build_manager.models import TravisInstance, TravisCiConfig
+from build_manager.models import TravisCiConfig, TravisInstance
 from docs_manager.models import Docs
+from git_manager.helpers.language_helper import PythonHelper, RHelper
 from git_manager.models import GitRepository
+from helpers.helper_mixins import ExperimentPackageTypeMixin
+from recommendations.models import Recommendation
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
-from recommendations.models import Recommendation
-from helpers.helper_mixins import ExperimentPackageTypeMixin
-from git_manager.helpers.language_helper import PythonHelper, RHelper
-
 
 PYPI_URL = 'https://pypi.python.org/pypi'
 
@@ -235,4 +232,3 @@ def get_latest_version(package):
             url = '{0}/{1}/{2}'.format(PYPI_URL, package.name, release)
             newer_release = PackageVersion(package=package, version_nr=release, changelog="Auto-added", url=url)
             newer_release.save()
-

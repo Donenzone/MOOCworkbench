@@ -1,11 +1,11 @@
-from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from feedback.models import Feedback, Task, UserTask
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView
-from user_manager.models import get_workbench_user
 from django.db.models import Q
-from django.shortcuts import reverse
+from django.shortcuts import redirect, reverse
+from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
+
+from feedback.models import Feedback, Task, UserTask
+from user_manager.models import get_workbench_user
 
 
 @login_required

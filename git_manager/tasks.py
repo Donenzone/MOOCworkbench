@@ -1,19 +1,19 @@
-from datetime import datetime
-import pytz
 import logging
+from datetime import datetime
 
-from MOOCworkbench.celery import app
-from requirements_manager.tasks import task_update_requirements
+import pytz
+
 from dataschema_manager.tasks import task_read_data_schema
 from docs_manager.tasks import task_generate_docs
-from quality_manager.tasks import task_complete_quality_check
 from experiments_manager.models import Experiment
 from marketplace.models import InternalPackage
+from MOOCworkbench.celery import app
+from quality_manager.tasks import task_complete_quality_check
+from requirements_manager.tasks import task_update_requirements
 
-from .helpers.helper import get_exp_or_package_from_repo_name
 from .helpers.github_helper import GitHubHelper
+from .helpers.helper import get_exp_or_package_from_repo_name
 from .models import Commit
-
 
 logger = logging.getLogger(__name__)
 

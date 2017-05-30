@@ -1,33 +1,30 @@
 import logging
 
-from markdown2 import Markdown
-
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, UpdateView, View
 from django.views.generic.list import ListView
-from django.contrib.auth.decorators import login_required
+from markdown2 import Markdown
 
 from experiments_manager.helper import verify_and_get_experiment
-from experiments_manager.models import ChosenExperimentSteps
 from experiments_manager.mixins import ActiveExperimentsList
-from helpers.helper_mixins import ExperimentPackageTypeMixin
-from user_manager.models import get_workbench_user
-from requirements_manager.helper import add_internalpackage_to_experiment
+from experiments_manager.models import ChosenExperimentSteps
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.mixins.repo_file_list import get_files_for_repository
-
+from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.forms import InternalPackageForm
-from marketplace.helpers.helper import create_tag_for_package_version
-from marketplace.helpers.helper import update_setup_py_with_new_version
-from marketplace.models import InternalPackage, PackageVersion, PackageResource
-from marketplace.tasks import task_create_package_from_experiment, task_publish_update_package
-from marketplace.tasks import task_remove_package
+from marketplace.helpers.helper import (create_tag_for_package_version,
+                                        update_setup_py_with_new_version)
 from marketplace.mixins import IsInternalPackageMixin, ObjectTypeIdMixin
-
+from marketplace.models import InternalPackage, PackageResource, PackageVersion
+from marketplace.tasks import (task_create_package_from_experiment,
+                               task_publish_update_package,
+                               task_remove_package)
+from requirements_manager.helper import add_internalpackage_to_experiment
+from user_manager.models import get_workbench_user
 
 logger = logging.getLogger(__name__)
 

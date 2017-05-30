@@ -1,8 +1,7 @@
-from django.test import TestCase
 from django.contrib.auth.models import User
-from django.test import Client
-from django.shortcuts import reverse
 from django.core.management import call_command
+from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
@@ -170,4 +169,3 @@ class UserManagerTestCase(TestCase):
         self.assertIsNotNone(response.context['form'])
         new_user = User.objects.filter(username=data['username'])
         self.assertFalse(new_user)
-

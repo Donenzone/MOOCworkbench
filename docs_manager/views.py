@@ -1,12 +1,12 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.views import View
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.views import View
 
 from experiments_manager.consumers import send_message
 from experiments_manager.helper import MessageStatus
-from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.git_helper import GitHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from helpers.helper import get_package_or_experiment
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 

@@ -1,8 +1,7 @@
 from django.conf.urls import url
-from coverage_manager.views import coveralls_enable
-from coverage_manager.views import coveralls_disable
-from coverage_manager.views import coveralls_status
-from coverage_manager.views import coveralls_filecoverage
+
+from coverage_manager.views import (coveralls_disable, coveralls_enable,
+                                    coveralls_filecoverage, coveralls_status)
 
 urlpatterns = [
     url(r'^enable-coverage/$', coveralls_enable, name="coveralls_enable"),

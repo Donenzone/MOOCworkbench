@@ -1,8 +1,8 @@
-from marketplace.models import PackageVersion, InternalPackage
 from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.helpers.helper import get_file_from_code_template
+from git_manager.helpers.helper import (CodeTemplateTypes,
+                                        get_file_from_code_template)
 from helpers.helper import replace_variable_in_file
-from git_manager.helpers.helper import CodeTemplateTypes
+from marketplace.models import InternalPackage, PackageVersion
 
 
 def create_tag_for_package_version(package_version_id):

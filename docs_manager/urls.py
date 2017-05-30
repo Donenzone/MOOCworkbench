@@ -1,9 +1,8 @@
 from django.conf.urls import url
-from docs_manager.views import DocView
-from docs_manager.views import DocStatusView
-from docs_manager.views import toggle_docs_status
-from docs_manager.views import docs_generate
 from django.contrib.auth.decorators import login_required
+
+from docs_manager.views import (DocStatusView, DocView, docs_generate,
+                                toggle_docs_status)
 
 urlpatterns = [
         url(r'^view/(?P<object_id>\d+)/(?P<object_type>\w+)/$', login_required(DocView.as_view()), name="docs_view"),

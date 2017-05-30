@@ -1,6 +1,7 @@
 from django.db import models
-from user_manager.models import WorkbenchUser
 from model_utils.models import TimeStampedModel
+
+from user_manager.models import WorkbenchUser
 
 
 class Task(models.Model):

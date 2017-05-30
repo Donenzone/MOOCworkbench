@@ -1,12 +1,12 @@
 import re
 
-from quality_manager.measurements.measurement import MeasurementAbstraction
-from requirements_manager.models import Requirement
-from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
-from quality_manager.models import RawMeasureResult
 from build_manager.models import TravisInstance
 from build_manager.travis_ci_helper import TravisCiHelper
 from git_manager.helpers.github_helper import GitHubHelper
+from quality_manager.measurements.measurement import MeasurementAbstraction
+from quality_manager.models import (ExperimentMeasure, ExperimentMeasureResult,
+                                    RawMeasureResult)
+from requirements_manager.models import Requirement
 
 
 class RequirementsMeasurement(MeasurementAbstraction):

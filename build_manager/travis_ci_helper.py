@@ -1,10 +1,8 @@
 import logging
+
 import requests
-
-
 from travispy import TravisPy
 from travispy.errors import TravisError
-
 
 logger = logging.getLogger(__name__)
 

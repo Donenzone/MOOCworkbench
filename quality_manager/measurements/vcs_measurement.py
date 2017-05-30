@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 
 from quality_manager.measurements.measurement import MeasurementAbstraction
-from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure, RawMeasureResult
+from quality_manager.models import (ExperimentMeasure, ExperimentMeasureResult,
+                                    RawMeasureResult)
 
 
 class VersionControlUseMeasurement(MeasurementAbstraction):

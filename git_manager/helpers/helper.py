@@ -1,7 +1,7 @@
 from helpers.helper import get_absolute_path
 
-from .github_helper import GitHubHelper
 from ..models import GitRepository
+from .github_helper import GitHubHelper
 
 
 def get_github_helper(request, exp_or_package):
@@ -40,4 +40,3 @@ def get_exp_or_package_from_repo_name(repo_name):
         elif git_repo.internalpackage_set:
             package = git_repo.internalpackage_set.first()
             return package
-

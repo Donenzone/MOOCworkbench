@@ -1,7 +1,7 @@
 import json
 
-from channels.auth import channel_session_user_from_http
 from channels import Group
+from channels.auth import channel_session_user_from_http
 
 
 @channel_session_user_from_http

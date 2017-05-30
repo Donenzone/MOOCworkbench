@@ -1,22 +1,21 @@
-from model_utils.models import TimeStampedModel
-
 from django.db import models
-from django.template.defaultfilters import slugify
-from django.urls import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.defaultfilters import slugify
+from django.urls import reverse
+from model_utils.models import TimeStampedModel
 
-from build_manager.models import TravisInstance, TravisCiConfig
+from build_manager.models import TravisCiConfig, TravisInstance
 from coverage_manager.models import CodeCoverage
 from dataschema_manager.models import DataSchema
 from docs_manager.models import Docs
+from git_manager.helpers.language_helper import PythonHelper, RHelper
 from git_manager.models import GitRepository
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.models import BasePackage
 from pylint_manager.models import PylintScan
 from requirements_manager.models import Requirement
 from user_manager.models import WorkbenchUser
-from git_manager.helpers.language_helper import PythonHelper, RHelper
 
 
 class Experiment(BasePackage):

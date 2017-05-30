@@ -1,16 +1,15 @@
 import base64
+from unittest.mock import patch
 
-from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
+from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
 from django.contrib.auth.models import User
 from django.core.management import call_command
-from django.test import Client
-from django.test import TestCase
-from unittest.mock import patch
+from django.test import Client, TestCase
 
 from dataschema_manager.models import DataSchema
 from experiments_manager.models import Experiment
-from git_manager.models import GitRepository
 from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.models import GitRepository
 from user_manager.models import WorkbenchUser
 
 

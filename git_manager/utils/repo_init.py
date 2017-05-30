@@ -1,11 +1,13 @@
 import shutil
 
-from cookiecutter_manager.helpers.helper_cookiecutter import clone_cookiecutter_template_with_dict
+from cookiecutter_manager.helpers.helper_cookiecutter import \
+    clone_cookiecutter_template_with_dict
 from cookiecutter_manager.models import CookieCutterTemplate
-from experiments_manager.consumers import send_exp_package_creation_status_update
+from experiments_manager.consumers import \
+    send_exp_package_creation_status_update
 
-from ..helpers.github_helper import GitHubHelper
 from ..helpers.git_helper import GitHelper, clean_up_after_git_helper
+from ..helpers.github_helper import GitHubHelper
 from ..models import GitRepository
 
 

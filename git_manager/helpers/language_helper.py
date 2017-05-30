@@ -5,13 +5,14 @@ import subprocess
 import requirements
 from rpy2.robjects.packages import importr
 
-from MOOCworkbench.settings import PROJECT_ROOT
 from docs_manager.sphinx_helper import SphinxHelper
-from requirements_manager.models import Requirement
-from requirements_manager.helper import delete_existing_requirements
-from pylint_manager.utils import run_rlint, run_pylint
-from marketplace.utils import internalpackage_publish_update, internalpackage_remove
 from helpers.constants import EXTRA_INDEX_URL, REQUIREMENT_COMMIT_MESSAGE
+from marketplace.utils import (internalpackage_publish_update,
+                               internalpackage_remove)
+from MOOCworkbench.settings import PROJECT_ROOT
+from pylint_manager.utils import run_pylint, run_rlint
+from requirements_manager.helper import delete_existing_requirements
+from requirements_manager.models import Requirement
 
 from .git_helper import GitHelper
 from .github_helper import GitHubHelper
@@ -268,4 +269,3 @@ class RHelper(LanguageHelper):
 
     def _del_tmp_file(self, file_name):
         os.remove(file_name)
-

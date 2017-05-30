@@ -1,6 +1,6 @@
 from build_manager.models import TravisInstance
 from quality_manager.measurements.measurement import MeasurementAbstraction
-from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
+from quality_manager.models import ExperimentMeasure, ExperimentMeasureResult
 
 
 class CiEnabledMeasurement(MeasurementAbstraction):

@@ -1,7 +1,7 @@
 from pylint_manager.models import PylintScanResult
 from quality_manager.measurements.measurement import MeasurementAbstraction
-from quality_manager.models import RawMeasureResult, ExperimentMeasure
-from quality_manager.models import ExperimentMeasureResult
+from quality_manager.models import (ExperimentMeasure, ExperimentMeasureResult,
+                                    RawMeasureResult)
 
 
 class PylintMeasurement(MeasurementAbstraction):

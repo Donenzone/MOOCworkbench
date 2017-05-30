@@ -1,5 +1,5 @@
-from quality_manager.models import ExperimentMeasureResult, ExperimentMeasure
 from experiments_manager.helper import verify_and_get_experiment
+from quality_manager.models import ExperimentMeasure, ExperimentMeasureResult
 
 
 class MeasurementMixin(object):

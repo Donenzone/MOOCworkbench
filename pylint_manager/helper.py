@@ -1,4 +1,4 @@
-from .models import PylintScan, PylintResult, PylintScanResult
+from .models import PylintResult, PylintScan, PylintScanResult
 
 
 def last_scan_results_for_experiment(experiment):

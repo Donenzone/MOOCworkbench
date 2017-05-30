@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -89,4 +88,3 @@ class DataSchema(models.Model):
         schema_dict = {}
         schema_dict['fields'] = [x.to_dict() for x in self.fields.all()]
         return schema_dict
-

@@ -1,19 +1,17 @@
 import logging
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.views.generic import View
 
-from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.consumers import send_message
-from experiments_manager.helper import MessageStatus
+from experiments_manager.helper import MessageStatus, verify_and_get_experiment
 
+from .forms import DataSchemaConstraintForm, DataSchemaFieldForm
 from .models import DataSchemaField
-from .forms import DataSchemaFieldForm, DataSchemaConstraintForm
 from .tasks import task_write_data_schema
-
 
 logger = logging.getLogger(__name__)
 
@@ -94,4 +92,3 @@ def dataschema_write(request, experiment_id):
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update data schema...')
     logger.debug('started updating schema for: %d', experiment_id)
     return JsonResponse({'success': True})
-

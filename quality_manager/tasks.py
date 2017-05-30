@@ -1,17 +1,15 @@
 import logging
 
-from MOOCworkbench.celery import app
-
 from experiments_manager.models import ChosenExperimentSteps
 from git_manager.helpers.github_helper import GitHubHelper
+from MOOCworkbench.celery import app
 
-from .measurements.requirements_measurement import RequirementsMeasurement
-from .measurements.vcs_measurement import VersionControlUseMeasurement
-from .measurements.test_measurement import TestMeasurement
 from .measurements.ci_measurement import CiEnabledMeasurement
 from .measurements.docs_measurement import DocsMeasurement
 from .measurements.pylint_measurement import PylintMeasurement
-
+from .measurements.requirements_measurement import RequirementsMeasurement
+from .measurements.test_measurement import TestMeasurement
+from .measurements.vcs_measurement import VersionControlUseMeasurement
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from marketplace.models import Language, Category,  PackageResource
+
+from marketplace.models import Category, Language, PackageResource
 
 # Register your models here.
 admin.site.register(Language)

@@ -1,8 +1,8 @@
 from django.db import models
 from django.template.defaultfilters import slugify
+from model_utils.models import TimeStampedModel
 
 from experiments_manager.models import ChosenExperimentSteps
-from model_utils.models import TimeStampedModel
 
 
 class ExperimentMeasure(models.Model):

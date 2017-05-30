@@ -1,9 +1,8 @@
 from django.template.defaultfilters import slugify
 
-from pylint_manager.helper import return_result_summary_for_file
-
-from git_manager.helpers.github_helper import GitHubHelper
 from experiments_manager.models import Experiment
+from git_manager.helpers.github_helper import GitHubHelper
+from pylint_manager.helper import return_result_summary_for_file
 
 
 class ContentFile(object):

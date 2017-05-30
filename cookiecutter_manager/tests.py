@@ -17,7 +17,7 @@ class CookieCutterTemplateTestCases(TestCase):
     def setUp(self):
         call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
         self.cookiecutter_template = CookieCutterTemplate.objects.create(
-            location='git@github.com:jlmdegoede/cookiecutter-data-science.git',
+            location='https://github.com/jlmdegoede/cookiecutter-data-science.git',
             name='Default data science template',
             language_id=1,
             docs_src_location='docs/')

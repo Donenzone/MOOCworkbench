@@ -23,11 +23,11 @@ class TravisCiHelper(object):
 
     def enable_travis_for_repository(self):
         """Enable Travis CI for the repository"""
-        self.travis_repo.enable()
+        return self.travis_repo.enable()
 
     def disable_travis_for_repository(self):
         """Disable Travis CI for the repository"""
-        self.travis_repo.disable()
+        return self.travis_repo.disable()
 
     def trigger_build_for_repo(self):
         """Trigger a build for this repository"""
@@ -39,7 +39,11 @@ class TravisCiHelper(object):
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Travis-API-Version': '3',
                    'Authorization': auth_token}
         response = requests.post(url, data=body, headers=headers)
-        logger.debug('build triggered for repo %s, travis response: %s', self.repo_slug, response.content)
+        if response.status_code == 202:
+            logger.debug('build triggered for repo %s, travis response: %s', self.repo_slug, response.content)
+            return True
+        else:
+            return False
 
     def get_log_for_last_build(self):
         """Retrieve the last log for Travis CI.

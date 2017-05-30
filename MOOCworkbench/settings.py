@@ -12,15 +12,20 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import logging
 import os
+from dotenv import load_dotenv
 from os.path import abspath, basename, dirname, join, normpath
 
 from helpers.constants import LOG_FMT
+
 
 from .production_settings import (ALLOWED_HOSTS, DEBUG, DEFAULT_FROM_EMAIL,
                                   EMAIL_BACKEND, EMAIL_HOST,
                                   EMAIL_HOST_PASSWORD, EMAIL_HOST_USER,
                                   EMAIL_PORT, EMAIL_USE_TLS,
                                   GITHUB_WEBHOOK_KEY, REDIS_HOST, SECRET_KEY)
+
+dotenv_path = join(dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

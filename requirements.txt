@@ -83,6 +83,7 @@ pypiserver==1.2.0
 pytest==3.0.7
 pytest-rerunfailures==2.1.0
 python-dateutil==2.6.0
+python-dotenv==0.6.4
 python3-openid==3.1.0
 pytz==2017.2
 redis==2.10.5
@@ -97,6 +98,7 @@ snowballstemmer==1.2.1
 Sphinx==1.6.1
 sphinx-click==1.0.1
 sphinxcontrib-websupport==1.0.1
+sphinx_rtd_theme==0.2.5b1
 SQLAlchemy==1.1.10
 tableschema==1.0.0a5
 tabulator==0.15.1

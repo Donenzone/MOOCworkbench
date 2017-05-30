@@ -22,6 +22,7 @@ class CookieCutterTemplateTestCases(TestCase):
             language_id=1,
             docs_src_location='docs/')
         self.folder_location = 'test_cookiecutter/'
+        os.mkdir(self.folder_location)
         self.project_name_1 = 'test_project/'
         self.project_name_2 = 'test_project_second/'
 
@@ -33,9 +34,9 @@ class CookieCutterTemplateTestCases(TestCase):
 
     def test_clone_cookiecutter_with_dict(self):
         """Test cloning a cookiecutter template with a dictionary of vars"""
-        dict = {'project_name': self.project_name_2, 'author_name': 'MOOC workbench',
-                'repo_name': self.project_name_2, 'description': 'Cloning test'}
-        clone_cookiecutter_template_with_dict(self.cookiecutter_template, self.folder_location, dict)
+        cookiecutter_vars = {'project_name': self.project_name_2, 'author_name': 'MOOC workbench',
+                             'repo_name': self.project_name_2, 'description': 'Cloning test'}
+        clone_cookiecutter_template_with_dict(self.cookiecutter_template, self.folder_location, cookiecutter_vars)
         self.assertTrue(os.path.exists(os.path.join(self.folder_location, self.project_name_2)))
 
     def tearDown(self):

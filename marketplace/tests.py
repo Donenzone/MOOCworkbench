@@ -185,7 +185,7 @@ class MarketplaceTestCase(TestCase):
         self.assertIsNotNone(response.context['edit_form'])
 
     @patch('marketplace.views.views_internalpackage.InternalPackageDetailView.readme_file_of_package')
-    @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
+    @patch('marketplace.views.views_internalpackage.get_github_helper')
     @patch('marketplace.views.views_internalpackage.get_files_for_repository')
     def test_internal_package_detail(self, mock_get_files, mock_file_list, mock_readme):
         mock_readme.return_value = 'Test readme'

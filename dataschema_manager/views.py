@@ -35,7 +35,7 @@ class DataSchemaOverview(View):
 
 
 @login_required
-def dataschema_new(request, experiment_id):
+def dataschemafield_new(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     context = {}
     if request.POST:
@@ -54,18 +54,18 @@ def dataschema_new(request, experiment_id):
         else:
             context['form'] = edit_form
             context['constraint_form'] = constraint_form
+            context['experiment_id'] = experiment_id
+            context['edit'] = False
             logger.debug('invalid data schema form for %s: %s', experiment, context)
             return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
 
 
 @login_required
-def dataschema_edit(request, pk, experiment_id):
+def dataschemafield_edit(request, pk, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     dataschema = DataSchemaField.objects.get(pk=pk)
     constraints = dataschema.constraints
-    context = {}
-    context['schema_id'] = dataschema.pk
-    context['experiment_id'] = experiment.id
+    context = {'schema_id': dataschema.pk, 'experiment_id': experiment.id}
     if request.POST:
         edit_form = DataSchemaFieldForm(request.POST, instance=dataschema)
         constraint_form = DataSchemaConstraintForm(request.POST, instance=constraints)
@@ -87,8 +87,8 @@ def dataschema_edit(request, pk, experiment_id):
 
 @login_required
 def dataschema_write(request, experiment_id):
-    verify_and_get_experiment(request, experiment_id)
+    experiment = verify_and_get_experiment(request, experiment_id)
     task_write_data_schema.delay(experiment_id)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update data schema...')
-    logger.debug('started updating schema for: %d', experiment_id)
+    logger.debug('started updating schema for: %s', experiment)
     return JsonResponse({'success': True})

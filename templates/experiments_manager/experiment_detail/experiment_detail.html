@@ -79,6 +79,7 @@
     <script type='text/javascript'>
 
         $(document).ready(function () {
+
             var hash = window.location.hash;
 
             if (hash === '#intro') {
@@ -91,37 +92,33 @@
                 window.location = $(this).find('.base-url').attr('href');
             });
 
-            $('.code-coverage').each(function () {
-                filename = $(this).attr('data-filename');
-                code_coverage_id = '#' + $(this).attr('id');
-
-                (function (code_coverage_id) {
-                    $(code_coverage_id).html('Getting coverage data...');
-                    $.post({
-                        url: '{% url "coveralls_filecoverage" %}',
-                        data: {
-                            'object_id': {{ experiment.id }},
-                            'object_type': '{{ object_type }}',
-                            'filename': filename
-                        },
-                        success: function (data) {
-                            if (data.coverage != -1) {
-                                $(code_coverage_id).html(data.coverage + ' %');
-                            } else {
-                                $(code_coverage_id).html('No data')
-                            }
-                        },
-                        error: function () {
-                            $(code_coverage_id).html('No coverage data');
+            function getCodeCoverageData(filename, code_coverage_id) {
+                code_coverage_id = '#' + code_coverage_id;
+                $(code_coverage_id).html('Getting coverage data...');
+                $.post({
+                    url: '{% url "coveralls_filecoverage" %}',
+                    data: {
+                        'object_id': {{ experiment.id }},
+                        'object_type': '{{ object_type }}',
+                        'filename': filename
+                    },
+                    success: function (data) {
+                        if (data.coverage != -1) {
+                            $(code_coverage_id).html(data.coverage + ' %');
+                        } else {
+                            $(code_coverage_id).html('No data')
                         }
-                    });
-                })(code_coverage_id);
-            });
+                    },
+                    error: function () {
+                        $(code_coverage_id).html('No coverage data');
+                    }
+                });
+            }
 
-            $('.step-panel .panel-title').not('.active').click(function (event) {
+            $('.step-panel .panel-title').click(function (event) {
                 var step_id = $(this).attr('id');
                 var identifier = '#tbody-' + step_id;
-                $(identifier).append('<tr><td>Loading files...</td><td></td></tr>');
+                $(identifier).append('<tr><td>Loading files...</td><td></td><td></td></tr>');
 
                 $.ajax({
                     url: '{% url "file_list_for_step" %}',
@@ -131,12 +128,34 @@
                     },
                     success: function (data) {
                         $(identifier).empty();
-                        for (value in data.files) {
-                            $(identifier).append('<tr><td>' + data.files[value][0] + '</td><td></td><td></td></tr>')
+                        for(index = 0, len = data.files.length; index < len; index++) {
+
+                            static_code_analysis = data.files[index]['static_code_analysis'];
+                            file_object = '<tr><td><a href="' + data.files[index]['file_url'] + '">' + data.files[index]['file_name'] + '</a></td><td>';
+                            if (static_code_analysis.e !== 0) {
+                                file_object += ' <span class="label label-danger">' + static_code_analysis.e + ' error(s)</span>'
+                            }
+                            if (static_code_analysis.w !== 0) {
+                                file_object += ' <span class="label label-warning">' + static_code_analysis.w + ' warning(s)</span>'
+                            }
+                            if (static_code_analysis.c !== 0) {
+                                file_object += '  <span class="label label-info">' + static_code_analysis.c + ' other issue(s)</span>'
+                            }
+                            if (static_code_analysis.s !== 0) {
+                                file_object += ' <span class="label label-info">' + static_code_analysis.s + ' style issue(s)</span>'
+                            }
+                            file_object += '</td>';
+                            file_object += '<td><span class="label label-info code-coverage" id="' + data.files[index]['slug'] +
+                                '" data-filename="' + data.files[index]['file_name'] + '"></span></td></tr>';
+
+                            $(identifier).append(file_object);
+                            getCodeCoverageData(data.files[index]['file_path'], data.files[index]['slug'])
                         }
                     }
                 })
             });
+
+            $('.panel-title.active').trigger('click');
         });
     </script>
 

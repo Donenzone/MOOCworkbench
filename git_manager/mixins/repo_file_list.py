@@ -20,15 +20,21 @@ def get_files_for_steps(experiment, github_helper, only_active=False):
     steps = []
     for step in experiment.chosenexperimentsteps_set.all():
         if not only_active or only_active and step.active:
-            location = step.location
-            if _is_folder(location):
-                files = _get_files_in_repository(github_helper, location,
-                                                 _add_static_results_to_files, experiment)
-            else:
-                files = [ContentFile(name=location, path=location)]
-            step.files = files
+            step.files = get_files_for_step(step, experiment, github_helper)
         steps.append(step)
     return steps
+
+
+def get_files_for_step(step, experiment, github_helper):
+    """Get a file list for a single step in an experiment,
+    also include static file code coverage results"""
+    location = step.location
+    if _is_folder(location):
+        files = _get_files_in_repository(github_helper, location,
+                                         _add_static_results_to_files, experiment)
+    else:
+        files = [ContentFile(name=location, path=location)]
+    return files
 
 
 def get_files_for_repository(github_helper, exp_or_package):

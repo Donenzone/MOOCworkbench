@@ -12,7 +12,7 @@ from django.views.generic.edit import UpdateView
 
 from docs_manager.mixins import DocsMixin
 from git_manager.helpers.github_helper import GitHubHelper, get_github_helper
-from git_manager.mixins.repo_file_list import (_get_files_in_repository,
+from git_manager.mixins.repo_file_list import (get_files_for_step,
                                                get_files_for_steps,)
 from pylint_manager.helper import return_results_for_file
 from quality_manager.mixins import get_most_recent_measurement
@@ -42,8 +42,7 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         self.object_type = self.get_requirement_type(experiment)
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
-        github_helper = get_github_helper(self.request, experiment)
-        context['steps'] = get_files_for_steps(experiment, github_helper, only_active=True)
+        context['steps'] = experiment.chosenexperimentsteps_set.all()
         context['object_type'] = self.object_type
         if not experiment.completed:
             active_step = experiment.get_active_step()
@@ -66,10 +65,16 @@ class FileListForStep(View):
 
         step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
         github_helper = get_github_helper(request, experiment)
-        file_list = _get_files_in_repository(github_helper, step.location)
+        file_list = get_files_for_step(step, experiment, github_helper)
         return_dict = []
         for content_file in file_list:
-            return_dict.append((content_file.name, content_file.type))
+            return_dict.append({'file_name': content_file.name,
+                                'file_url': reverse('file_detail', kwargs={'experiment_id': experiment.id})
+                                            + '?file_name=' + content_file.path,
+                                'type': content_file.type,
+                                'file_path': content_file.path,
+                                'slug': content_file.slug,
+                                'static_code_analysis': content_file.pylint_results})
         return JsonResponse({'files': return_dict})
 
 

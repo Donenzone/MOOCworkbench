@@ -59,9 +59,8 @@ class DataSchemaField(models.Model):
     constraints = models.ForeignKey(to=DataSchemaConstraints, null=True)
 
     def to_dict(self):
-        obj_dict = {}
-        obj_dict['name'] = self.name
-        obj_dict['type'] = self.datatype
+        obj_dict = {'name': self.name,
+                    'type': self.datatype}
         if self.title:
             obj_dict['title'] = self.title
         if self.description:

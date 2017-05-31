@@ -45,7 +45,7 @@ services:
     env_file: '.env'
     ports:
       - '5555:5555'
-    command: ' celery flower -A MOOCworkbench --address=0.0.0.0 --port=5555'
+    command: 'celery flower -A MOOCworkbench --address=0.0.0.0 --port=5555'
     volumes_from:
       - web
     depends_on:

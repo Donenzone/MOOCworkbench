@@ -1,12 +1,13 @@
+import logging
+
 from helpers.helper import get_absolute_path
 
 from ..models import GitRepository
 from .github_helper import GitHubHelper
 
 
-def get_github_helper(request, exp_or_package):
-    assert exp_or_package.owner.user == request.user
-    return GitHubHelper(request.user, exp_or_package.git_repo.name)
+logger = logging.getLogger(__name__)
+
 
 
 class TemplateHelper(object):
@@ -40,3 +41,35 @@ def get_exp_or_package_from_repo_name(repo_name):
         elif git_repo.internalpackage_set:
             package = git_repo.internalpackage_set.first()
             return package
+
+
+def get_user_repositories(user):
+    github_helper = GitHubHelper(user)
+    github_api = github_helper.github_object
+    if github_api:
+        repo_list = []
+        for repo in github_api.get_user().get_repos(type='owner'):
+            repo_list.append((repo.name, repo.clone_url))
+        return repo_list
+    return []
+
+
+def create_new_github_repository(title, user):
+    try:
+        github_helper = GitHubHelper(user, title, create=True)
+        return github_helper, True
+    except Exception as e:
+        logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', user,
+                     title, e)
+        return get_existing_repository(title, user)
+
+
+def get_existing_repository(title, user):
+    try:
+        github_helper = GitHubHelper(user, title)
+        return github_helper, False
+    except Exception as e:
+        logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', user,
+                     title, e)
+        return None, False
+

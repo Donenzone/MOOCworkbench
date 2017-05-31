@@ -1,6 +1,6 @@
 """Helper module for build_manager with function to get exp or package from request"""
 from build_manager.travis_ci_helper import TravisCiHelper
-from git_manager.helpers.helper import get_github_helper
+from git_manager.helpers.github_helper import get_github_helper
 from helpers.helper import get_package_or_experiment
 
 

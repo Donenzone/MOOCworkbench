@@ -1,12 +1,16 @@
 import base64
+import logging
 
 from allauth.socialaccount.models import SocialToken
 from django.conf import settings
 from django.shortcuts import reverse
 from github import Github
-from github.GithubException import GithubException
+from github.GithubException import GithubException, UnknownObjectException
 
 from user_manager.models import WorkbenchUser
+
+
+logger = logging.getLogger(__name__)
 
 
 class GitHubHelper(object):
@@ -16,16 +20,23 @@ class GitHubHelper(object):
         self.socialtoken = self._get_social_token()
         self.github_object = self._get_github_object()
         self.github_user = self.github_object.get_user()
+        self.github_repository = None
 
         if repo_name:
             self.repo_name = repo_name
 
         if create:
-            self.github_repository = self._create_repository()
-            self.repo_name = self.github_repository.name
-            self._create_webhook()
+            self.create_github_repository()
         elif repo_name is not None:
-            self.github_repository = self.github_user.get_repo(repo_name)
+            self.init_github_repository(repo_name)
+
+    def create_github_repository(self):
+        self.github_repository = self._create_repository()
+        self.repo_name = self.github_repository.name
+        self._create_webhook()
+
+    def init_github_repository(self, repo_name):
+        self.github_repository = self.github_user.get_repo(repo_name)
 
     @property
     def owner(self):
@@ -36,19 +47,14 @@ class GitHubHelper(object):
         remaining_clone_url = clone_url.split('https://')[1]
         return 'https://{0}@{1}'.format(self.socialtoken, remaining_clone_url)
 
-    def list_files_in_folder(self, folder=''):
+    def list_files_in_folder(self, folder='', func=None, *args):
         try:
             folder = self._fix_folder_slashes(folder)
+            if func:
+                return func(self.github_repository.get_contents(folder), *args)
             return self.github_repository.get_contents(folder)
         except GithubException as e:
             return [e.data['message']]
-
-    def _fix_folder_slashes(self, folder):
-        if not folder.startswith('/'):
-            folder = '/{0}'.format(folder)
-        if folder != '/' and folder.endswith('/'):
-            folder = folder[:-1]
-        return folder
 
     def view_file(self, file_name):
         try:
@@ -100,12 +106,19 @@ class GitHubHelper(object):
     def get_single_issue(self, issue_nr):
         return self.github_repository.get_issue(issue_nr)
 
+    def _fix_folder_slashes(self, folder):
+        if not folder.startswith('/'):
+            folder = '/{0}'.format(folder)
+        if folder != '/' and folder.endswith('/'):
+            folder = folder[:-1]
+        return folder
+
     def _create_webhook(self):
         from helpers.helper import get_absolute_url
         webhook_url = get_absolute_url(to=reverse('webhook_receive'))
-        config_dict = {'url': webhook_url}
-        config_dict['content_type'] = 'json'
-        config_dict['secret'] = settings.GITHUB_WEBHOOK_KEY
+        config_dict = {'url': webhook_url,
+                       'content_type': 'json',
+                       'secret': settings.GITHUB_WEBHOOK_KEY}
         self.github_repository.create_hook('web', config_dict)
 
     def _get_repo_file_name(self, file_name, folder=''):
@@ -131,3 +144,11 @@ class GitHubHelper(object):
         if socialtoken.count() != 0:
             return socialtoken[0].token
         raise ValueError('SocialToken is missing')
+
+
+def get_github_helper(request, exp_or_package):
+    try:
+        return GitHubHelper(request.user, exp_or_package.git_repo.name)
+    except UnknownObjectException as e:
+            logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', request.user,
+                         exp_or_package, e)

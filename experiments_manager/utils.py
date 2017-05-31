@@ -8,7 +8,7 @@ from experiments_manager.consumers import \
     send_exp_package_creation_status_update
 from git_manager.helpers.git_helper import GitHelper
 from git_manager.models import GitRepository
-from git_manager.views import create_new_github_repository
+from git_manager.helpers.helper import create_new_github_repository
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +22,17 @@ class ExperimentProgress(object):
 
 
 def init_git_repo_for_experiment(experiment, cookiecutter):
+    """Initialize a GitHub repository for an experiment with specified cookiecutter template
+    If GitHub repo could not be created, but a repo already exists, returns True without modifying any code
+    If a GitHub repo does not exist, initialize it with cookiecutter template, read existing dependencies and add those to DB model
+    """
     try:
         username = experiment.owner.user.username
-        github_helper = create_new_github_repository(experiment.title, experiment.owner.user)
+        github_helper, created = create_new_github_repository(experiment.title, experiment.owner.user)
+        # if github helper is none, continuing is useless
+        if not github_helper:
+            return False
+
         send_exp_package_creation_status_update(username, ExperimentProgress.STEP_CREATING_GITHUB_REPO)
         repo = github_helper.github_repository
         repo_name = repo.name
@@ -38,6 +46,11 @@ def init_git_repo_for_experiment(experiment, cookiecutter):
             git_repo.save()
             experiment.git_repo = git_repo
             experiment.save()
+
+        # if we have a github helper, but a repo already exists
+        # since one could not be created, return True and continue as normal
+        if github_helper and not created:
+            return True
 
         git_helper = GitHelper(github_helper)
         git_helper.clone_or_pull_repository()

@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from git_manager.helpers.helper import get_github_helper
+from git_manager.helpers.github_helper import get_github_helper
 from helpers.helper import get_package_or_experiment
 
 from .helpers.coveralls_helper import CoverallsHelper, get_experiment_from_request_post, enable_coveralls

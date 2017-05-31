@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 
-from .views import (DataSchemaOverview, dataschema_edit, dataschema_new,
+from .views import (dataschema_edit, dataschema_new,
                     dataschema_write)
 
 urlpatterns = [

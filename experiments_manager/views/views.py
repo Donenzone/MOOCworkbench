@@ -11,9 +11,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 
 from docs_manager.mixins import DocsMixin
-from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper, get_github_helper
 from git_manager.mixins.repo_file_list import (_get_files_in_repository,
-                                               get_files_for_steps)
+                                               get_files_for_steps,)
 from pylint_manager.helper import return_results_for_file
 from quality_manager.mixins import get_most_recent_measurement
 from recommendations.utils import get_recommendations
@@ -257,8 +257,10 @@ def readme_of_experiment(request, experiment_id):
 def experiment_issues(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
-    context = {'object': experiment, 'object_type': experiment.get_object_type(), 'issues_active': True}
-    context['issues'] = github_helper.get_issues()
+    context = {'object': experiment,
+               'object_type': experiment.get_object_type(),
+               'issues_active': True,
+               'issues': github_helper.get_issues()}
     return render(request, 'experiments_manager/experiment_detail/experiment_issues.html', context)
 
 

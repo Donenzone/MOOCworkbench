@@ -10,9 +10,12 @@ class TravisCiHelperTestCases(TestCase):
     Make sure that the env contains a valid GITHUB_TOKEN for a GitHub repository
     (this test can sometimes fail because Travis acts up and returns random 403s)"""
     def setUp(self):
-        socialtoken = os.environ.get('GITHUB_TOKEN')
-        self.github_helper = GitHubHelperReplacement(socialtoken, 'Workbench-Python-Experiment')
-        self.travis_ci_helper = TravisCiHelper(self.github_helper)
+        socialtoken = os.environ.get['GITHUB_TOKEN']
+        if socialtoken:
+            self.github_helper = GitHubHelperReplacement(socialtoken, 'Workbench-Python-Experiment')
+            self.travis_ci_helper = TravisCiHelper(self.github_helper)
+        else:
+            print("Socialtoken variable not set!")
 
     def test_enable_travis(self):  # pylint: disable=unused-argument
         """Test if Travis CI can be enabled for repository"""

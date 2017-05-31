@@ -10,6 +10,8 @@ Welcome to MOOC workbench's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   deployment
+
 
 
 Indices and tables

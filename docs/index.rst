@@ -11,6 +11,8 @@ Welcome to MOOC workbench's documentation!
    :caption: Contents:
 
    deployment
+   getting_started
+   features
 
 
 

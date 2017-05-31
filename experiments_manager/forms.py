@@ -7,11 +7,13 @@ from .models import *
 
 class ExperimentForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea, required=True)
-    template = forms.ModelChoiceField(queryset=CookieCutterTemplate.objects.filter(meant_for=CookieCutterTemplate.EXPERIMENT))
+    template = forms.ModelChoiceField(queryset=CookieCutterTemplate.objects.filter(
+        meant_for=CookieCutterTemplate.EXPERIMENT))
 
     class Meta:
         model = Experiment
-        fields = ('title', 'description', 'template')
+        fields = ('title', 'description', 'template', 'owner')
+        widgets = {'owner': forms.HiddenInput()}
 
 
 class ExperimentSelectForm(forms.Form):

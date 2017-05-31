@@ -9,6 +9,7 @@ from django.views import View
 
 from git_manager.helpers.github_helper import GitHubHelper
 from git_manager.helpers.helper import get_user_repositories
+from user_manager.models import get_workbench_user
 
 from ..forms import ExperimentForm
 from ..helper import verify_and_get_experiment
@@ -31,7 +32,9 @@ class StepOneExperimentCreateView(View):
 
     def post(self, request, experiment_id=0):
         experiment = Experiment()
-        form = ExperimentForm(request.POST, instance=experiment)
+        data = request.POST.copy()
+        data['owner'] = get_workbench_user(request.user).id
+        form = ExperimentForm(data, instance=experiment)
         if form.is_valid():
             cookiecutter = form.cleaned_data['template']
             experiment.language = cookiecutter.language

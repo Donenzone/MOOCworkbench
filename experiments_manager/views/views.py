@@ -42,7 +42,8 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         self.object_type = self.get_requirement_type(experiment)
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
-        context['steps'] = get_files_for_steps(experiment, only_active=True)
+        github_helper = get_github_helper(self.request, experiment)
+        context['steps'] = get_files_for_steps(experiment, github_helper, only_active=True)
         context['object_type'] = self.object_type
         if not experiment.completed:
             active_step = experiment.get_active_step()
@@ -64,7 +65,8 @@ class FileListForStep(View):
         experiment = verify_and_get_experiment(request, experiment_id)
 
         step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
-        file_list = _get_files_in_repository(request.user, experiment.git_repo.name, step.location)
+        github_helper = get_github_helper(request, experiment)
+        file_list = _get_files_in_repository(github_helper, step.location)
         return_dict = []
         for content_file in file_list:
             return_dict.append((content_file.name, content_file.type))
@@ -172,8 +174,9 @@ class ExperimentReadOnlyView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
     def get_context_data(self, **kwargs):
         experiment = self.object
         self.object_type = self.get_requirement_type(experiment)
+        github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
         context = super(ExperimentReadOnlyView, self).get_context_data(**kwargs)
-        context['steps'] = get_files_for_steps(experiment)
+        context['steps'] = get_files_for_steps(experiment, github_helper)
         context['object_type'] = self.object_type
         context['object_id'] = experiment.pk
         context['completed'] = True

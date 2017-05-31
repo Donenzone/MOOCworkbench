@@ -12,7 +12,7 @@ from markdown2 import Markdown
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.mixins import ActiveExperimentsList
 from experiments_manager.models import ChosenExperimentSteps
-from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper, get_github_helper
 from git_manager.mixins.repo_file_list import get_files_for_repository
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.forms import InternalPackageForm
@@ -169,10 +169,11 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
     def get_context_data(self, **kwargs):
         self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
         context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
+        github_helper = get_github_helper(self.request, context['package'])
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         context['index_active'] = True
-        context['git_list'] = get_files_for_repository(self.object)
+        context['git_list'] = get_files_for_repository(github_helper, self.object)
         if InternalPackage.objects.filter(pk=self.object.pk):
             context['readme'] = self.readme_file_of_package()
         return context

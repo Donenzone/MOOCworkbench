@@ -24,7 +24,7 @@ def index(request):
     workbench_user = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=workbench_user).order_by('-created')[:5]
     packages = InternalPackage.objects.filter(owner=workbench_user).order_by('-created')[:5]
-    logger.debug('%s accessed index', workbench_user)
+    logger.info('%s accessed index', workbench_user)
     recent_versions = list(PackageVersion.objects.all().order_by('-created')[:5])
     recent_resources = list(PackageResource.objects.all().order_by('-created')[:5])
     recent_internal = list(InternalPackage.objects.all().order_by('-created')[:5])
@@ -48,7 +48,7 @@ class EditProfileView(View):
     def get(self, request):
         workbench_user = get_workbench_user(request.user)
         form = WorkbenchUserForm(instance=workbench_user)
-        logger.debug('%s edit get profile view', workbench_user)
+        logger.info('%s edit get profile view', workbench_user)
         return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
 
     def post(self, request):
@@ -65,7 +65,7 @@ class EditProfileView(View):
                                                                   'or incorrect current password.')
                     return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
             form.save()
-            logger.debug('%s edited profile successfully', workbench_user)
+            logger.info('%s edited profile successfully', workbench_user)
             return redirect(to='/')
         else:
             return render(request, "user_manager/workbenchuser_edit.html", {'form': form})
@@ -98,7 +98,7 @@ class RegisterView(View):
                 workbench_user = WorkbenchUser.objects.get(user=user)
                 workbench_user.netid = form.cleaned_data['netid']
                 workbench_user.save()
-                logger.debug('new user created: %s', workbench_user)
+                logger.info('new user created: %s', workbench_user)
                 return redirect(to='/')
             else:
                 return render(request, 'user_manager/register.html', {'form': form})

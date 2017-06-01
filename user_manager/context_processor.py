@@ -3,6 +3,6 @@ def workbench_user(request):
     import logging
     logger = logging.getLogger(__name__)
     if request.user.is_authenticated():
-        logger.debug('%s accessed the page %s', request.user, request.path)
+        logger.info('%s accessed the page %s', request.user, request.path)
         return {'workbench_user': WorkbenchUser.objects.get(user=request.user)}
     return {}

@@ -9,6 +9,7 @@ from travispy.errors import TravisError
 from build_manager.travis_ci_helper import TravisCiHelper
 from git_manager.helpers.github_helper import get_github_helper
 from helpers.helper import get_package_or_experiment
+from quality_manager.tasks import task_ci_quality_check
 
 from .helper import get_exp_or_package_from_request, enable_travis
 

@@ -13,7 +13,7 @@ def task_generate_docs(object_type, object_id):
     exp_or_package = get_package_or_experiment_without_request(object_type, object_id)
     username = exp_or_package.owner.user.username
     if exp_or_package.docs.enabled:
-        logger.debug('start docs generation for %s (%s)', exp_or_package, username)
+        logger.info('start docs generation for %s (%s)', exp_or_package, username)
         language_helper = exp_or_package.language_helper()
         language_helper.generate_documentation()
         send_message(username, MessageStatus.SUCCESS,

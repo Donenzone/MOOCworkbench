@@ -30,7 +30,7 @@ class DataSchemaOverview(View):
         context['form'] = DataSchemaFieldForm()
         context['constraint_form'] = DataSchemaConstraintForm()
         context['schema_active'] = True
-        logger.debug('data schema overview for: %s', experiment)
+        logger.info('data schema overview for: %s', experiment)
         return render(request, self.template_name, context)
 
 
@@ -49,14 +49,14 @@ def dataschemafield_new(request, experiment_id):
                 data_schema = experiment.schema
                 data_schema.fields.add(edit_form.instance)
                 data_schema.save()
-            logger.debug('new data schema created for %s: %s', experiment, data_schema)
+            logger.info('new data schema created for %s: %s', experiment, data_schema)
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
             context['constraint_form'] = constraint_form
             context['experiment_id'] = experiment_id
             context['edit'] = False
-            logger.debug('invalid data schema form for %s: %s', experiment, context)
+            logger.info('invalid data schema form for %s: %s', experiment, context)
             return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
 
 
@@ -73,7 +73,7 @@ def dataschemafield_edit(request, pk, experiment_id):
             constraints.save()
             dataschema.constraint = constraints
             dataschema.save()
-            logger.debug('edit data schema for %s: %s', experiment, dataschema)
+            logger.info('edit data schema for %s: %s', experiment, dataschema)
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
@@ -90,5 +90,5 @@ def dataschema_write(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     task_write_data_schema.delay(experiment_id)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update data schema...')
-    logger.debug('started updating schema for: %s', experiment)
+    logger.info('started updating schema for: %s', experiment)
     return JsonResponse({'success': True})

@@ -45,7 +45,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         context['experiment_id'] = self.kwargs['experiment_id']
         context['step_id'] = self.kwargs['step_id']
 
-        logger.debug('%s started on package creation for %s', self.request.user, self.kwargs['experiment_id'])
+        logger.info('%s started on package creation for %s', self.request.user, self.kwargs['experiment_id'])
         return context
 
     def form_valid(self, form):
@@ -135,7 +135,7 @@ def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_publish_update_package.delay(package.pk)
-    logger.debug('%s published the package %s', request.user, package)
+    logger.info('%s published the package %s', request.user, package)
     return redirect(to=package.get_absolute_url())
 
 
@@ -195,7 +195,7 @@ def internalpackage_install(request, pk):
     experiment = verify_and_get_experiment(request, experiment_id)
     result = add_internalpackage_to_experiment(internal_package, experiment)
     if result:
-        logger.debug('%s installed the package %s in experiment %s', request.user, internal_package, experiment)
+        logger.info('%s installed the package %s in experiment %s', request.user, internal_package, experiment)
         messages.add_message(request, messages.SUCCESS, 'Added package to your experiment')
         return JsonResponse({'added': True})
     else:

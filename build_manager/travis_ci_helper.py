@@ -40,7 +40,7 @@ class TravisCiHelper(object):
                    'Authorization': auth_token}
         response = requests.post(url, data=body, headers=headers)
         if response.status_code == 202:
-            logger.debug('build triggered for repo %s, travis response: %s', self.repo_slug, response.content)
+            logger.info('build triggered for repo %s, travis response: %s', self.repo_slug, response.content)
             return True
         else:
             return False
@@ -55,6 +55,10 @@ class TravisCiHelper(object):
         except TravisError:
             logger.error('could not retrieve log of last build for %s', self.repo_slug)
             return 'Log not found'
+
+    def get_last_build_status(self):
+        build = self.travis.build(self.travis_repo.last_build_id)
+        return build.passed
 
     def _get_access_token(self):
         headers = {'Content-Type': 'application/json', 'User-Agent': 'TravisMOOCworkbench',

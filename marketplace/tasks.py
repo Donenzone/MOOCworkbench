@@ -13,6 +13,17 @@ from .models import InternalPackage, update_all_versions
 def task_check_for_new_package_version():
     update_all_versions()
 
+@app.task
+def task_create_package(internalpackage_id):
+    package = InternalPackage.objects.get(pk=internalpackage_id)
+    username = package.owner.user.username
+    send_exp_package_creation_status_update(username, 1)
+    package_repo = PackageGitRepoInit(package, username)
+    if not package_repo.existing_repo:
+        package.git_repo = package_repo.init_repo_boilerplate()
+    package.save()
+    redirect_url = package.get_absolute_url()
+    send_exp_package_creation_status_update(username, 7, completed=True, redirect_url=redirect_url)
 
 @app.task
 def task_create_package_from_experiment(internalpackage_id, experiment_id, step_folder):
@@ -20,8 +31,9 @@ def task_create_package_from_experiment(internalpackage_id, experiment_id, step_
     experiment = Experiment.objects.get(pk=experiment_id)
     username = experiment.owner.user.username
     send_exp_package_creation_status_update(username, 1)
-    package_repo = PackageGitRepoInit(package, experiment, step_folder, username)
-    package.git_repo = package_repo.init_repo_boilerplate()
+    package_repo = PackageGitRepoInit(package, username, experiment, step_folder)
+    if not package_repo.existing_repo:
+        package.git_repo = package_repo.init_repo_boilerplate()
     package.save()
     redirect_url = package.get_absolute_url()
     send_exp_package_creation_status_update(username, 7, completed=True, redirect_url=redirect_url)

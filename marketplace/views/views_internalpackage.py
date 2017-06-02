@@ -22,7 +22,8 @@ from marketplace.mixins import IsInternalPackageMixin, ObjectTypeIdMixin
 from marketplace.models import InternalPackage, PackageResource, PackageVersion
 from marketplace.tasks import (task_create_package_from_experiment,
                                task_publish_update_package,
-                               task_remove_package)
+                               task_remove_package,
+                               task_create_package)
 from requirements_manager.helper import add_internalpackage_to_experiment
 from user_manager.models import get_workbench_user
 
@@ -42,6 +43,25 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
+        logger.info('%s started on package creation for own code', self.request.user)
+        return context
+
+    def form_valid(self, form):
+        form.instance.owner = get_workbench_user(self.request.user)
+        form.instance.template_id = 1
+        response = super(InternalPackageCreateView, self).form_valid(form)
+        task_create_package(form.instance.pk)
+        return response
+
+
+class InternalPackageCreateFromExperimentView(ExperimentPackageTypeMixin, CreateView):
+    model = InternalPackage
+    form_class = InternalPackageForm
+    template_name = 'marketplace/package_create/package_form.html'
+    success_url = '/packages/new/status'
+
+    def get_context_data(self, **kwargs):
+        context = super(InternalPackageCreateFromExperimentView, self).get_context_data(**kwargs)
         context['experiment_id'] = self.kwargs['experiment_id']
         context['step_id'] = self.kwargs['step_id']
 
@@ -53,7 +73,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         experiment = self.get_experiment()
         form.instance.owner = experiment.owner
         form.instance.template_id = 1
-        response = super(InternalPackageCreateView, self).form_valid(form)
+        response = super(InternalPackageCreateFromExperimentView, self).form_valid(form)
         task_create_package_from_experiment.delay(form.instance.pk, experiment.pk, step_folder)
         return response
 

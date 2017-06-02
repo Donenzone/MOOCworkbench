@@ -26,11 +26,11 @@ class PackageGitRepoInit(object):
 
     def __init__(self, internal_package, username, experiment=None, step_folder=None):
         self.existing_repo = False
-        self.github_helper = self.initialize_github_helper(experiment, internal_package)
         self.experiment = experiment
         self.internal_package = internal_package
         self.step_folder = step_folder
         self.username = username
+        self.github_helper = self.initialize_github_helper(experiment, internal_package)
         if self.experiment:
             self.language_helper = self.experiment.language_helper()
             self.language = self.experiment.language
@@ -39,14 +39,14 @@ class PackageGitRepoInit(object):
         try:
             return GitHubHelper(internal_package.owner, internal_package.name, create=True)
         except Exception as e:
-            github_helper = GitHubHelper(internal_package.owner, internal_package.name)
+            self.github_helper = GitHubHelper(internal_package.owner, internal_package.name)
             self.existing_repo = True
             git_repo_obj = self.create_git_db_object()
             self.internal_package.git_repo = git_repo_obj
             self.internal_package.save()
             logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', experiment.owner,
                          internal_package, e)
-            return github_helper
+            return self.github_helper
 
     def init_repo_boilerplate(self):
         # create git repository in DB

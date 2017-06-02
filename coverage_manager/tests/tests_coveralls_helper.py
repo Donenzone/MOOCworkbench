@@ -6,7 +6,7 @@ from django.core.validators import URLValidator
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
 
 
-class CoverallsHelperTest(unittest.TestCase):
+class CoverallsHelperTestCase(unittest.TestCase):
     """Tests for the class that interacts with Coveralls API"""
     def setUp(self):
         self.coveralls = CoverallsHelper('jlmdegoede', 'MOOCworkbench')

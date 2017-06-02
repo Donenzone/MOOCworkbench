@@ -50,7 +50,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         form.instance.owner = get_workbench_user(self.request.user)
         form.instance.template_id = 1
         response = super(InternalPackageCreateView, self).form_valid(form)
-        task_create_package(form.instance.pk)
+        task_create_package.delay(form.instance.pk)
         return response
 
 

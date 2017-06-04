@@ -1,3 +1,4 @@
+"""Forms for DataSchema app"""
 from django import forms
 from django.forms import ModelForm, Textarea, TextInput
 
@@ -5,11 +6,14 @@ from .models import DataSchemaConstraints, DataSchemaField
 
 
 class JsonTableSchemaNameField(forms.CharField):
+    """A special form field for JSON Table Schema,
+    that requires the name field to be all lowercase"""
     def to_python(self, value):
         return value.lower()
 
 
 class DataSchemaFieldForm(ModelForm):
+    """Form for adding a DataSchemaField"""
     name = JsonTableSchemaNameField(max_length=100)
 
     class Meta:
@@ -23,6 +27,7 @@ class DataSchemaFieldForm(ModelForm):
 
 
 class DataSchemaConstraintForm(ModelForm):
+    """Form for adding a DataSchemaConstraint, part of a DataSchemaField"""
 
     class Meta:
         model = DataSchemaConstraints

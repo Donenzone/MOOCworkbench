@@ -58,7 +58,6 @@ urlpatterns = [
     url(r'^builds/', include('build_manager.urls')),
     url(r'^coverage/', include('coverage_manager.urls')),
     url(r'^metrics/', include('quality_manager.urls')),
-    url(r'^feedback/', include('feedback.urls')),
     url(r'^github/', include('git_manager.urls')),
     url(r'^docs/', include('docs_manager.urls')),
     url(r'^schema/', include('dataschema_manager.urls')),

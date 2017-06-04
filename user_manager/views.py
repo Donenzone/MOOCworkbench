@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 
 from experiments_manager.models import Experiment
-from feedback.views import get_available_tasks
 from marketplace.models import (ExternalPackage, InternalPackage, Package,
                                 PackageResource, PackageVersion)
 
@@ -34,7 +33,6 @@ def index(request):
     total_list = reversed(sorted(total_list, key=lambda x: x.created))
     return render(request, 'index.html', {'experiments': experiments,
                                           'packages': packages,
-                                          'tasks': get_available_tasks(workbench_user),
                                           'activities': total_list})
 
 

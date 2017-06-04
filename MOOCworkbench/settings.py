@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     'requirements_manager',
     'quality_manager',
     'build_manager',
-    'feedback',
     'docs_manager',
     'coverage_manager',
     'cookiecutter_manager',
@@ -114,7 +113,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'feedback.middleware.MiddlewareTaskCompleted',
     'user_manager.middleware.AuthRequiredMiddleware'
 ]
 
@@ -145,7 +143,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'user_manager.context_processor.workbench_user',
-                'feedback.context_processor.active_task',
                 'django.template.context_processors.request'
             ],
         },

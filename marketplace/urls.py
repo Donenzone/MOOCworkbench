@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.views.generic import TemplateView
 
 from marketplace.views.views import *
 from marketplace.views.views_internalpackage import *
@@ -7,7 +8,9 @@ from requirements_manager.views import RequirementListView
 urlpatterns = [
     url(r'^$', login_required(MarketplaceIndex.as_view()), name="marketplace_index"),
     url(r'^list/$', login_required(PackageListView.as_view()), name="package_list"),
-    url(r'^new/$', login_required(ExternalPackageCreateView.as_view(success_url='/packages')), name="package_new"),
+    url(r'^new/$', TemplateView.as_view(template_name='marketplace/package_create/package_create_choose.html'),
+        name="package_new"),
+    url(r'^new/external-package/$', login_required(ExternalPackageCreateView.as_view(success_url='/packages')), name="externalpackage_new"),
     url(r'^new/internal-package/$', login_required(InternalPackageCreateView.as_view()), name="internalpackage_create"),
     url(r'^new/internal-package/(?P<experiment_id>\d+)/(?P<step_id>\d+)$', login_required(InternalPackageCreateFromExperimentView.as_view()), name="internalpackage_create_fromexperiment"),
     url(r'^new/status$', package_status_create, name="package_status_create"),

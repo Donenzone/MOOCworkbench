@@ -60,7 +60,7 @@ class PackageGitRepoInit(object):
             git_repo_obj = self.create_git_db_object()
             self.internal_package.git_repo = git_repo_obj
             self.internal_package.save()
-            logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', experiment.owner,
+            logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', internal_package.owner,
                          internal_package, e)
             return self.github_helper
 

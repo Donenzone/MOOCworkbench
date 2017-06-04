@@ -10,15 +10,5 @@ class TravisCiConfig(models.Model):
 class TravisInstance(models.Model):
     """Travis Instance model, indicating if builds are enabled or not,
     a TravisCiConfig and the status of the last build"""
-    FAILED = 'F'
-    SUCCESS = 'S'
-    CANCELLED = 'C'
-
-    BUILD_STATUS = {
-        (FAILED, 'Failed'),
-        (SUCCESS, 'Success'),
-        (CANCELLED, 'Cancelled')
-    }
-    last_build_status = models.CharField(max_length=1, choices=BUILD_STATUS, null=True)
     config = models.ForeignKey(to=TravisCiConfig)
     enabled = models.BooleanField(default=False)

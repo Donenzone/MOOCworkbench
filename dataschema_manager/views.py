@@ -1,3 +1,4 @@
+"""View for DataSchema app"""
 import logging
 
 from django.contrib.auth.decorators import login_required

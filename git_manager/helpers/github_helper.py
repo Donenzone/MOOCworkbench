@@ -145,6 +145,9 @@ class GitHubHelper(object):
             return socialtoken[0].token
         raise ValueError('SocialToken is missing')
 
+    def _delete_repository(self):
+        self.github_repository.delete()
+
 
 def get_github_helper(request, exp_or_package):
     try:

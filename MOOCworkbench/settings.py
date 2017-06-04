@@ -211,7 +211,7 @@ STATICFILES_DIRS = [
 ]
 
 
-logging.basicConfig(level=logging.DEBUG, format=LOG_FMT)
+logging.basicConfig(level=logging.INFO, format=LOG_FMT)
 
 LOGGING = {
     'version': 1,
@@ -223,6 +223,12 @@ LOGGING = {
             'filename': 'info.log',
             'formatter': 'verbose',
         },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+
     },
     'formatters': {
         'verbose': {

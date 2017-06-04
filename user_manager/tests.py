@@ -32,7 +32,6 @@ class UserManagerTestCase(TestCase):
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)
         call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
-        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
 
     def test_index(self):
         response = self.client.get(reverse('index'))

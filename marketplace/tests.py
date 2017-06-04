@@ -21,7 +21,6 @@ class MarketplaceTestCase(TestCase):
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)
         call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
-        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
         call_command('loaddata', 'fixtures/cookiecutter.json', verbosity=0)
 
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
@@ -100,7 +99,7 @@ class MarketplaceTestCase(TestCase):
         Test to ensure the page for creating an external page
         loads successfully
         """
-        response = self.client.get(reverse('package_new'))
+        response = self.client.get(reverse('externalpackage_new'))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
@@ -110,7 +109,7 @@ class MarketplaceTestCase(TestCase):
                                  'project_page': 'http://test.nl',
                                  'category': '1',
                                  'language': '1'}
-        response = self.client.post(reverse('package_new'), data=external_package_data)
+        response = self.client.post(reverse('externalpackage_new'), data=external_package_data)
         self.assertEqual(response.status_code, 302)
         external_package = ExternalPackage.objects.filter(id=2)
         self.assertTrue(external_package)
@@ -121,7 +120,7 @@ class MarketplaceTestCase(TestCase):
                                  'project_page': 'http://test',
                                  'category': '1',
                                  'language': '1'}
-        response = self.client.post(reverse('package_new'), data=external_package_data)
+        response = self.client.post(reverse('externalpackage_new'), data=external_package_data)
         self.assertEqual(response.status_code, 200)
         external_package = ExternalPackage.objects.filter(id=2)
         self.assertFalse(external_package)

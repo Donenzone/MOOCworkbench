@@ -19,7 +19,6 @@ class QualityManagerTestCase(TestCase):
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)
         call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
         call_command('loaddata', 'fixtures/templates.json', verbosity=0)
-        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
 
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)

@@ -1,6 +1,12 @@
 {% load bootstrap %}
-<form action="{% url 'dataschemafield_edit' schema_id experiment_id %}" method="post">{% csrf_token %}
-    {{ form|bootstrap_inline }}
-    {{ constraint_form|bootstrap_inline }}
-    <input type="submit" class="btn btn-primary" value="Save Changes" />
+{% if edit %}
+    <form action="{% url 'dataschemafield_edit' schema_id experiment_id %}" method="post">
+{% else %}
+
+    <form action="{% url 'dataschemafield_new' experiment_id %}" method="post">
+{% endif %}
+{% csrf_token %}
+{{ form|bootstrap_inline }}
+{{ constraint_form|bootstrap_inline }}
+<input type="submit" class="btn btn-primary" value="Save Changes"/>
 </form>

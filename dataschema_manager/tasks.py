@@ -18,20 +18,20 @@ def task_write_data_schema(experiment_id):
     experiment = Experiment.objects.get(pk=experiment_id)
     data_schema = experiment.schema
     data_schema_str = str(json.dumps(data_schema.to_dict()))
-    logger.debug('writing data schema for %s with schema: %s', experiment, data_schema_str)
+    logger.info('writing data schema for %s with schema: %s', experiment, data_schema_str)
     github_helper = GitHubHelper(experiment.owner.user, experiment.git_repo.name)
     github_helper.update_file('schema/schema.json', 'Updated data schema by MOOC workbench',
                               data_schema_str)
     username = experiment.owner.user.username
     send_message(username, MessageStatus.SUCCESS, 'Data schema successfully updated in GitHub')
-    logger.debug('writing data schema success for: %s', experiment, data_schema_str)
+    logger.info('writing data schema success for: %s', experiment, data_schema_str)
 
 
 @app.task
 def task_read_data_schema(repository_name):
     experiment = get_exp_or_package_from_repo_name(repository_name)
     if isinstance(experiment, Experiment):
-        logger.debug('reading data schema for: %s', experiment)
+        logger.info('reading data schema for: %s', experiment)
         github_helper = GitHubHelper(experiment.owner.user, experiment.git_repo.name)
         schema_json = json.loads(github_helper.view_file('schema/schema.json'))
         data_schema_fields = parse_json_table_schema(schema_json)
@@ -44,4 +44,4 @@ def task_read_data_schema(repository_name):
             new_field.save()
             data_schema.fields.add(new_field)
             data_schema.save()
-        logger.debug('read data schema for: %s', experiment, data_schema_fields)
+        logger.info('read data schema for: %s', experiment, data_schema_fields)

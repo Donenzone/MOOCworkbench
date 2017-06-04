@@ -1,3 +1,4 @@
+"""View for DataSchema app"""
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -30,12 +31,12 @@ class DataSchemaOverview(View):
         context['form'] = DataSchemaFieldForm()
         context['constraint_form'] = DataSchemaConstraintForm()
         context['schema_active'] = True
-        logger.debug('data schema overview for: %s', experiment)
+        logger.info('data schema overview for: %s', experiment)
         return render(request, self.template_name, context)
 
 
 @login_required
-def dataschema_new(request, experiment_id):
+def dataschemafield_new(request, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     context = {}
     if request.POST:
@@ -49,23 +50,23 @@ def dataschema_new(request, experiment_id):
                 data_schema = experiment.schema
                 data_schema.fields.add(edit_form.instance)
                 data_schema.save()
-            logger.debug('new data schema created for %s: %s', experiment, data_schema)
+            logger.info('new data schema created for %s: %s', experiment, data_schema)
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
             context['constraint_form'] = constraint_form
-            logger.debug('invalid data schema form for %s: %s', experiment, context)
+            context['experiment_id'] = experiment_id
+            context['edit'] = False
+            logger.info('invalid data schema form for %s: %s', experiment, context)
             return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
 
 
 @login_required
-def dataschema_edit(request, pk, experiment_id):
+def dataschemafield_edit(request, pk, experiment_id):
     experiment = verify_and_get_experiment(request, experiment_id)
     dataschema = DataSchemaField.objects.get(pk=pk)
     constraints = dataschema.constraints
-    context = {}
-    context['schema_id'] = dataschema.pk
-    context['experiment_id'] = experiment.id
+    context = {'schema_id': dataschema.pk, 'experiment_id': experiment.id}
     if request.POST:
         edit_form = DataSchemaFieldForm(request.POST, instance=dataschema)
         constraint_form = DataSchemaConstraintForm(request.POST, instance=constraints)
@@ -73,7 +74,7 @@ def dataschema_edit(request, pk, experiment_id):
             constraints.save()
             dataschema.constraint = constraints
             dataschema.save()
-            logger.debug('edit data schema for %s: %s', experiment, dataschema)
+            logger.info('edit data schema for %s: %s', experiment, dataschema)
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
@@ -87,8 +88,8 @@ def dataschema_edit(request, pk, experiment_id):
 
 @login_required
 def dataschema_write(request, experiment_id):
-    verify_and_get_experiment(request, experiment_id)
+    experiment = verify_and_get_experiment(request, experiment_id)
     task_write_data_schema.delay(experiment_id)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update data schema...')
-    logger.debug('started updating schema for: %d', experiment_id)
+    logger.info('started updating schema for: %s', experiment)
     return JsonResponse({'success': True})

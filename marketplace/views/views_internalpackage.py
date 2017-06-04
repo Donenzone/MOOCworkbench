@@ -12,7 +12,7 @@ from markdown2 import Markdown
 from experiments_manager.helper import verify_and_get_experiment
 from experiments_manager.mixins import ActiveExperimentsList
 from experiments_manager.models import ChosenExperimentSteps
-from git_manager.helpers.github_helper import GitHubHelper
+from git_manager.helpers.github_helper import GitHubHelper, get_github_helper
 from git_manager.mixins.repo_file_list import get_files_for_repository
 from helpers.helper_mixins import ExperimentPackageTypeMixin
 from marketplace.forms import InternalPackageForm
@@ -22,7 +22,8 @@ from marketplace.mixins import IsInternalPackageMixin, ObjectTypeIdMixin
 from marketplace.models import InternalPackage, PackageResource, PackageVersion
 from marketplace.tasks import (task_create_package_from_experiment,
                                task_publish_update_package,
-                               task_remove_package)
+                               task_remove_package,
+                               task_create_package)
 from requirements_manager.helper import add_internalpackage_to_experiment
 from user_manager.models import get_workbench_user
 
@@ -42,10 +43,29 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(InternalPackageCreateView, self).get_context_data(**kwargs)
+        logger.info('%s started on package creation for own code', self.request.user)
+        return context
+
+    def form_valid(self, form):
+        form.instance.owner = get_workbench_user(self.request.user)
+        form.instance.template_id = 1
+        response = super(InternalPackageCreateView, self).form_valid(form)
+        task_create_package.delay(form.instance.pk)
+        return response
+
+
+class InternalPackageCreateFromExperimentView(ExperimentPackageTypeMixin, CreateView):
+    model = InternalPackage
+    form_class = InternalPackageForm
+    template_name = 'marketplace/package_create/package_form.html'
+    success_url = '/packages/new/status'
+
+    def get_context_data(self, **kwargs):
+        context = super(InternalPackageCreateFromExperimentView, self).get_context_data(**kwargs)
         context['experiment_id'] = self.kwargs['experiment_id']
         context['step_id'] = self.kwargs['step_id']
 
-        logger.debug('%s started on package creation for %s', self.request.user, self.kwargs['experiment_id'])
+        logger.info('%s started on package creation for %s', self.request.user, self.kwargs['experiment_id'])
         return context
 
     def form_valid(self, form):
@@ -53,7 +73,7 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
         experiment = self.get_experiment()
         form.instance.owner = experiment.owner
         form.instance.template_id = 1
-        response = super(InternalPackageCreateView, self).form_valid(form)
+        response = super(InternalPackageCreateFromExperimentView, self).form_valid(form)
         task_create_package_from_experiment.delay(form.instance.pk, experiment.pk, step_folder)
         return response
 
@@ -135,7 +155,7 @@ def internalpackage_publish(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_publish_update_package.delay(package.pk)
-    logger.debug('%s published the package %s', request.user, package)
+    logger.info('%s published the package %s', request.user, package)
     return redirect(to=package.get_absolute_url())
 
 
@@ -169,10 +189,11 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
     def get_context_data(self, **kwargs):
         self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
         context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
+        github_helper = get_github_helper(self.request, context['package'])
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         context['index_active'] = True
-        context['git_list'] = get_files_for_repository(self.object)
+        context['git_list'] = get_files_for_repository(github_helper, self.object)
         if InternalPackage.objects.filter(pk=self.object.pk):
             context['readme'] = self.readme_file_of_package()
         return context
@@ -194,7 +215,7 @@ def internalpackage_install(request, pk):
     experiment = verify_and_get_experiment(request, experiment_id)
     result = add_internalpackage_to_experiment(internal_package, experiment)
     if result:
-        logger.debug('%s installed the package %s in experiment %s', request.user, internal_package, experiment)
+        logger.info('%s installed the package %s in experiment %s', request.user, internal_package, experiment)
         messages.add_message(request, messages.SUCCESS, 'Added package to your experiment')
         return JsonResponse({'added': True})
     else:

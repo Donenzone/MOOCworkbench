@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap %}
+
+{% block title %}Error 500{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Error 404" "404" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>This page could not be found</h1>
+
+            <p class="lead">Sorry, it appears the requested page could not be found.</p>
+        </div>
+    </div>
+
+{% endblock %}

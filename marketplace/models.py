@@ -13,6 +13,7 @@ from model_utils.models import TimeStampedModel
 from notifications.signals import notify
 
 from build_manager.models import TravisCiConfig, TravisInstance
+from coverage_manager.models import CodeCoverage
 from docs_manager.models import Docs
 from git_manager.helpers.language_helper import PythonHelper, RHelper
 from git_manager.models import GitRepository
@@ -118,7 +119,8 @@ class InternalPackage(Package):
         return ExperimentPackageTypeMixin.PACKAGE_TYPE
 
     def success_url_dict(self, hash=''):
-        return {'dependencies': reverse('package_dependencies', kwargs={'pk': self.pk, 'object_type': self.get_object_type()}) + hash,
+        return {'dependencies': reverse('package_dependencies',
+                                        kwargs={'pk': self.pk, 'object_type': self.get_object_type()}) + hash,
                 'resources': '',
                 'versions': ''}
 
@@ -132,6 +134,19 @@ class InternalPackage(Package):
     @property
     def python_package_name(self):
         return slugify(self.name).replace('-', '_')
+
+    def delete(self, using=None, keep_parents=False):
+        if self.docs:
+            self.docs.delete()
+        if self.git_repo:
+            self.git_repo.delete()
+        if self.travis.codecoverage_set:
+            coverage = self.travis.codecoverage_set.all()
+            for cov in coverage:
+                cov.delete()
+        if self.travis:
+            self.travis.delete()
+        super(InternalPackage, self).delete()
 
 
 @receiver(post_save, sender=InternalPackage)
@@ -147,9 +162,15 @@ def add_package_config(sender, instance, created, **kwargs):
         travis.save()
         instance.travis = travis
 
+        coverage = CodeCoverage()
+        coverage.travis_instance = travis
+        coverage.enabled = False
+        coverage.save()
+
         instance.save()
 
-        package_version = PackageVersion(package=instance, version_nr='0.0.1', changelog='Initial version', added_by=instance.owner, url='')
+        package_version = PackageVersion(package=instance, version_nr='0.0.1', changelog='Initial version',
+                                         added_by=instance.owner, url='')
         package_version.save()
 
 

@@ -12,7 +12,7 @@ from django.views.generic.edit import UpdateView
 
 from docs_manager.mixins import DocsMixin
 from git_manager.helpers.github_helper import GitHubHelper, get_github_helper
-from git_manager.mixins.repo_file_list import (_get_files_in_repository,
+from git_manager.mixins.repo_file_list import (get_files_for_step,
                                                get_files_for_steps,)
 from pylint_manager.helper import return_results_for_file
 from quality_manager.mixins import get_most_recent_measurement
@@ -42,7 +42,7 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
         experiment = verify_and_get_experiment(self.request, self.kwargs['pk'])
         self.object_type = self.get_requirement_type(experiment)
         context = super(ExperimentDetailView, self).get_context_data(**kwargs)
-        context['steps'] = get_files_for_steps(experiment, only_active=True)
+        context['steps'] = experiment.chosenexperimentsteps_set.all()
         context['object_type'] = self.object_type
         if not experiment.completed:
             active_step = experiment.get_active_step()
@@ -50,7 +50,7 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
             context['final_step'] = experiment.get_active_step().step_nr == experiment.chosenexperimentsteps_set.count()
             context['recommendations'] = get_recommendations(active_step)
         context['index_active'] = True
-        logger.debug('%s viewed index for %s', self.request.user, experiment)
+        logger.info('%s viewed index for %s', self.request.user, experiment)
         return context
 
 
@@ -64,10 +64,17 @@ class FileListForStep(View):
         experiment = verify_and_get_experiment(request, experiment_id)
 
         step = get_object_or_404(ChosenExperimentSteps, pk=step_id)
-        file_list = _get_files_in_repository(request.user, experiment.git_repo.name, step.location)
+        github_helper = get_github_helper(request, experiment)
+        file_list = get_files_for_step(step, experiment, github_helper)
         return_dict = []
         for content_file in file_list:
-            return_dict.append((content_file.name, content_file.type))
+            return_dict.append({'file_name': content_file.name,
+                                'file_url': reverse('file_detail', kwargs={'experiment_id': experiment.id})
+                                            + '?file_name=' + content_file.path,
+                                'type': content_file.type,
+                                'file_path': content_file.path,
+                                'slug': content_file.slug,
+                                'static_code_analysis': content_file.pylint_results})
         return JsonResponse({'files': return_dict})
 
 
@@ -125,10 +132,11 @@ def complete_step_and_go_to_next(request, experiment_id, create_package):
             next_step = next_step[0]
             next_step.active = True
             next_step.save()
-            logger.debug('%s completed the step %s and moved on to %s for experiment %s', request.user, active_step,
+            logger.info('%s completed the step %s and moved on to %s for experiment %s', request.user, active_step,
                          next_step, experiment)
             if int(create_package) == 1:
-                return redirect(to=reverse('internalpackage_create', kwargs={'experiment_id': experiment_id,'step_id': completed_step_id}))
+                return redirect(to=reverse('internalpackage_create_fromexperiment',
+                                           kwargs={'experiment_id': experiment_id,'step_id': completed_step_id}))
             else:
                 return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
     return redirect(to=reverse('experiment_publish', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
@@ -172,8 +180,9 @@ class ExperimentReadOnlyView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
     def get_context_data(self, **kwargs):
         experiment = self.object
         self.object_type = self.get_requirement_type(experiment)
+        github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
         context = super(ExperimentReadOnlyView, self).get_context_data(**kwargs)
-        context['steps'] = get_files_for_steps(experiment)
+        context['steps'] = get_files_for_steps(experiment, github_helper)
         context['object_type'] = self.object_type
         context['object_id'] = experiment.pk
         context['completed'] = True

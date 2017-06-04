@@ -19,7 +19,7 @@ from user_manager.models import WorkbenchUser
 
 
 class Experiment(BasePackage):
-    title = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(to=WorkbenchUser)
     template = models.ForeignKey('cookiecutter_manager.CookieCutterTemplate')
@@ -91,6 +91,9 @@ class Experiment(BasePackage):
     def language_helper(self):
         language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}
         return language_helper_dict[self.template.language.language](self)
+
+    class Meta:
+        unique_together = ('title', 'owner')
 
 
 @receiver(post_save, sender=Experiment)

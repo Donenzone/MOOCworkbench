@@ -24,7 +24,8 @@ class ExperimentTestCase(TestCase):
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
         self.second_user = User.objects.create_user('test2', 'test@test.nl', 'test2')
-        self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user, github_url='https://github')
+        self.git_repo = GitRepository.objects.create(name='Experiment', owner=self.workbench_user,
+                                                     github_url='https://github')
         schema = DataSchema(name='main')
         schema.save()
         self.experiment = Experiment.objects.create(title='Experiment',
@@ -63,8 +64,8 @@ class ExperimentTestCase(TestCase):
         self.assertIsNotNone(response.context['form'])
         self.assertEqual(response.context['experiment_id'], 0)
 
-    #@patch('experiments_manager.views.init_git_repo_for_experiment')
-    #def test_create_new_experiment_post(self, mock_create_new_github_repo):
+    # @patch('experiments_manager.views.init_git_repo_for_experiment')
+    # def test_create_new_experiment_post(self, mock_create_new_github_repo):
     #    git_repo = GitRepository(name='Sandbox-Research', owner=self.workbench_user, github_url='https://github')
     #    git_repo.save()
 
@@ -157,10 +158,11 @@ class ExperimentTestCase(TestCase):
         self.assertIsNotNone(response_json['message'])
 
     @patch('experiments_manager.views.views.GitHubHelper')
-    @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
+    @patch('experiments_manager.views.views.GitHubHelper.list_files_in_folder')
     @patch('experiments_manager.views.views.get_files_for_steps')
-    @patch('experiments_manager.views.views._get_files_in_repository')
-    def test_experiment_detail_view(self, mock_context_data, mock_get_files_in_repository, mock_github_helper_file_list, mock_github_helper):
+    @patch('experiments_manager.views.views.get_files_for_step')
+    def test_experiment_detail_view(self, mock_context_data, mock_get_files_in_repository, mock_github_helper_file_list,
+                                    mock_github_helper):
         self.test_choose_experiment_steps_post()
         mock_context_data.return_value = {'git_list': self.get_mock_files()}
         mock_github_helper.return_value = None
@@ -182,23 +184,26 @@ class ExperimentTestCase(TestCase):
         response = c.get(reverse('experiment_detail', kwargs={'pk': 1, 'slug': 'experiment'}))
         self.assertEqual(response.status_code, 302)
 
-    @patch('experiments_manager.views.views.GitHubHelper')
-    @patch('experiments_manager.views.views._get_files_in_repository')
+    @patch('experiments_manager.views.views.get_github_helper')
+    @patch('experiments_manager.views.views.get_files_for_step')
     def test_get_file_list_for_exp_step(self, mock_get_files_in_repository, mock_github_helper):
         self.test_choose_experiment_steps_post()
         mock_github_helper.return_value = None
         mock_get_files_in_repository.return_value = self.get_mock_files()
-
         response = self.client.get(reverse('file_list_for_step'), {'experiment_id': 1, 'step_id': 2})
         response_json = json.loads(str(response.content, encoding='utf8'))
-        self.assertEqual(response_json['files'], [['main.py', 'file'], ['tests.py', 'file']])
+        self.assertEqual(response_json['files'], [
+            {'file_url': '/experiments/file/1/?file_name=/src/main.py', 'slug': 'main-py', 'file_path': '/src/main.py',
+             'type': 'file', 'static_code_analysis': [], 'file_name': 'main.py'},
+            {'file_url': '/experiments/file/1/?file_name=/sr/tests.py', 'slug': 'tests-py', 'file_path': '/sr/tests.py',
+             'type': 'file', 'static_code_analysis': [], 'file_name': 'tests.py'}])
 
     def test_get_file_list_for_exp_non_exist_step(self):
         response = self.client.get(reverse('file_list_for_step'), {'experiment_id': 1, 'step_id': 1})
         self.assertEqual(response.status_code, 404)
 
     def get_mock_files(self):
-        Foo = namedtuple('Foo', ['name', 'path', 'type'])
-        main = Foo(name='main.py', path='/src/main.py', type='file')
-        test = Foo(name='tests.py', path='/sr/tests.py', type='file')
+        Foo = namedtuple('Foo', ['name', 'path', 'type', 'slug', 'pylint_results'])
+        main = Foo(name='main.py', path='/src/main.py', type='file', slug='main-py', pylint_results=[])
+        test = Foo(name='tests.py', path='/sr/tests.py', type='file', slug='tests-py', pylint_results=[])
         return [main, test]

@@ -15,6 +15,6 @@ install:
 - pip install -r requirements.txt
 - sh travis/setup.sh
 script:
-- coverage run --source=build_manager,cookiecutter_manager,coverage_manager,dataschema_manager,docs_manager,experiments_manager,feedback,git_manager,helpers,marketplace,pylint_manager,quality_manager,requirements_manager,recommendations,user_manager,
+- coverage run --source=build_manager,cookiecutter_manager,coverage_manager,dataschema_manager,docs_manager,experiments_manager,git_manager,helpers,marketplace,pylint_manager,quality_manager,requirements_manager,recommendations,user_manager,
   manage.py test
 after_success: coveralls

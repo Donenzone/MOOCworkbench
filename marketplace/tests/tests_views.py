@@ -21,7 +21,6 @@ class MarketplaceTestCase(TestCase):
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)
         call_command('loaddata', 'fixtures/package_categories_languages.json', verbosity=0)
-        call_command('loaddata', 'fixtures/tasks.json', verbosity=0)
         call_command('loaddata', 'fixtures/cookiecutter.json', verbosity=0)
 
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
@@ -100,7 +99,7 @@ class MarketplaceTestCase(TestCase):
         Test to ensure the page for creating an external page
         loads successfully
         """
-        response = self.client.get(reverse('package_new'))
+        response = self.client.get(reverse('externalpackage_new'))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
@@ -110,7 +109,7 @@ class MarketplaceTestCase(TestCase):
                                  'project_page': 'http://test.nl',
                                  'category': '1',
                                  'language': '1'}
-        response = self.client.post(reverse('package_new'), data=external_package_data)
+        response = self.client.post(reverse('externalpackage_new'), data=external_package_data)
         self.assertEqual(response.status_code, 302)
         external_package = ExternalPackage.objects.filter(id=2)
         self.assertTrue(external_package)
@@ -121,13 +120,14 @@ class MarketplaceTestCase(TestCase):
                                  'project_page': 'http://test',
                                  'category': '1',
                                  'language': '1'}
-        response = self.client.post(reverse('package_new'), data=external_package_data)
+        response = self.client.post(reverse('externalpackage_new'), data=external_package_data)
         self.assertEqual(response.status_code, 200)
         external_package = ExternalPackage.objects.filter(id=2)
         self.assertFalse(external_package)
 
     def test_create_internal_package_get(self):
-        response = self.client.get(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}))
+        response = self.client.get(reverse('internalpackage_create_fromexperiment',
+                                           kwargs={'experiment_id': 1, 'step_id': 1}))
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
@@ -139,7 +139,8 @@ class MarketplaceTestCase(TestCase):
                                  'language': '1',
                                  }
         mock_package_repo_init.return_value = RepoInitMock(self.git_repo)
-        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}),
+        response = self.client.post(reverse('internalpackage_create_fromexperiment',
+                                            kwargs={'experiment_id': 1, 'step_id': 1}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 302)
         internal_package = InternalPackage.objects.filter(id=2)
@@ -149,7 +150,8 @@ class MarketplaceTestCase(TestCase):
         internal_package_data = {'name': 'My new package',
                                  'description': 'Desc',
                                  }
-        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 1}),
+        response = self.client.post(reverse('internalpackage_create_fromexperiment',
+                                            kwargs={'experiment_id': 1, 'step_id': 1}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 200)
         internal_package = InternalPackage.objects.filter(id=2)
@@ -159,7 +161,8 @@ class MarketplaceTestCase(TestCase):
         internal_package_data = {'name': 'My new package',
                                  'description': 'Desc',
                                  }
-        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 0, 'step_id': 1}),
+        response = self.client.post(reverse('internalpackage_create_fromexperiment',
+                                            kwargs={'experiment_id': 0, 'step_id': 1}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 200)
         internal_package = InternalPackage.objects.filter(id=2)
@@ -169,7 +172,8 @@ class MarketplaceTestCase(TestCase):
         internal_package_data = {'name': 'My new package',
                                  'description': 'Desc',
                                  }
-        response = self.client.post(reverse('internalpackage_create', kwargs={'experiment_id': 1, 'step_id': 0}),
+        response = self.client.post(reverse('internalpackage_create_fromexperiment',
+                                            kwargs={'experiment_id': 1, 'step_id': 0}),
                                     data=internal_package_data)
         self.assertEqual(response.status_code, 200)
         internal_package = InternalPackage.objects.filter(id=2)
@@ -185,7 +189,7 @@ class MarketplaceTestCase(TestCase):
         self.assertIsNotNone(response.context['edit_form'])
 
     @patch('marketplace.views.views_internalpackage.InternalPackageDetailView.readme_file_of_package')
-    @patch('git_manager.mixins.repo_file_list.GitHubHelper.list_files_in_folder')
+    @patch('marketplace.views.views_internalpackage.get_github_helper')
     @patch('marketplace.views.views_internalpackage.get_files_for_repository')
     def test_internal_package_detail(self, mock_get_files, mock_file_list, mock_readme):
         mock_readme.return_value = 'Test readme'

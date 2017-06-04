@@ -22,7 +22,7 @@ coverage==4.4.1
 coveralls==1.1
 daphne==1.2.0
 defusedxml==0.5.0
-Django==1.11.1
+Django==1.11.2
 django-ajax-selects==1.6.0
 django-allauth==0.32.0
 django-autoadmin==1.1.1

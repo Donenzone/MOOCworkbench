@@ -111,7 +111,8 @@ class PackageGitRepoInit(object):
         language_helper = self.internal_package.language_helper()
         req_file_loc = language_helper.get_requirements_file_location()
         requirements_file = self.github_helper.view_file(req_file_loc)
-        language_helper.parse_requirements(requirements_file)
+        if requirements_file:
+            language_helper.parse_requirements(requirements_file)
 
         return git_repo_obj
 

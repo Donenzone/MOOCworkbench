@@ -49,7 +49,7 @@ class BasePackage(TimeStampedModel):
         abstract = True
 
 
-alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+alphanumeric = RegexValidator(r'^[a-z]*$', 'Only lowercase letters are allowed.')
 
 
 class Package(BasePackage):

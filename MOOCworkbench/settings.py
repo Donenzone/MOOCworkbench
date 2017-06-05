@@ -117,13 +117,13 @@ MIDDLEWARE = [
 ]
 
 LOGIN_EXEMPT_URLS = (
-     r'^about\.html$',
      r'^experiments/readonly/(?P<unique_id>[-\w]+)$',
      r'^reset-password/$',
      r'^accounts/register/$',
      r'^reset-password/done$',
      r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
      r'^reset-password/complete$',
+     r'^receive/$'
 )
 
 ROOT_URLCONF = 'MOOCworkbench.urls'

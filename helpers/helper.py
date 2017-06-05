@@ -21,6 +21,7 @@ def get_package_or_experiment_with_context(context, request, object_type, object
         return context
     elif object_type == ExperimentPackageTypeMixin.PACKAGE_TYPE:
         context['package'] = InternalPackage.objects.get(id=object_id)
+        context['object'] = InternalPackage.objects.get(id=object_id)
         return context
 
 

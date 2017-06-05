@@ -8,7 +8,8 @@ from django.core.management import call_command
 
 from experiments_manager.models import Experiment
 from git_manager.helpers.github_helper import GitHubHelper
-from ..tasks import task_create_package_from_experiment, task_create_package
+from ..tasks import task_create_package_from_experiment, \
+    task_create_package, task_publish_update_package
 from ..models import InternalPackage
 from git_manager.models import GitRepository
 from user_manager.models import WorkbenchUser
@@ -86,6 +87,14 @@ class MarketplaceTasksTestCase(TestCase):
         github_helper = GitHubHelper('test', self.package_name)
         self.assertTrue(github_helper.view_file('requirements.txt'))
         self.assertTrue(github_helper.view_file('{0}/make_dataset.py'.format(self.package_name)))
+
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
+    def test_task_publish_package(self, mock_social_token):
+        self.test_create_empty_package()
+        mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
+        task_publish_update_package(self.internal_package.pk)
+        path = os.path.exists('packages/{0}/dist/{0}-0.0.1.tar.gz'.format(self.package_name))
+        self.assertTrue(path)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def tearDown(self, mock_social_token):

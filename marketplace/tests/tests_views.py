@@ -314,6 +314,35 @@ class MarketplaceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
+    # regression tests
+    def test_package_missing_install_on_resourcepage(self):
+        """Test to ensure that the install button is present
+        for a published package on the Package detail Resource list page"""
+        self.internal_package.published = True
+        self.internal_package.save()
+        response = self.client.get(reverse('packageresource_list', kwargs={'pk': self.internal_package.pk}))
+        self.assertTrue(response.context['is_internal'])
+        self.assertTrue(response.context['object'].published)
+
+    def test_package_missing_install_on_dependencypage(self):
+        """Test to ensure that the install button is present
+        for a published package on the Package detail Dependency page"""
+        self.internal_package.published = True
+        self.internal_package.save()
+        response = self.client.get(reverse('package_dependencies', kwargs={'pk': self.internal_package.pk,
+                                                                           'object_type': self.internal_package.get_object_type()}))
+        self.assertTrue(response.context['is_internal'])
+        self.assertTrue(response.context['object'].published)
+
+    def test_package_missing_install_on_versionspage(self):
+        """Test to ensure that the install button is present
+        for a published package on the Package detail resource page"""
+        self.internal_package.published = True
+        self.internal_package.save()
+        response = self.client.get(reverse('packageversion_list', kwargs={'pk': self.internal_package.pk}))
+        self.assertTrue(response.context['is_internal'])
+        self.assertTrue(response.context['object'].published)
+
 
 class RepoInitMock(object):
     def __init__(self, git_repo):

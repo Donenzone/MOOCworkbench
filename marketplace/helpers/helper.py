@@ -1,8 +1,13 @@
 from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.helpers.helper import (CodeTemplateTypes,
-                                        get_file_from_code_template)
-from helpers.helper import replace_variable_in_file
-from marketplace.models import InternalPackage, PackageVersion
+from marketplace.models import InternalPackage, ExternalPackage, PackageVersion
+
+
+def get_internal_external_package(pk):
+    package = InternalPackage.objects.filter(id=pk)
+    if package:
+        return package[0]
+    else:
+        return ExternalPackage.objects.get(id=pk)
 
 
 def create_tag_for_package_version(package_version_id):

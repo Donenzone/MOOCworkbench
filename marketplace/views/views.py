@@ -17,6 +17,7 @@ from ..models import (ExternalPackage, InternalPackage, Package,
                       PackageResource, PackageVersion)
 from ..tasks import task_check_for_new_package_version
 from .views_internalpackage import InternalPackageBaseView
+from ..helpers.helper import get_internal_external_package
 
 
 class MarketplaceIndex(View):
@@ -83,6 +84,7 @@ class PackageVersionListView(InternalPackageBaseView, ListView):
     def get_context_data(self, **kwargs):
         context = super(PackageVersionListView, self).get_context_data(**kwargs)
         context['versions_active'] = True
+        context['object'] = get_internal_external_package(pk=self.kwargs['pk'])
         return context
 
 
@@ -149,7 +151,7 @@ class PackageResourceListView(InternalPackageBaseView, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PackageResourceListView, self).get_context_data(**kwargs)
-        context['object'] = Package.objects.get(pk=self.kwargs['pk'])
+        context['object'] = get_internal_external_package(pk=self.kwargs['pk'])
         context['resources_active'] = True
         return context
 

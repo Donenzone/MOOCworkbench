@@ -72,7 +72,7 @@ def init_git_repo_for_experiment(experiment, cookiecutter):
         send_exp_package_creation_status_update(username, ExperimentProgress.STEP_READING_DEPENDENCIES)
         return True
     except Exception as e:
-        logger.error('failed to create experiment %s with error', experiment, e)
+        logger.error('failed to create experiment %s with error %s', experiment, e)
         logger.error('removing experiment %s to maintain db integrity', experiment)
         experiment.delete()
         return False

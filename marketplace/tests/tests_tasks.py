@@ -65,7 +65,7 @@ class MarketplaceTasksTestCase(TestCase):
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_create_empty_python_package(self, mock_social_token):
-        """Test if an empty package can be initialized"""
+        """Test if an empty Python package can be initialized"""
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
         task_create_package(self.internal_package.pk)
         self.internal_package.refresh_from_db()
@@ -75,7 +75,7 @@ class MarketplaceTasksTestCase(TestCase):
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_create_empty_r_package(self, mock_social_token):
-        """Test if an empty package can be initialized"""
+        """Test if an empty R package can be initialized"""
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
         task_create_package(self.internal_r_package.pk)
         self.internal_r_package.refresh_from_db()
@@ -106,6 +106,7 @@ class MarketplaceTasksTestCase(TestCase):
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_create_python_package_from_experiment(self, mock_social_token):
+        """Test to create a Python package from an existing experiment"""
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
         task_create_package_from_experiment(self.internal_package.pk,
                                             self.python_experiment.pk,
@@ -118,6 +119,7 @@ class MarketplaceTasksTestCase(TestCase):
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_create_r_package_from_experiment(self, mock_social_token):
+        """Test to create a R package from an existing experiment"""
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
         task_create_package_from_experiment(self.internal_r_package.pk,
                                             self.r_experiment.pk,
@@ -130,6 +132,7 @@ class MarketplaceTasksTestCase(TestCase):
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_task_publish_package(self, mock_social_token):
+        """Test to publish a Python package"""
         self.test_create_empty_python_package()
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
         task_publish_update_package(self.internal_package.pk)

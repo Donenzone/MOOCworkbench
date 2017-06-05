@@ -123,7 +123,7 @@ LOGIN_EXEMPT_URLS = (
      r'^reset-password/done$',
      r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
      r'^reset-password/complete$',
-     r'^receive/$'
+     r'^github/receive/$'
 )
 
 ROOT_URLCONF = 'MOOCworkbench.urls'

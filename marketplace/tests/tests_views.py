@@ -207,7 +207,7 @@ class MarketplaceTestCase(TestCase):
         internalpackage_data = {'name': 'alksdjaasdf', 'description': 'New Desc', 'category': 1, 'language': 1}
         response = self.client.post(reverse('internalpackage_update', kwargs={'pk': 1}), data=internalpackage_data)
         self.assertEqual(response.status_code, 302)
-        internalpackage = InternalPackage.objects.filter(name='23u4892')
+        internalpackage = InternalPackage.objects.filter(name='alksdjaasdf')
         self.assertTrue(internalpackage)
 
     def test_packageversion_create_get(self):

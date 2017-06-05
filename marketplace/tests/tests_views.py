@@ -292,7 +292,7 @@ class MarketplaceTestCase(TestCase):
 
     @patch('marketplace.views.views_internalpackage.create_tag_for_package_version')
     @patch('marketplace.views.views_internalpackage.update_setup_py_with_new_version')
-    def test_internalpackageversion_create_post(self, mock_tag, mock_update_setup_py):
+    def test_internalpackageversion_create_post_no_prerelease(self, mock_tag, mock_update_setup_py):
         """
         Test creating new internal package version with missing pre_release bool,
         creating should pass with default pre_release value (False).

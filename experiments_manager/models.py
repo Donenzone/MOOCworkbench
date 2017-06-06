@@ -150,6 +150,9 @@ class ChosenExperimentSteps(models.Model):
     def location_slug(self):
         return slugify(self.location)
 
+    def __str__(self):
+        return "{0} (nr: {1})".format(self.step, self.step_nr)
+
 
 def delete_existing_chosen_steps(experiment):
     ChosenExperimentSteps.objects.filter(experiment=experiment).delete()

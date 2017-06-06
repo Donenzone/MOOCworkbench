@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
@@ -15,6 +17,9 @@ from .forms import RequirementForm
 from .mixins import RequirementSuccessUrlMixin
 from .models import Requirement
 from .tasks import task_write_requirements_file
+
+
+logger = logging.getLogger(__name__)
 
 
 class RequirementListView(IsInternalPackageMixin, ExperimentPackageTypeMixin, ListView):
@@ -43,6 +48,7 @@ class RequirementCreateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMix
         response = super(RequirementCreateView, self).form_valid(form)
         exp_or_package = self.get_exp_or_package()
         self.add_req_to_object(form.instance, exp_or_package)
+        logger.info("added dependency %s to experiment %s", form.instance, exp_or_package)
         return response
 
     def add_req_to_object(self, req, obj):
@@ -84,6 +90,7 @@ def remove_experiment_requirement(request, object_id, object_type):
             with transaction.atomic():
                 exp_or_package.requirements.remove(requirement)
                 exp_or_package.save()
+                logger.info("deleted dependency %s from experiment %s", requirement, exp_or_package)
                 requirement.delete()
             return JsonResponse({'deleted': True})
     return JsonResponse({'deleted': False})
@@ -93,5 +100,6 @@ def remove_experiment_requirement(request, object_id, object_type):
 def write_requirements_file(request, object_id, object_type):
     get_package_or_experiment(request, object_type, object_id)
     task_write_requirements_file.delay(object_id, object_type)
+    logger.info("manually updating dependencies for experiment %s of %s", request.user, object_id)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update dependencies...')
     return JsonResponse({'success': True})

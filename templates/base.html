@@ -103,13 +103,6 @@
     </div>
 {% endif %}
 
-{% if completed_task %}
-    <div class="container">
-        <div class="alert alert-success">Great! You've completed the task <b>{{ completed_task.for_task.name }}</b>! <a
-                href="{% url 'feedback_create' completed_task.for_task.id %}">Tell us about your experience</a></div>
-    </div>
-{% endif %}
-
 <div class="container">
     {% render_breadcrumbs "django_bootstrap_breadcrumbs/bootstrap3.html" %}
     {% block content %}

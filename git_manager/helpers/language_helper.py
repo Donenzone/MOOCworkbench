@@ -113,7 +113,7 @@ class PythonHelper(LanguageHelper):
         self.exp_or_package.save()
 
     def remove_package(self):
-        internalpackage_remove(self.exp_or_package)
+        internalpackage_remove(self.exp_or_package.name)
 
         self.exp_or_package.published = False
         self.exp_or_package.save()

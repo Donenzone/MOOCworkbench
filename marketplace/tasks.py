@@ -5,7 +5,7 @@ from celery.task import periodic_task
 from django.shortcuts import reverse
 
 from experiments_manager.consumers import \
-    send_exp_package_creation_status_update
+    send_exp_package_creation_status_update, send_message
 from experiments_manager.models import Experiment
 from git_manager.utils.repo_init import PackageGitRepoInit
 from MOOCworkbench.celery import app
@@ -82,3 +82,4 @@ def task_remove_package(internalpackage_id):
     package = InternalPackage.objects.get(pk=internalpackage_id)
     language_helper = package.language_helper()
     language_helper.remove_package()
+    send_message(package.owner.user.username, 'success', 'Package removed successfully')

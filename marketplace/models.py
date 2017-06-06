@@ -122,7 +122,8 @@ class InternalPackage(Package):
         return {'dependencies': reverse('package_dependencies',
                                         kwargs={'pk': self.pk, 'object_type': self.get_object_type()}) + hash,
                 'resources': '',
-                'versions': ''}
+                'versions': '',
+                'dashboard': reverse('internalpackage_dashboard', kwargs={'pk': self.pk})}
 
     def language_helper(self):
         language_helper_dict = {'Python3': PythonHelper, 'R': RHelper}

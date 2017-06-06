@@ -179,7 +179,9 @@ def internalpackage_remove(request, pk):
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_remove_package.delay(package.pk)
-    return JsonResponse({"publish": "started"})
+    logger.info("%s removed the package %s", request.user, package)
+    messages.add_message(request, messages.INFO, "Removing package...")
+    return redirect(to=package.success_url_dict()['dashboard'])
 
 
 class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, DetailView):
@@ -221,3 +223,4 @@ def internalpackage_install(request, pk):
     else:
         messages.add_message(request, messages.ERROR, 'Could not add package to your experiment')
         return JsonResponse({'added': False})
+

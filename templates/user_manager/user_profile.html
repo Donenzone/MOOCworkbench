@@ -39,23 +39,23 @@
 
     <h2>Connected accounts</h2>
 
- <div class="row">
-        <div class="col-md-6">
-            {% for account in user.socialaccount_set.all %}
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Account provider: GitHub</div>
-                    <div class="panel-body">
-                        <p style="float:left;margin:10px;"><img width="50" height="50"
-                                                                src="{{ account.get_avatar_url }}"/></p>
-                        <p>UID: <a href="{{ account.extra_data.link }}">{{ account.uid }}</a></p>
-                        <p>Username: {{ account.extra_data.login }}</p>
-                        <p>GitHub Profile:
-                            <a href="{{ account.extra_data.html_url }}">{{ account.extra_data.html_url }}</a>
-                        </p>
+     <div class="row">
+            <div class="col-md-6">
+                {% for account in w_user.user.socialaccount_set.all %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Account provider: GitHub</div>
+                        <div class="panel-body">
+                            <p style="float:left;margin:10px;"><img width="50" height="50"
+                                                                    src="{{ account.get_avatar_url }}"/></p>
+                            <p>UID: <a href="{{ account.extra_data.link }}">{{ account.uid }}</a></p>
+                            <p>Username: {{ account.extra_data.login }}</p>
+                            <p>GitHub Profile:
+                                <a href="{{ account.extra_data.html_url }}">{{ account.extra_data.html_url }}</a>
+                            </p>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
-    </div>
 
-{% endblock %}
+    {% endblock %}

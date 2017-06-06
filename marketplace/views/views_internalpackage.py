@@ -191,7 +191,7 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
     def get_context_data(self, **kwargs):
         self.object_type = ExperimentPackageTypeMixin.PACKAGE_TYPE
         context = super(InternalPackageDetailView, self).get_context_data(**kwargs)
-        github_helper = get_github_helper(self.request, context['package'])
+        github_helper = get_github_helper(context['package'].owner, context['package'])
         package_id = self.kwargs['pk']
         context['version_history'] = PackageVersion.objects.filter(package=package_id).order_by('-created')[:5]
         context['index_active'] = True

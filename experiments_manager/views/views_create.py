@@ -52,7 +52,7 @@ def step_two_experiment_status_create(request):
 class StepThreeChooseExperimentSteps(ExperimentContextMixin, View):
     def get(self, request, experiment_id):
         context = super(StepThreeChooseExperimentSteps, self).get(request, experiment_id)
-        context['steps'] = ExperimentStep.objects.all()
+        context['steps'] = ExperimentStep.objects.all().order_by('default_order')
         return render(request, "experiments_manager/experiment_create/experimentsteps_choose.html", context)
 
     def post(self, request, experiment_id):

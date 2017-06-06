@@ -35,7 +35,8 @@ class CiEnabledMeasurement(MeasurementAbstraction):
 
     def get_last_five_build_results(self):
         last_five_measures = ExperimentMeasureResult.objects.filter(measurement=self.measurement,
-                                                                    step=self.experiment_step)[:5]
+                                                                    step=self.experiment_step)
+        last_five_measures = last_five_measures.order_by('-created')[:5]
         passed_list = []
         for measure in last_five_measures:
             for raw_value in measure.raw_values.all():

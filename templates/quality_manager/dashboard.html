@@ -11,6 +11,7 @@
         <div class="col-md-3">
             <h3>Refresh</h3>
             <a href="#" id="refresh" class="btn btn-default">Refresh this data</a>
+            <span id="last-refresh"></span>
             <span id="refresh-message"></span>
         </div>
     </div>
@@ -118,7 +119,7 @@
                     url: "{% url 'measurements_refresh' active_step_id %}",
                     success: function (data) {
                         if (data.refresh) {
-                            $('#refresh-message').text("Refreshing data...")
+                            $('#refresh-message').html("<br />Data is being refreshed... This can take some time, please check back later")
                         }
                     }
                 })

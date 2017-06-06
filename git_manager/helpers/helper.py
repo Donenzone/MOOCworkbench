@@ -43,17 +43,6 @@ def get_exp_or_package_from_repo_name(repo_name):
             return package
 
 
-def get_user_repositories(user):
-    github_helper = GitHubHelper(user)
-    github_api = github_helper.github_object
-    if github_api:
-        repo_list = []
-        for repo in github_api.get_user().get_repos(type='owner'):
-            repo_list.append((repo.name, repo.clone_url))
-        return repo_list
-    return []
-
-
 def create_new_github_repository(title, user):
     try:
         github_helper = GitHubHelper(user, title, create=True)

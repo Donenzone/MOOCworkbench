@@ -13,7 +13,7 @@ from ..models import Experiment
 from user_manager.models import WorkbenchUser
 
 
-class MarketplaceTasksTestCase(TestCase):
+class ExperimentTasksTestCase(TestCase):
     def setUp(self):
         call_command('loaddata', 'fixtures/steps.json', verbosity=0)
         call_command('loaddata', 'fixtures/measures.json', verbosity=0)

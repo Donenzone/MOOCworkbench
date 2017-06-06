@@ -1,14 +1,15 @@
 from coverage_manager.helpers.coveralls_helper import CoverallsHelper
+from git_manager.helpers.github_helper import GitHubHelper
 from quality_manager.measurements.measurement import MeasurementAbstraction
 from quality_manager.models import (ExperimentMeasure, ExperimentMeasureResult,
                                     RawMeasureResult)
 
 
 class TestMeasurement(MeasurementAbstraction):
-    def __init__(self, experiment_step, github_helper):
+    def __init__(self, experiment_step):
         super().__init__(experiment_step)
         self.measurement = ExperimentMeasure.objects.get(name='Testing')
-        self.github_helper = github_helper
+        self.github_helper = GitHubHelper(self.experiment.owner, self.experiment.git_repo.name)
         self.raw = RawMeasureResult()
 
     def measure(self):

@@ -1,4 +1,6 @@
 import json
+import os
+from datetime import datetime
 from collections import namedtuple
 from unittest.mock import patch
 
@@ -39,30 +41,26 @@ class ExperimentTestCase(TestCase):
         self.client.login(username='test', password='test')
 
     def test_index_not_signed_in(self):
+        """Test index when not signed in"""
         c = Client()
         response = c.get(reverse('experiments_index'))
         self.assertEqual(response.status_code, 302)
 
     def test_index_signed_in(self):
+        """Test if index loads while signed in"""
         response = self.client.get(reverse('experiments_index'))
         self.assertIsNotNone(response.context['table'])
 
     def test_create_new_experiment_get(self):
+        """Test http get for creating a new experiment"""
         response = self.client.get(reverse('experiment_new'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
     def test_create_new_experiment_get_not_signed_in(self):
+        """Test http get for creating a new experiment when not signed in"""
         c = Client()
         response = c.get(reverse('experiment_new'))
         self.assertEqual(response.status_code, 302)
-
-    @patch('experiments_manager.views.views_create.get_user_repositories')
-    def test_create_new_experiment_get_mock(self, mock_get_user_repositories):
-        mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
-        response = self.client.get(reverse('experiment_new'))
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.context['form'])
-        self.assertEqual(response.context['experiment_id'], 0)
 
     # @patch('experiments_manager.views.init_git_repo_for_experiment')
     # def test_create_new_experiment_post(self, mock_create_new_github_repo):
@@ -75,47 +73,38 @@ class ExperimentTestCase(TestCase):
     #    self.assertEqual(response.status_code, 302)
     #    self.assertEqual(response.url, reverse('experimentsteps_choose', kwargs={'experiment_id': 2}))
 
-    @patch('experiments_manager.views.views_create.get_user_repositories')
-    def test_create_new_experiment_post_missing_title(self, mock_get_user_repositories):
-        mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
-
+    def test_create_new_experiment_post_missing_title(self):
+        """Test creating a new experiment with a missing title"""
         data = {'description': 'My first experiment', 'language': 1, 'template': 2}
         response = self.client.post(reverse('experiment_new'), data=data)
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('experiments_manager.views.views_create.get_user_repositories')
-    def test_create_new_experiment_post_missing_description(self, mock_get_user_repositories):
-        mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
-
+    def test_create_new_experiment_post_missing_description(self):
+        """Test creating a new experiment with a missing description"""
         data = {'title': 'Sandbox Research', 'language': 1, 'template': 2}
         response = self.client.post(reverse('experiment_new'), data=data)
-
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('experiments_manager.views.views_create.get_user_repositories')
-    def test_create_new_experiment_post_missing_title_and_desc(self, mock_get_user_repositories):
-        mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
-
+    def test_create_new_experiment_post_missing_title_and_desc(self):
+        """Test creating a new experiment with a missing title and description"""
         data = {'language': 1, 'template': 2}
         response = self.client.post(reverse('experiment_new'), data=data)
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
-    @patch('experiments_manager.views.views_create.get_user_repositories')
-    def test_create_new_experiment_post_empty(self, mock_get_user_repositories):
-        mock_get_user_repositories.return_value = [('My First Experiment', 'https://test')]
-
+    def test_create_new_experiment_post_empty(self):
+        """Test creating a new experiment with empty data"""
         data = {}
         response = self.client.post(reverse('experiment_new'), data=data)
-
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context['form'])
 
     def test_choose_experiment_steps_get(self):
+        """Test http get for choosing experiment steps"""
         response = self.client.get(reverse('experimentsteps_choose', kwargs={'experiment_id': 1}))
         self.assertIsNotNone(response.context['steps'])
         self.assertEqual(len(response.context['steps']), 5)
@@ -202,8 +191,93 @@ class ExperimentTestCase(TestCase):
         response = self.client.get(reverse('file_list_for_step'), {'experiment_id': 1, 'step_id': 1})
         self.assertEqual(response.status_code, 404)
 
+    @patch('experiments_manager.views.views_create.GitHubHelper')
+    def test_step_four_in_experiment(self, mock_github_helper):
+        """Test if the fourth step in creating an experiment loads"""
+        response = self.client.get(reverse('experiment_first_time', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['object'])
+        self.assertFalse(response.context['configured'])
+        self.assertTrue(response.context['travis'])
+
+    def test_complete_step_gonext(self):
+        """Test complete the current step and go to next
+        Creates two chosen steps and tests if moved on to the next step"""
+        ChosenExperimentSteps.objects.create(
+            step_id=1,
+            experiment=self.experiment,
+            step_nr=1,
+            started_at=datetime.now(),
+            active=True,
+            location='src/data',
+            main_module='make_dataset'
+        )
+        chosen_step_two = ChosenExperimentSteps.objects.create(
+            step_id=2,
+            experiment=self.experiment,
+            step_nr=2,
+            location='src/data',
+            main_module='make_dataset'
+        )
+        old_step = self.experiment.get_active_step()
+        response = self.client.get(reverse('complete_step_and_go_to_next', kwargs={'experiment_id': 1,
+                                                                                   'create_package': 0}))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(old_step != self.experiment.get_active_step())
+        self.assertTrue(self.experiment.get_active_step().pk == chosen_step_two.pk)
+
+    @patch('experiments_manager.views.views.GitHubHelper')
+    def test_publish_experiment(self, mock_gh_helper):
+        """Test if an experiment can be published"""
+        mock_gh_helper.return_value = MockGitHub('test', 'test')
+        response = self.client.get(reverse('experiment_publish_2', kwargs={'pk': 1, 'slug': self.experiment.slug()}))
+        self.assertEqual(response.status_code, 302)
+        self.experiment.refresh_from_db()
+        self.assertTrue(self.experiment.unique_id)
+        self.assertTrue(self.experiment.publish_url_zip == 'https://test_release')
+
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
+    def test_experiment_readonly_view(self, mock_social_token):
+        """Test if readonly view works after publishing an experiment"""
+        mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
+        git_repo = GitRepository.objects.create(name='Workbench-Acceptence-Experiment', owner=self.workbench_user,
+                                                github_url='https://github')
+        experiment = Experiment.objects.create(title='Workbench-Acceptence-Experiment',
+                                               description='test',
+                                               owner=self.workbench_user,
+                                               git_repo=git_repo,
+                                               language_id=1,
+                                               template_id=2)
+
+        self.publish_experiment(experiment)
+        experiment.refresh_from_db()
+        response = self.client.get(reverse('experiment_readonly', kwargs={'unique_id': experiment.unique_id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['completed'])
+
     def get_mock_files(self):
         Foo = namedtuple('Foo', ['name', 'path', 'type', 'slug', 'pylint_results'])
         main = Foo(name='main.py', path='/src/main.py', type='file', slug='main-py', pylint_results=[])
         test = Foo(name='tests.py', path='/sr/tests.py', type='file', slug='tests-py', pylint_results=[])
         return [main, test]
+
+    @patch('experiments_manager.views.views.GitHubHelper')
+    def publish_experiment(self, experiment, mock_gh_helper):
+        """Test if an experiment can be published"""
+        mock_gh_helper.return_value = MockGitHub('test', 'test')
+        self.client.get(reverse('experiment_publish_2', kwargs={'pk': experiment.pk,
+                                                                'slug': experiment.slug()}))
+
+
+class MockGitRelease(object):
+    def __init__(self):
+        self.html_url = "https://test_release"
+
+
+class MockGitHub(object):
+    def __init__(self, owner, title):
+        self.owner = owner
+        self.title = title
+
+    def create_release(self, tag_name, name, body, pre_release):
+        return MockGitRelease()

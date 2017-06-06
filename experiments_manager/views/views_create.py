@@ -8,7 +8,6 @@ from django.shortcuts import redirect, render
 from django.views import View
 
 from git_manager.helpers.github_helper import GitHubHelper
-from git_manager.helpers.helper import get_user_repositories
 from user_manager.models import get_workbench_user
 
 from ..forms import ExperimentForm
@@ -22,10 +21,8 @@ class StepOneExperimentCreateView(View):
     def get(self, request, experiment_id=0):
         try:
             form = ExperimentForm()
-            repository_list = get_user_repositories(request.user)
             return render(request, "experiments_manager/experiment_create/experiment_new.html", {'form': form,
-                                                                                                 'experiment_id': experiment_id,
-                                                                                                 'repository_list': repository_list})
+                                                                                                 'experiment_id': experiment_id})
         except ValueError as a:
             messages.add_message(request, messages.INFO, 'Before creating an experiment, please connect with GitHub')
             return redirect(to=reverse('view_my_profile'))
@@ -43,9 +40,8 @@ class StepOneExperimentCreateView(View):
             initialize_repository.delay(experiment.id, cookiecutter.id)
             return redirect(to=reverse('experiment_status_create'))
         else:
-            repository_list = get_user_repositories(request.user)
             return render(request, "experiments_manager/experiment_create/experiment_new.html",
-                          {'form': form, 'experiment_id': experiment_id, 'repository_list': repository_list})
+                          {'form': form, 'experiment_id': experiment_id})
 
 
 @login_required

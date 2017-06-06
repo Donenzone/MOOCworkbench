@@ -61,9 +61,7 @@ def task_version_control_quality_check(step_id):
 @app.task
 def task_test_quality_check(step_id):
     step = ChosenExperimentSteps.objects.get(id=step_id)
-    experiment = step.experiment
-    github_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)
-    test_measure = TestMeasurement(step, github_helper)
+    test_measure = TestMeasurement(step)
     test_measure.measure()
     test_measure.save_and_get_result()
 

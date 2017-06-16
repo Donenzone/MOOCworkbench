@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+from allauth.socialaccount.models import SocialToken
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -20,6 +22,9 @@ from ..tasks import initialize_repository
 class StepOneExperimentCreateView(View):
     def get(self, request, experiment_id=0):
         try:
+            socialtoken = SocialToken.objects.filter(account__user=request.user, account__provider='github')
+            if not socialtoken:
+                raise ValueError
             form = ExperimentForm()
             return render(request, "experiments_manager/experiment_create/experiment_new.html", {'form': form,
                                                                                                  'experiment_id': experiment_id})

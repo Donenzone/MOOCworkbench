@@ -20,11 +20,93 @@
     <hr/>
 
     <h2>Create New Experiment</h2>
-    <p class="lead">Your First Steps</p>
+    <h3>1. Getting Started</h3>
+    <p>Execute these commands to get started quickly with your new experiment.
+    </p>
+    <p>Before you begin, make sure you have installed  and git.
+        We also recommend the use of the , which simplifies set-up.
+    </p>
+    <p>For R, Packrat is used to help with dependency management.</p>
 
-    <h3>1. Enable Automatic Builds</h3>
+    <h4>System requirements for Python Template</h4>
+    <ul>
+        <li><a href="https://www.python.org/" target="_blank">Python 3.5+</a></li>
+        <li><a href="https://git-scm.com/" target="_blank">git</a></li>
+        <li>Recommended: <a href="https://pypi.python.org/pypi/virtualenv" target="_blank">virtualenv</a></li>
+        <li>Recommended: <a href="http://virtualenvwrapper.readthedocs.io/en/latest/install.html#basic-installation" target="_blank">virtualenvwrapper</a></li>
+        <li>Recommended: <a href="https://desktop.github.com/" target="_blank">GitHub Desktop app for
+            Windows and macOS</a></li>
+    </ul>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#nix" aria-controls="home" role="tab" data-toggle="tab">macOS
+            and Linux</a></li>
+        <li role="presentation"><a href="#windows" aria-controls="profile" role="tab" data-toggle="tab">Windows</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="nix">
+            <h4>For macOS and Linux</h4>
+            <ol>
+                <li>Clone your new experiment with the following command:
+                    <pre>git clone git@github.com:{{ github_username }}/{{ reposlug }}.git</pre>
+                </li>
+                <li>Make your new repository folder active:
+                    <pre>cd {{ reposlug }}</pre>
+                </li>
+                <li>Take a moment to look at what commands make supports:
+                    <pre>make</pre>
+                </li>
+                <li>(optional, but recommended) Then, create a virtual environment (requires virtualenv and virtualenvwrapper for Python 3):
+                    <pre>make create_environment</pre>
+                </li>
+                <li>(optional, but recommended) Activate the environment with (depending upon your environment):
+                    <pre>source activate {{ reposlug }}</pre>
+                    <pre>workon {{ reposlug }}</pre>
+                </li>
+                <li>Install the dependencies:
+                    <pre>make requirements</pre>
+                </li>
+                <li>Run the tests:
+                    <pre>make test</pre>
+                </li>
+            </ol>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="windows">
+            <h4>For Windows</h4>
+            <ol>
+                <li>Clone your new experiment with the following command:
+                    <pre>git clone git@github.com:{{ github_username }}/{{ reposlug }}.git</pre>
+                </li>
+                <li>(optional, but recommended) Make sure you have installed virtualenv and virtualenvwrapper:
+                    <pre>pip install virtualenv virtualenvwrapper</pre>
+                </li>
+                <li>(optional, but recommended) Set up a new virtual environment for your project:
+                    <pre>virtualenv -p python3 .venv{{ reposlug|lower }}</pre>
+                </li>
+                <li>(optional, but recommended) Activate your virtual environment:
+                    <pre>source .venv{{ reposlug|lower }}/bin/activate</pre>
+                </li>
+                <li>Make your new repository folder active:
+                    <pre>cd {{ reposlug }}</pre>
+                </li>
+                <li>Install the initial dependencies:
+                    <pre>pip3 install -r requirements.txt</pre>
+                </li>
+                <li>Check if the tests run:
+                    <pre>python3 test_runner.py</pre>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <h3>2. Enable Automatic Builds</h3>
     <div class="row">
-
+        <p>Automatic builds, also known as Continuous Integration, is useful because it automatically runs your tests in
+            the cloud,
+            that way it is ensured your experiment can be run by others later on and is repeatable and better
+            reproducible. Take a moment now to get started.</p>
         <div class="row">
             <div class="col-md-6">
                 <div class="panel panel-default">
@@ -36,7 +118,7 @@
             </div>
         </div>
 
-        <h3>2. Enable Code Coverage</h3>
+        <h3>3. Enable Code Coverage Measurement</h3>
         <div class="row">
             <div class="col-md-6">
                 <div class="panel panel-default">
@@ -45,76 +127,6 @@
                         <p>{% include "coverage_manager/coverage_status.html" %}</p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <h3>3. Set-up Your Experiment Locally</h3>
-        <p class="lead">Execute these commands to get started quickly with your new experiment.
-        </p>
-        <p class="lead">With these commands, among other things, you are setting up a virtualenv for Python experiments,
-            which is an encapsulated sandbox where you install your dependencies, which helps reproducibility of your
-            experiment.
-        </p>
-        <p class="lead">For R, Packrat is used to help with dependency management.</p>
-
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#nix" aria-controls="home" role="tab" data-toggle="tab">macOS
-                and Linux</a></li>
-            <li role="presentation"><a href="#windows" aria-controls="profile" role="tab" data-toggle="tab">Windows</a>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="nix">
-                <h4>For macOS and Linux</h4>
-                <ol>
-                    <li>Clone your new experiment with the following command:
-                        <pre>git clone git@github.com:{{ github_username }}/{{ reposlug }}.git</pre>
-                    </li>
-                    <li>Make your new repository folder active:
-                        <pre>cd {{ reposlug }}</pre>
-                    </li>
-                    <li>Take a moment to look at what commands make supports:
-                        <pre>make</pre>
-                    </li>
-                    <li>Then, create a virtual environment:
-                        <pre>make create_environment</pre>
-                    </li>
-                    <li>Activate the environment with (depending upon your environment):
-                        <pre>source activate {{ reposlug }}</pre>
-                        <pre>workon {{ reposlug }}</pre>
-                    </li>
-                    <li>Install the dependencies:
-                        <pre>make requirements</pre>
-                    </li>
-                    <li>Run the tests:
-                        <pre>make test</pre>
-                    </li>
-                </ol>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="windows">
-                <h4>For Windows</h4>
-                <ol>
-                    <li>Clone your new experiment with the following command:
-                        <pre>git clone git@github.com:{{ github_username }}/{{ reposlug }}.git</pre>
-                    </li>
-                    <li>Set up a new virtual environment for your project:
-                        <pre>virtualenv -p python3 .venv{{ reposlug|lower }}</pre>
-                    </li>
-                    <li>Activate your virtual environment:
-                        <pre>source .venv{{ reposlug|lower }}/bin/activate</pre>
-                    </li>
-                    <li>Make your new repository folder active:
-                        <pre>cd {{ reposlug }}</pre>
-                    </li>
-                    <li>Install the initial dependencies:
-                        <pre>pip3 install -r requirements.txt</pre>
-                    </li>
-                    <li>Check if the tests run:
-                        <pre>python3 test_runner.py</pre>
-                    </li>
-                </ol>
             </div>
         </div>
     </div>

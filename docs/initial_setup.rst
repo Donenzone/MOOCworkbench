@@ -1,6 +1,6 @@
-===============
-Getting started
-===============
+==============
+Initial set-up
+==============
 
 Once you have signed in for the first time, you need to connect GitHub with the workbench, so that users can use all the features.
 

@@ -39,7 +39,7 @@ class Experiment(BasePackage):
         return slugify(self.title)
 
     def get_absolute_url(self, tab=None):
-        if self.completed:
+        if self.completed and self.unique_id:
             return reverse('experiment_readonly', kwargs={'unique_id': self.unique_id})
         return reverse('experiment_detail', kwargs={'pk': self.pk, 'slug': self.slug()})
 

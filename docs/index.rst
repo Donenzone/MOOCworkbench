@@ -11,8 +11,10 @@ Welcome to MOOC workbench's documentation!
    :caption: Contents:
 
    deployment
-   getting_started
+   initial_setup
    features
+   getting_started
+   packages
 
 
 

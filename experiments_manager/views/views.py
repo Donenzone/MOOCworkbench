@@ -128,17 +128,16 @@ def complete_step_and_go_to_next(request, experiment_id, create_package):
         next_step_nr = active_step.step_nr + 1
         next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)
 
+        if int(create_package) == 1:
+            return redirect(to=reverse('internalpackage_create_fromexperiment',
+                                       kwargs={'experiment_id': experiment_id, 'step_id': completed_step_id}))
         if next_step.count() != 0:
             next_step = next_step[0]
             next_step.active = True
             next_step.save()
             logger.info('%s completed the step %s and moved on to %s for experiment %s', request.user, active_step,
                          next_step, experiment)
-            if int(create_package) == 1:
-                return redirect(to=reverse('internalpackage_create_fromexperiment',
-                                           kwargs={'experiment_id': experiment_id,'step_id': completed_step_id}))
-            else:
-                return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+            return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
     return redirect(to=reverse('experiment_publish', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
 
 

@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Packages &amp; Code Sharing &mdash; MOOC workbench 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="MOOC workbench 1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Getting started" href="getting_started.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MOOC workbench
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_setup.html">Initial set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Packages &amp; Code Sharing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-package-from-an-experiment-step">Creating a package from an experiment step</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparing-for-publication">Preparing for publication</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-an-empty-package">Creating an empty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-and-using-a-package-in-your-experiment">Installing and using a package in your experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-an-external-package">Creating an external package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MOOC workbench</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Packages &amp; Code Sharing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/packages.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="packages-code-sharing">
+<h1>Packages &amp; Code Sharing<a class="headerlink" href="#packages-code-sharing" title="Permalink to this headline">¶</a></h1>
+<p>One of the more important features of the workbench is the <em>Packages</em> section.</p>
+<div class="section" id="creating-a-package-from-an-experiment-step">
+<h2>Creating a package from an experiment step<a class="headerlink" href="#creating-a-package-from-an-experiment-step" title="Permalink to this headline">¶</a></h2>
+<p>The recommended way to create a package, is to create an immediately after you have completed a step of your experiment. That’s when you’re still familiair with the code and it’s easiest to determine if it’s useful for a package and you can make some improvements if necessary. To create a package, complete a step by clicking on the experiment detail page on <em>Complete and go to next</em>. Review the score card and click <em>Continue towards next step</em>. In the modal dialog that appears, choose for <em>Yes, create a package from the code in this step and publish it on the Marketplace</em>.</p>
+<p>Enter a name for your new package: make sure this is all lowercase, no spaces and only letters. Also enter a description. Choose a category for your package and tell us which programming language your package is for. Click <em>Create New Package</em>.</p>
+<p>What happens next, is that the workbench automatically extracts the code from your experiment step, but keeps the git history of your commits, which is useful if you ever want to go back or review older code in your package. It then creates the boilerplate code for either Python or an R package. For Python, we create a pip package.</p>
+<p>Once your package is created, you are redirected to the Internal package dashboard. From here, you can add dependencies for your packages, view the package readme, create a new version or publish your package.</p>
+<div class="section" id="preparing-for-publication">
+<h3>Preparing for publication<a class="headerlink" href="#preparing-for-publication" title="Permalink to this headline">¶</a></h3>
+<p>Now that you have created your package, it is not yet published and thus not yet visible for others. Before that, we recommend that you</p>
+<ul class="simple">
+<li>check that all the dependencies are present on the Dependencies tab, and if not add them</li>
+<li>write a Getting started guide on how to use your package by going to the <em>Resources</em> tab and creating a new package resource. Make sure this Package resource contains which functions/classes your packages exposes, what these do and how they are to be used (e.g. which parameters, what behaviour)</li>
+<li>we recommend to clone your package locally and review the code. Optionally, you can make functions private in Python by starting the function name with an underscore (for example to make make_dataset private, change the name to _make_dataset)</li>
+<li>the source code of your package is placed in the folder &lt;packagename&gt;/</li>
+<li>you can test your pacakage as follows: Open a command-line and <em>cd</em> to your package directory. Run the command <em>python3 setup.py install</em>. Next, open a Python3 shell and type import &lt;packagename&gt;. You can then call and try out your functions in your package.</li>
+</ul>
+<p>Once you have done all that, go to the Internal package dashboard and click <em>Publish My Package</em>. Follow the final checklist and click the button to publish your package. It is then visible on the Packages section of the workbench and will be added to the PyPi packages directory, if it is a Python package.</p>
+</div>
+</div>
+<div class="section" id="creating-an-empty-package">
+<h2>Creating an empty package<a class="headerlink" href="#creating-an-empty-package" title="Permalink to this headline">¶</a></h2>
+<p>If you want to start from scratch, you can also create an empty package. Go to the <em>Packages</em> index page and click <em>Create New Package</em> / <em>Create an Internal Package</em>.</p>
+</div>
+<div class="section" id="installing-and-using-a-package-in-your-experiment">
+<h2>Installing and using a package in your experiment<a class="headerlink" href="#installing-and-using-a-package-in-your-experiment" title="Permalink to this headline">¶</a></h2>
+<p>If you want to use an existing internal package into your own experiment, you can add this package several ways.</p>
+<p>On the package detail page, click <em>Package options</em> / <em>Install package</em>. Choose the experiment into which you want to install this package. The package is added to your dependencies file. Locally, pull in the git changes and update your environment, for Python with the commando <em>make requirements</em>.</p>
+<p>On the Dependencies tab of your experiment detail page, type the name of the package you want to install. The workbench will autocomplete the name and version of packages present in the workbench. Add this dependency and follow the same steps as previously to install the package locally.</p>
+<p>For Python, we add an extra index-url for pip which points to the workbenches custom PyPi server. This way, these local packages can be installed and used in your own Python scripts. The Pypi server is public, so it can be used by other researchers not part of the workbench. Once the package is installed, you can, at the top of your Python script where you want to use this package, add an import statement: <em>import &lt;packagename&gt;</em> and then use the functions present in this package. Check the documentation and source code to know which functions and classes it exposes.</p>
+</div>
+<div class="section" id="creating-an-external-package">
+<h2>Creating an external package<a class="headerlink" href="#creating-an-external-package" title="Permalink to this headline">¶</a></h2>
+<p>If you have found a useful external package, for example something on Pypi, we would invite you to share this package with other researchers in the workbench. To do this, click <em>Create New Package</em> / <em>Create an External Package</em>. Add the required information, such as a description and the URL. If the package is on PyPi, the workbench will automatically update you of new versions.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, JLM de Goede.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

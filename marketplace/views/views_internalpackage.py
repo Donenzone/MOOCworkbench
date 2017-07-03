@@ -36,6 +36,7 @@ class InternalPackageBaseView(ObjectTypeIdMixin, IsInternalPackageMixin):
 
 
 class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
+    """View for InternalPackage Create, this view is used for creating an empty package from the Packages index"""
     model = InternalPackage
     form_class = InternalPackageForm
     template_name = 'marketplace/package_create/package_form.html'
@@ -55,6 +56,8 @@ class InternalPackageCreateView(ExperimentPackageTypeMixin, CreateView):
 
 
 class InternalPackageCreateFromExperimentView(ExperimentPackageTypeMixin, CreateView):
+    """View of InternalPackage Create from Experiment. After completing an experiment step, if users wish, they can create
+    a package and are redirected to this view."""
     model = InternalPackage
     form_class = InternalPackageForm
     template_name = 'marketplace/package_create/package_form.html'
@@ -113,6 +116,7 @@ class InternalPackageDashboard(ExperimentPackageTypeMixin, View):
 
 
 class InternalPackageUpdateView(UpdateView):
+    """Updates the information associated with an InternalPackage."""
     model = InternalPackage
     form_class = InternalPackageForm
 
@@ -126,6 +130,8 @@ class InternalPackageUpdateView(UpdateView):
 
 
 class InternalPackageVersionCreateView(CreateView):
+    """View for creating a new version of an InternalPackage.
+    Starts task to publish this new package and publish it. This is only needed for Python experiments."""
     model = PackageVersion
     fields = ['version_nr', 'changelog', 'pre_release']
     template_name = 'marketplace/package_detail/packageversion_form.html'
@@ -142,8 +148,9 @@ class InternalPackageVersionCreateView(CreateView):
         form.instance.added_by = get_workbench_user(self.request.user)
         response = super(InternalPackageVersionCreateView, self).form_valid(form)
         create_tag_for_package_version(form.instance.id)
-        update_setup_py_with_new_version(form.instance.id)
-        task_publish_update_package.delay(package.pk)
+        if 'Python' in package.language.language:
+            update_setup_py_with_new_version(form.instance.id)
+            task_publish_update_package.delay(package.pk)
         return response
 
     def get_success_url(self):
@@ -152,6 +159,7 @@ class InternalPackageVersionCreateView(CreateView):
 
 @login_required
 def internalpackage_publish(request, pk):
+    """Publish a package, starts task doing the actual publish work"""
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_publish_update_package.delay(package.pk)
@@ -161,6 +169,7 @@ def internalpackage_publish(request, pk):
 
 @login_required
 def internalpackage_publish_checklist(request, pk):
+    """View for displaying the InternalPackage checklist before publishing a package."""
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     dependencies_defined = package.requirements.count() != 0
@@ -176,6 +185,8 @@ def internalpackage_publish_checklist(request, pk):
 
 @login_required
 def internalpackage_remove(request, pk):
+    """View for removing an internal package.
+    This is an action that can only be performed by the owner of the package."""
     package = InternalPackage.objects.get(id=pk)
     assert package.owner.user == request.user
     task_remove_package.delay(package.pk)
@@ -211,6 +222,9 @@ class InternalPackageDetailView(InternalPackageBaseView, ActiveExperimentsList, 
 
 @login_required
 def internalpackage_install(request, pk):
+    """View for installing a package in own project.
+    Adds this package to the requirements file of the chosen experiment and starts
+    task to update this file in GitHub"""
     internal_package = InternalPackage.objects.get(pk=pk)
     assert 'experiment_id' in request.POST
     experiment_id = request.POST['experiment_id']

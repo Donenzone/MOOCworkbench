@@ -2,6 +2,7 @@ from .models import Requirement
 
 
 def delete_existing_requirements(exp_or_package):
+    """Deletes the existing requirements from an exp or package"""
     for req in exp_or_package.requirements.all():
         exp_or_package.requirements.remove(req)
         exp_or_package.save()
@@ -9,6 +10,8 @@ def delete_existing_requirements(exp_or_package):
 
 
 def add_internalpackage_to_experiment(internal_package, experiment):
+    """Adds an internal package to an experiment dependency/requirements file
+    :return: True if success, else False"""
     latest_version = internal_package.get_latest_package_version()
     new_requirement = Requirement()
     new_requirement.package_name = internal_package.name

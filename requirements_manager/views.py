@@ -80,6 +80,8 @@ class RequirementUpdateView(ExperimentPackageTypeMixin, RequirementSuccessUrlMix
 
 @login_required
 def remove_experiment_requirement(request, object_id, object_type):
+    """Removes the requirement from the experiment, expects requirement_id (PK of req object)
+    to be present in request.POST"""
     if request.POST:
         assert 'requirement_id' in request.POST
         requirement_id = request.POST['requirement_id']
@@ -98,6 +100,7 @@ def remove_experiment_requirement(request, object_id, object_type):
 
 @login_required
 def write_requirements_file(request, object_id, object_type):
+    """View that starts task to write the requirements file for package or experiment"""
     get_package_or_experiment(request, object_type, object_id)
     task_write_requirements_file.delay(object_id, object_type)
     logger.info("manually updating dependencies for experiment %s of %s", request.user, object_id)

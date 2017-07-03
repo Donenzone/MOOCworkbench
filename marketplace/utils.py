@@ -11,6 +11,9 @@ PACKAGES_DIR = os.path.join(settings.PROJECT_ROOT, 'packages')
 
 
 def internalpackage_publish_update(package):
+    """Publishes an internalpackage, or, if it is already published, publishes a new version.
+    This function is for Python only and publishes packages on the PyPi server.
+    :param package: The package to publish or update"""
     # clone/pull repository
     # copy repository to packages
     package_location = os.path.join(PACKAGES_DIR, package.git_repo.name)
@@ -25,11 +28,15 @@ def internalpackage_publish_update(package):
 
 
 def internalpackage_rename(package, old_name):
+    """Rename an internalpackage, consists of removing the old one
+    and re-publishing the one with the new name."""
     internalpackage_remove(old_name)
     internalpackage_publish_update(package)
 
 
 def internalpackage_remove(package_name):
+    """Removes an internal package by deleting the folder on the PyPi packages dir
+    :param package_name: String of package to remove"""
     dst_dir = os.path.join(PACKAGES_DIR, package_name)
     if os.path.exists(dst_dir):
         shutil.rmtree(dst_dir)

@@ -7,6 +7,7 @@ from MOOCworkbench.celery import app
 
 @app.task
 def task_write_requirements_file(object_id, object_type):
+    """Task to write requirements file to repository"""
     exp_or_package = get_package_or_experiment_without_request(object_type, object_id)
     language_helper = exp_or_package.language_helper()
     language_helper.write_requirements_file()
@@ -16,6 +17,8 @@ def task_write_requirements_file(object_id, object_type):
 
 @app.task
 def task_update_requirements(repository_name):
+    """Task to update the requirements for exp/package with repository_name,
+    task useful for git webhook"""
     experiment = get_exp_or_package_from_repo_name(repository_name)
     language_helper = experiment.language_helper()
     language_helper.update_requirements()

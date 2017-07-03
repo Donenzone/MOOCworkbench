@@ -6,6 +6,9 @@ from .models import Recommendation
 
 
 def recommend(object_to_like, workbench_user):
+    """Saves the recommendation of object by user
+    :param object_to_like: The object that is recommended
+    :param workbench_user: The workbench user instance that has recommended this object"""
     existing_recommendation = object_to_like.recommendations.filter(liked_by=workbench_user)
     if existing_recommendation:
         existing_recommendation = existing_recommendation[0]
@@ -20,6 +23,7 @@ def recommend(object_to_like, workbench_user):
 
 
 def get_recommendations(step):
+    """For an experiment step, retrieves recommended packages"""
     relevant_category = Category.objects.filter(name__icontains=step.step.name)
     if relevant_category:
         relevant_category = relevant_category[0]

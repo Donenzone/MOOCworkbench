@@ -40,12 +40,16 @@ class DashboardView(ExperimentContextMixin, MeasurementMixin, View):
 
 
 class VcsOverviewView(ExperimentContextMixin, View):
+    """View for Version Control Use overview, with context.
+    Actual contents is fetched on the page through ajax."""
     def get(self, request, experiment_id):
         context = super(VcsOverviewView, self).get(request, experiment_id)
         return render(request, 'quality_manager/vcs_overview.html', context)
 
 
 class NrOfCommitsView(MeasurementMixin, View):
+    """Json view for nr of commits to fill the graph with,
+    returns a Json dict with keys as the days and values the nr of commits on that day"""
     def get(self, request, experiment_id):
         experiment = verify_and_get_experiment(request, experiment_id)
         raw_values, key_values = get_nr_of_commits_last_week(experiment)
@@ -54,6 +58,8 @@ class NrOfCommitsView(MeasurementMixin, View):
 
 @login_required
 def refresh_measurements(request, step_id):
+    """View that starts the task to refresh all the quality measurements
+    On the dashboard, the user can press a button to call this view/task."""
     step = ChosenExperimentSteps.objects.get(pk=step_id)
     verify_and_get_experiment(request, step.experiment_id)
     task_complete_quality_check.delay(step_id)

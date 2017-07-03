@@ -8,6 +8,8 @@ if hasattr(settings, 'LOGIN_EXEMPT_URLS'):
 
 
 class AuthRequiredMiddleware(object):
+    """Middleware to ensure views by default require a login.
+    Only those in the list LOGIN_EXEMPT_URLS in settings.py do not require this. """
     def __init__(self, get_response):
         self.get_response = get_response
 

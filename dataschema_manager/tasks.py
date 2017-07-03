@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def task_write_data_schema(experiment_id):
+    """Task to write data schema to GitHub in schema/schema.json file
+    By converting the schema to dictionary and then to Json"""
     experiment = Experiment.objects.get(pk=experiment_id)
     data_schema = experiment.schema
     data_schema_str = str(json.dumps(data_schema.to_dict()))
@@ -29,6 +31,7 @@ def task_write_data_schema(experiment_id):
 
 @app.task
 def task_read_data_schema(repository_name):
+    """Reads data schema from a schema/schema.json and converts it to DataSchema models in DB"""
     experiment = get_exp_or_package_from_repo_name(repository_name)
     if isinstance(experiment, Experiment):
         logger.info('reading data schema for: %s', experiment)

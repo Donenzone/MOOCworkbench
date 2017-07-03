@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
+    """Detail view of an experiment, showing the experiment steps and
+    for each experiment step the files in that folder"""
     model = Experiment
     template_name = "experiments_manager/experiment_detail/experiment_detail.html"
 
@@ -55,6 +57,9 @@ class ExperimentDetailView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
 
 
 class FileListForStep(View):
+    """Shows a list of files for a specific experiment step
+    Expects in request.GET the experiment_id and step_id
+    Checks if user requesting is owner of experiment"""
     def get(self, request):
         assert 'experiment_id' in request.GET
         assert 'step_id' in request.GET
@@ -79,6 +84,8 @@ class FileListForStep(View):
 
 
 class FileViewGitRepository(ExperimentContextMixin, View):
+    """Shows the source code of a file
+     Attaches pylint results, if available, and incorporates them at the right line"""
     def get(self, request, experiment_id):
         context = super(FileViewGitRepository, self).get(request, experiment_id)
         file_name = request.GET['file_name']
@@ -108,6 +115,7 @@ class FileViewGitRepository(ExperimentContextMixin, View):
 
 @login_required
 def index(request):
+    """Experiment table showing all current and previous experiments of owner"""
     owner = WorkbenchUser.objects.get(user=request.user)
     experiments = Experiment.objects.filter(owner=owner).order_by('-created')
     table = ExperimentTable(experiments)
@@ -116,6 +124,9 @@ def index(request):
 
 @login_required
 def complete_step_and_go_to_next(request, experiment_id, create_package):
+    """"Completes an experiment step and moves on to the next.
+    If no next step is available, redirect to publication page
+    In request.GET, if create_package is 1, user is redirected to pacakge create page"""
     experiment = verify_and_get_experiment(request, experiment_id)
     active_step = ChosenExperimentSteps.objects.filter(experiment=experiment, active=True)
     if active_step:
@@ -143,6 +154,7 @@ def complete_step_and_go_to_next(request, experiment_id, create_package):
 
 @login_required
 def experiment_publish(request, pk, slug):
+    """Experiment publish view: sets experiment to completed, saves it and shows publish view"""
     experiment = verify_and_get_experiment(request, pk)
     experiment.completed = True
     experiment.save()
@@ -151,6 +163,8 @@ def experiment_publish(request, pk, slug):
 
 @login_required
 def experiment_generate_uuid_and_make_public(request, pk, slug):
+    """Publishes an experiment by generating a unique ID of length 32,
+    setting the experiment public, creating a Git release and saving the GitHub release URL"""
     experiment = verify_and_get_experiment(request, pk)
     if not experiment.unique_id:
         experiment.unique_id = get_random_string(32)
@@ -170,6 +184,8 @@ def experiment_generate_uuid_and_make_public(request, pk, slug):
 
 
 class ExperimentReadOnlyView(DocsMixin, ExperimentPackageTypeMixin, DetailView):
+    """Read-only view of an experiment, provides a complete overview of the experiment work done.
+    This view is excluded from required sign in."""
     model = Experiment
     template_name = "experiments_manager/experiment_detail/experiment_readonly.html"
 
@@ -222,6 +238,8 @@ class ExperimentEditView(UpdateView):
 
 @login_required
 def experimentstep_scorecard(request, pk, slug):
+    """Shows the score card for the relevant experiment/ experiment step
+    To do: clean up this code"""
     experiment = verify_and_get_experiment(request, pk)
     completed_step = experiment.get_active_step()
     context = {}
@@ -254,6 +272,7 @@ def experimentstep_scorecard(request, pk, slug):
 
 @login_required
 def readme_of_experiment(request, experiment_id):
+    """Retrieves read me from GitHub repository of experiment"""
     experiment = verify_and_get_experiment(request, experiment_id)
     content_file = get_readme_of_experiment(experiment)
     return render(request, 'experiments_manager/experiment_detail/experiment_readme.html', {'readme': content_file,
@@ -263,6 +282,8 @@ def readme_of_experiment(request, experiment_id):
 
 @login_required
 def experiment_issues(request, experiment_id):
+    """Retrieves the GitHub issues of experiment
+    To do: this view is currently not used."""
     experiment = verify_and_get_experiment(request, experiment_id)
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
     context = {'object': experiment,
@@ -274,6 +295,8 @@ def experiment_issues(request, experiment_id):
 
 @login_required
 def experiment_single_issue(request, experiment_id, issue_nr):
+    """View single GitHub issue from experiment
+    Todo: this view is currently not used"""
     experiment = verify_and_get_experiment(request, experiment_id)
     github_helper = GitHubHelper(request.user, experiment.git_repo.name)
     issue = github_helper.get_single_issue(int(issue_nr))

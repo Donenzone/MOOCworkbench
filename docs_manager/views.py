@@ -14,6 +14,8 @@ from .tasks import task_generate_docs
 
 
 class DocView(View):
+    """Shows the documentation for the selected page_slug
+    via the attached language helper to an experiment"""
     def get(self, request, object_id, object_type, page_slug=None):
         exp_or_package = get_package_or_experiment(request, object_type, object_id)
         language_helper = exp_or_package.language_helper()
@@ -25,6 +27,8 @@ class DocView(View):
 
 
 class DocStatusView(ExperimentPackageTypeMixin, View):
+    """Views the Documentation status: if doc gen is enabled and
+    the latest docs quality messages"""
     def get(self, request, object_id, object_type):
         context = {}
         django_object = get_package_or_experiment(request, object_type, object_id)
@@ -51,6 +55,7 @@ def toggle_docs_status(request, object_id, object_type):
 
 @login_required
 def docs_generate(request, object_id, object_type):
+    """Start task to regenerate documentation"""
     exp_or_package = get_package_or_experiment(request, object_type, object_id)
     send_message(exp_or_package.owner.user.username, MessageStatus.INFO,
                  'Task to regenerate documentation started.')

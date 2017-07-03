@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class DataSchemaOverview(View):
+    """Overview page for the DataSchema, shows dataschema fields for this experiment"""
     template_name = 'dataschema_manager/dataschemafield_overview.html'
 
     def get(self, request, experiment_id):
@@ -37,6 +38,7 @@ class DataSchemaOverview(View):
 
 @login_required
 def dataschemafield_new(request, experiment_id):
+    """Creates new data schema field"""
     experiment = verify_and_get_experiment(request, experiment_id)
     context = {}
     if request.POST:
@@ -88,6 +90,8 @@ def dataschemafield_edit(request, pk, experiment_id):
 
 @login_required
 def dataschema_write(request, experiment_id):
+    """Starts task to update the data schema in the GitHub repository,
+    if a user clicked Save changes"""
     experiment = verify_and_get_experiment(request, experiment_id)
     task_write_data_schema.delay(experiment_id)
     send_message(request.user.username, MessageStatus.INFO, 'Task started to update data schema...')

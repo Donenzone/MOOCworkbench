@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def task_generate_docs(object_type, object_id):
+    """Generates documentation for experiment or package"""
     exp_or_package = get_package_or_experiment_without_request(object_type, object_id)
     username = exp_or_package.owner.user.username
     if exp_or_package.docs.enabled:

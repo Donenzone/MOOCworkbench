@@ -9,29 +9,9 @@ from .github_helper import GitHubHelper
 logger = logging.getLogger(__name__)
 
 
-
-class TemplateHelper(object):
-    TEMPLATE_FOLDER = '/codetemplates/'
-
-
-class CodeTemplateTypes(object):
-    PACKAGE_TYPE = 'pip'
-    PYTHON_TYPE = 'python'
-
-
-def get_file_from_code_template(type, file_name, folder=None):
-    template_type_folder = '{0}{1}/'.format(TemplateHelper.TEMPLATE_FOLDER, type)
-    if folder:
-        path = '{0}{1}{2}{3}'.format(get_absolute_path(), template_type_folder, folder, file_name)
-    else:
-        path = '{0}{1}{2}'.format(get_absolute_path(), template_type_folder, file_name)
-    file_to_open = open(path, 'r')
-    contents = file_to_open.read()
-    file_to_open.close()
-    return contents
-
-
 def get_exp_or_package_from_repo_name(repo_name):
+    """Helper function to retrieve experiment or InternalPackage DB object based on repository name
+    Useful for tasks that do not have a session or other information"""
     git_repo = GitRepository.objects.filter(name=repo_name)
     if git_repo:
         git_repo = git_repo[0]
@@ -44,16 +24,25 @@ def get_exp_or_package_from_repo_name(repo_name):
 
 
 def create_new_github_repository(title, user):
+    """Creates a new GitHub repository with title for user
+    :param title: Title of new GitHub repository
+    :param user: User or WorkbenchUser object for whom to create repository
+    :return: initialized GitHubHelper and True if succeeded, else returns existing repository"""
     try:
         github_helper = GitHubHelper(user, title, create=True)
         return github_helper, True
     except Exception as e:
         logger.error('GitHubHelper could not be initialized for %s (%s) with error: %s', user,
                      title, e)
-        return get_existing_repository(title, user)
+        return _get_existing_repository(title, user)
 
 
-def get_existing_repository(title, user):
+def _get_existing_repository(title, user):
+    """Gets an existing repository, if it exists
+    :param title: Title of GitHub repository to check for existence
+    :param user: User or WorkbenchUser object for which to create repository
+    :return: Return GitHubHelper if repo exists, with False because this function is called from Create,
+    if no repo exists, return None, False"""
     try:
         github_helper = GitHubHelper(user, title)
         return github_helper, False

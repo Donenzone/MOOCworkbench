@@ -6,6 +6,8 @@ from .models import ChosenExperimentSteps, Experiment
 
 
 def verify_and_get_experiment(request, experiment_id):
+    """Verifies if an experiment belongs to the user currently logged in,
+    if so returns the experiment associated with that PK, else AssertionError"""
     experiment = Experiment.objects.get(id=experiment_id)
     assert experiment.owner.user == request.user
     return experiment

@@ -10,6 +10,11 @@ from .utils import init_git_repo_for_experiment
 
 @app.task
 def initialize_repository(experiment_id, cookiecutter_id):
+    """Initializes an experiment: fetches experiment obj, username and cookiecutter
+    object and calls function to initialize and create git repo.
+    In case of failure, redirects to experiment_new page and sends error message.
+    :param experiment_id: PK of experiment to initialize
+    :param cookiecutter_id: PK of cookiecutter template to use for initialization"""
     experiment = Experiment.objects.get(id=experiment_id)
     cookiecutter = CookieCutterTemplate.objects.get(id=cookiecutter_id)
     username = experiment.owner.user.username

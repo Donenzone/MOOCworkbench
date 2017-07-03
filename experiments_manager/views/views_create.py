@@ -92,7 +92,8 @@ class StepThreeChooseExperimentSteps(ExperimentContextMixin, View):
 
 @login_required
 def step_four_experiment_first_time(request, pk):
-    """"""
+    """Displays the page for enabling CI and Code Coverage, and
+    config commands for getting started with the experiment"""
     experiment = verify_and_get_experiment(request, pk)
     context = {}
     gh_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)

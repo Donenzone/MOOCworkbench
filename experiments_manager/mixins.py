@@ -12,6 +12,7 @@ class ExperimentContextMixin(object):
 
 
 class ActiveExperimentsList(object):
+    """Adds a list to the context with active experiments (not completed) of the current user"""
     def get_context_data(self, **kwargs):
         context = super(ActiveExperimentsList, self).get_context_data(**kwargs)
         context['experiment_select_form'] = ExperimentSelectForm(user_id=self.request.user.id)

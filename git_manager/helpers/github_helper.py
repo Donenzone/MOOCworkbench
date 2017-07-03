@@ -14,32 +14,36 @@ logger = logging.getLogger(__name__)
 
 
 class GitHubHelper(object):
-    def __init__(self, user, repo_name=None, create=False):
+    def __init__(self, user, repo_name, create=False):
+        """GitHubHelper helps with common functions for GitHub for experiments in the workbench
+        :param user: Either a workbench or user instance
+        :param repo_name: Repository name for which to initialize the GitHub helper.
+        :param create: Boolean to indicate if a repository has to be created, if True new repo is created.
+        False by default"""
         self.user = self._get_user(user)
 
         self.socialtoken = self._get_social_token()
         self.github_object = self._get_github_object()
         self.github_user = self.github_object.get_user()
         self.github_repository = None
-
-        if repo_name:
-            self.repo_name = repo_name
+        self.repo_name = repo_name
 
         if create:
-            self.create_github_repository()
+            self._create_github_repository()
         elif repo_name is not None:
-            self.init_github_repository(repo_name)
+            self._init_github_repository()
 
-    def create_github_repository(self):
-        self.github_repository = self._create_repository()
+    def _create_github_repository(self):
+        self.github_repository = self.github_user.create_repo(self.repo_name)
         self.repo_name = self.github_repository.name
         self._create_webhook()
 
-    def init_github_repository(self, repo_name):
-        self.github_repository = self.github_user.get_repo(repo_name)
+    def _init_github_repository(self):
+        self.github_repository = self.github_user.get_repo(self.repo_name)
 
     @property
     def owner(self):
+        """Gets the GitHub username of the user"""
         return self.github_repository.owner.login
 
     def get_clone_url(self):
@@ -124,13 +128,6 @@ class GitHubHelper(object):
     def _get_repo_file_name(self, file_name, folder=''):
         return '/{0}/{1}'.format(folder, file_name) if folder else '/{0}'.format(file_name)
 
-    def _create_repository(self):
-        repo = self._create_new_repository()
-        return repo
-
-    def _create_new_repository(self):
-        return self.github_user.create_repo(self.repo_name)
-
     def _get_github_object(self):
         return Github(login_or_token=self.socialtoken)
 
@@ -150,6 +147,9 @@ class GitHubHelper(object):
 
 
 def get_github_helper(request, exp_or_package):
+    """Returns GitHubHelper more easily
+    :param request: The request, containing the currently signed in user
+    :param exp_or_package: DB object to Experiment or InternalPackage"""
     try:
         return GitHubHelper(request.user, exp_or_package.git_repo.name)
     except UnknownObjectException as e:

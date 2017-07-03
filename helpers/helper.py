@@ -9,6 +9,12 @@ from .helper_mixins import ExperimentPackageTypeMixin
 
 
 def get_package_or_experiment(request, object_type, object_id):
+    """Gets either a package or an experiment
+    :param request: Request object of view
+    :param object_type: One of the options from ExperimentPackageTypeMixin
+    :param object_id: PK of the object
+
+    :return: Returns package, or returns experiment, for experiment the owner is first checked"""
     if object_type == ExperimentPackageTypeMixin.EXPERIMENT_TYPE:
         return verify_and_get_experiment(request, object_id)
     elif object_type == ExperimentPackageTypeMixin.PACKAGE_TYPE:
@@ -16,6 +22,7 @@ def get_package_or_experiment(request, object_type, object_id):
 
 
 def get_package_or_experiment_with_context(context, request, object_type, object_id):
+    """Gets package or experiment and adds it to the context object with key object"""
     if object_type == ExperimentPackageTypeMixin.EXPERIMENT_TYPE:
         context['object'] = verify_and_get_experiment(request, object_id)
         return context
@@ -26,15 +33,11 @@ def get_package_or_experiment_with_context(context, request, object_type, object
 
 
 def get_package_or_experiment_without_request(object_type, object_id):
+    """If no request object is available, use this function to retrieve package or experiment"""
     if object_type == ExperimentPackageTypeMixin.EXPERIMENT_TYPE:
         return Experiment.objects.get(pk=object_id)
     elif object_type == ExperimentPackageTypeMixin.PACKAGE_TYPE:
         return InternalPackage.objects.get(id=object_id)
-
-
-def replace_variable_in_file(contents, variable, value):
-    variable_name = '{{{0}}}'.format(variable)
-    return contents.replace(variable_name, value)
 
 
 def get_absolute_path():

@@ -19,41 +19,58 @@ from .github_helper import GitHubHelper
 
 
 class LanguageHelper(object):
+    """LanguageHelper interface that provides common abstracted functions for programming languages,
+    so that the rest of the workbench does not have to worry about language specific implementation details"""
     def __init__(self, exp_or_package):
+        """
+        Initializes a GitHubHelper
+        :param exp_or_package: Exp or package for which to initialize this LanguageHelper
+        """
         self.exp_or_package = exp_or_package
         self.github_helper = GitHubHelper(self.exp_or_package.owner.user, self.exp_or_package.git_repo.name)
 
     def parse_requirements(self, requirements_file):
+        """Parses the given requirements file and create Requirements DB objects per requirement"""
         pass
 
     def build_requirements_file(self):
+        """Converts the requirements DB objects into a requirements file"""
         pass
 
     def write_requirements_file(self):
+        """Writes the requirements file to the GitHub repository"""
         pass
 
     def update_requirements(self):
+        """Updates the requirements"""
         pass
 
     def get_requirements_file_location(self):
+        """Location of the requirements file"""
         pass
 
     def static_code_analysis(self):
+        """Perform static code analysis for the files in the current active experiment step"""
         pass
 
     def cookiecutter_dict(self, internal_package):
+        """Returns the cookiecutter dict for the package template for this language"""
         pass
 
     def publish_package(self):
+        """Publishes a package on the workbench/language-specific packages section"""
         pass
 
     def remove_package(self):
+        """Removes a published package"""
         pass
 
     def get_document(self, document_name):
+        """Get a document from the documentation"""
         pass
 
     def generate_documentation(self):
+        """Regenerate the documentation for this experiment"""
         pass
 
 

@@ -20,6 +20,10 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def task_process_git_push(repository_name, sha_list):
+    """Processes a Git push and expects the repository name and a list of SHA hashes of the commit(s)
+    If the git push belongs to an experiment, run all the connected tasks sequentially. Swallow any errors
+    to ensure that if one task fails, other tasks can still be executed.
+    In case of a package, only update the docs and requirements list in the workbench."""
     exp_or_package = get_exp_or_package_from_repo_name(repository_name)
     logger.debug('received and processing git commit for %s', exp_or_package)
     if isinstance(exp_or_package, Experiment):
@@ -52,6 +56,10 @@ def task_process_git_push(repository_name, sha_list):
 
 @app.task
 def task_process_commit(repository_name, sha_hash_list):
+    """Processes a list of git commits (sha hashes) for repository (repository_name),
+    and creates for each git commit a Commit DB object with the associated information
+    :param repository_name: Repository name of GitHub repo for which to process commits
+    :param sha_hash_list: A list of SHA hashes of the commits to process"""
     experiment = get_exp_or_package_from_repo_name(repository_name)
     git_repo = experiment.git_repo
     github_helper = GitHubHelper(experiment.owner, repository_name)

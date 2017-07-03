@@ -71,4 +71,5 @@ def webhook_receive(request):
 
 
 def run_post_push_tasks(repository_name, sha_list):
+    """Starts the task upon receiveing a git webhook call"""
     task_process_git_push.delay(repository_name, sha_list)

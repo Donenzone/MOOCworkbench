@@ -20,7 +20,8 @@ from ..tasks import initialize_repository
 
 
 class StepOneExperimentCreateView(View):
-    """"""
+    """Creates an experiment object if valid form is posed
+    and starts task to initialize this new experiment"""
     def get(self, request, experiment_id=0):
         try:
             socialtoken = SocialToken.objects.filter(account__user=request.user, account__provider='github')
@@ -52,10 +53,13 @@ class StepOneExperimentCreateView(View):
 
 @login_required
 def step_two_experiment_status_create(request):
+    """Renders empty status page.
+    Updates are sent from the Celery task using django channels"""
     return render(request, 'experiments_manager/experiment_create/experiment_status_create.html', {})
 
 
 class StepThreeChooseExperimentSteps(ExperimentContextMixin, View):
+    """View to choose which experiment steps are to be used during the experiment"""
     def get(self, request, experiment_id):
         context = super(StepThreeChooseExperimentSteps, self).get(request, experiment_id)
         context['steps'] = ExperimentStep.objects.all().order_by('default_order')
@@ -88,6 +92,7 @@ class StepThreeChooseExperimentSteps(ExperimentContextMixin, View):
 
 @login_required
 def step_four_experiment_first_time(request, pk):
+    """"""
     experiment = verify_and_get_experiment(request, pk)
     context = {}
     gh_helper = GitHubHelper(experiment.owner, experiment.git_repo.name)

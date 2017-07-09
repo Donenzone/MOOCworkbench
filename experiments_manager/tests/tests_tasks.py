@@ -22,8 +22,8 @@ class ExperimentTasksTestCase(TestCase):
 
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
-        self.python_cookiecutter = CookieCutterTemplate.objects.get(language_id=2, meant_for='e')
-        self.r_cookiecutter = CookieCutterTemplate.objects.get(language_id=3, meant_for='e')
+        self.python_cookiecutter = CookieCutterTemplate.objects.filter(language_id=2, meant_for='e').first()
+        self.r_cookiecutter = CookieCutterTemplate.objects.filter(language_id=3, meant_for='e').first()
 
         random_string = get_random_string(5)
         self.python_experiment_name = 'python_experiment_{0}'.format(random_string)

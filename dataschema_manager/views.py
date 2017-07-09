@@ -80,11 +80,13 @@ def dataschemafield_edit(request, pk, experiment_id):
             return redirect(to=experiment.success_url_dict(hash='#edit')['schema'])
         else:
             context['form'] = edit_form
+            context['edit'] = True
             context['constraint_form'] = constraint_form
             return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
     else:
         context['form'] = DataSchemaFieldForm(instance=dataschema)
         context['constraint_form'] = DataSchemaConstraintForm(instance=constraints)
+        context['edit'] = True
         return render(request, 'dataschema_manager/dataschemafield_edit.html', context)
 
 

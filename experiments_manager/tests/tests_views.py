@@ -239,9 +239,15 @@ class ExperimentTestCase(TestCase):
         self.assertTrue(self.experiment.publish_url_zip == 'https://test_release')
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    def test_experiment_readonly_view(self, mock_social_token):
+    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
+    @patch('experiments_manager.views.views.get_readme_of_experiment')
+    def test_experiment_readonly_view(self, mock_readme, mock_clone_url, mock_social_token):
         """Test if readonly view works after publishing an experiment"""
+        github_token = os.environ.get('GITHUB_TOKEN')
+        mock_readme.return_value = 'Readme'
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
+        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
+                                                                                        'Workbench-Acceptance-Experiment')
         git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment', owner=self.workbench_user,
                                                 github_url='https://github')
         experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment',

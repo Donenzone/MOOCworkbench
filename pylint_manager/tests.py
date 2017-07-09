@@ -23,9 +23,9 @@ class PylintManagerTestCase(TestCase):
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
-        self.git_repo = GitRepository.objects.create(name='Workbench-Acceptence-Experiment',
+        self.git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment',
                                                      owner=self.workbench_user,
-                                                     github_url='https://github.com/jlmdegoede/Workbench-Acceptence-Experiment.git')
+                                                     github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment.git')
 
         self.experiment = Experiment.objects.create(title='Experiment',
                                                     description='test',

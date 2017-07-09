@@ -16,7 +16,7 @@ class GitHelperTestCase(TestCase):
     def setUp(self, mock_social_token):
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
-        self.github_helper = GitHubHelper(self.user, 'Workbench-Acceptence-Experiment')
+        self.github_helper = GitHubHelper(self.user, 'Workbench-Acceptance-Experiment')
         self.git_helper = GitHelper(self.github_helper)
 
     def test_git_helper_repo_dir_and_clone(self):

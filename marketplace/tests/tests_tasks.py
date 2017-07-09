@@ -34,11 +34,11 @@ class MarketplaceTasksTestCase(TestCase):
                                                                owner_id=1,
                                                                template_id=1)
 
-        self.python_git_repo = GitRepository.objects.create(name='Workbench-Acceptence-Experiment',
+        self.python_git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment',
                                                             owner=self.workbench_user,
-                                                            github_url='https://github.com/jlmdegoede/Workbench-Acceptence-Experiment.git')
+                                                            github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment.git')
 
-        self.python_experiment = Experiment.objects.create(title='Workbench-Acceptence-Experiment',
+        self.python_experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment',
                                                            description='test',
                                                            owner=self.workbench_user,
                                                            git_repo=self.python_git_repo,

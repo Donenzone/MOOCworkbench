@@ -242,9 +242,9 @@ class ExperimentTestCase(TestCase):
     def test_experiment_readonly_view(self, mock_social_token):
         """Test if readonly view works after publishing an experiment"""
         mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
-        git_repo = GitRepository.objects.create(name='Workbench-Acceptence-Experiment', owner=self.workbench_user,
+        git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment', owner=self.workbench_user,
                                                 github_url='https://github')
-        experiment = Experiment.objects.create(title='Workbench-Acceptence-Experiment',
+        experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment',
                                                description='test',
                                                owner=self.workbench_user,
                                                git_repo=git_repo,

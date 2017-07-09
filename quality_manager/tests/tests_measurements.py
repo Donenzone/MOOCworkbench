@@ -29,10 +29,10 @@ class QualityManagerTestCase(TestCase):
         self.user = User.objects.create_user('test', 'test@test.nl', 'test')
         self.workbench_user = WorkbenchUser.objects.get(user=self.user)
 
-        self.git_repo = GitRepository.objects.create(name='Workbench-Acceptence-Experiment',
+        self.git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment',
                                                      owner=self.workbench_user,
-                                                     github_url='https://github.com/jlmdegoede/Workbench-Acceptence-Experiment.git')
-        self.python_experiment = Experiment.objects.create(title='Workbench-Acceptence-Experiment',
+                                                     github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment.git')
+        self.python_experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment',
                                                            description='test',
                                                            owner=self.workbench_user,
                                                            language_id=2,

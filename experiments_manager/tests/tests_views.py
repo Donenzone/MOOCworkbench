@@ -51,8 +51,10 @@ class ExperimentTestCase(TestCase):
         response = self.client.get(reverse('experiments_index'))
         self.assertIsNotNone(response.context['table'])
 
-    def test_create_new_experiment_get(self):
+    @patch('experiments_manager.views.views_create.SocialToken')
+    def test_create_new_experiment_get(self, mock_social_token):
         """Test http get for creating a new experiment"""
+        mock_social_token.return_value = 'socialtoken'
         response = self.client.get(reverse('experiment_new'))
         self.assertEqual(response.status_code, 200)
 

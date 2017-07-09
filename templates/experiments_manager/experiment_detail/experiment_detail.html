@@ -131,17 +131,23 @@
                         for(index = 0, len = data.files.length; index < len; index++) {
 
                             static_code_analysis = data.files[index]['static_code_analysis'];
-                            file_object = '<tr><td><a href="' + data.files[index]['file_url'] + '">' + data.files[index]['file_name'] + '</a></td><td>';
-                            if (static_code_analysis.e !== 0) {
+                            file_name = data.files[index]['file_name'];
+                            if (file_name.indexOf(".") != -1) {
+                                file_object = '<tr><td><a href="' + data.files[index]['file_url'] + '">' + file_name + '</a></td><td>';
+                            }
+                            else {
+                                file_object = '<tr><td>'+ file_name + '</td><td>';
+                            }
+                            if (static_code_analysis &&  static_code_analysis.e !== 0) {
                                 file_object += ' <span class="label label-danger">' + static_code_analysis.e + ' error(s)</span>'
                             }
-                            if (static_code_analysis.w !== 0) {
+                            if (static_code_analysis && static_code_analysis.w !== 0) {
                                 file_object += ' <span class="label label-warning">' + static_code_analysis.w + ' warning(s)</span>'
                             }
-                            if (static_code_analysis.c !== 0) {
+                            if (static_code_analysis && static_code_analysis.c !== 0) {
                                 file_object += '  <span class="label label-info">' + static_code_analysis.c + ' other issue(s)</span>'
                             }
-                            if (static_code_analysis.s !== 0) {
+                            if (static_code_analysis && static_code_analysis.s !== 0) {
                                 file_object += ' <span class="label label-info">' + static_code_analysis.s + ' style issue(s)</span>'
                             }
                             file_object += '</td>';

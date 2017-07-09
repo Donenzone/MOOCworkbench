@@ -73,13 +73,15 @@ class FileListForStep(View):
         file_list = get_files_for_step(step, experiment, github_helper)
         return_dict = []
         for content_file in file_list:
-            return_dict.append({'file_name': content_file.name,
+            file_dict = {'file_name': content_file.name,
                                 'file_url': reverse('file_detail', kwargs={'experiment_id': experiment.id})
                                             + '?file_name=' + content_file.path,
                                 'type': content_file.type,
                                 'file_path': content_file.path,
-                                'slug': content_file.slug,
-                                'static_code_analysis': content_file.pylint_results})
+                                'slug': content_file.slug}
+            if hasattr(content_file, 'pylint_results'):
+                file_dict['static_code_analysis'] = content_file.pylint_results
+            return_dict.append(file_dict)
         return JsonResponse({'files': return_dict})
 
 
@@ -139,16 +141,20 @@ def complete_step_and_go_to_next(request, experiment_id, create_package):
         next_step_nr = active_step.step_nr + 1
         next_step = ChosenExperimentSteps.objects.filter(experiment=experiment, step_nr=next_step_nr)
 
-        if int(create_package) == 1:
-            return redirect(to=reverse('internalpackage_create_fromexperiment',
-                                       kwargs={'experiment_id': experiment_id, 'step_id': completed_step_id}))
-        if next_step.count() != 0:
-            next_step = next_step[0]
+        if next_step.count() != 0: # if there is a next step
+            next_step = next_step[0] # set this step as active
             next_step.active = True
-            next_step.save()
+            next_step.save() # and save it
             logger.info('%s completed the step %s and moved on to %s for experiment %s', request.user, active_step,
                          next_step, experiment)
+
+        if int(create_package) == 1: # if a package is to be created, redirect
+            return redirect(to=reverse('internalpackage_create_fromexperiment',
+                                       kwargs={'experiment_id': experiment_id, 'step_id': completed_step_id}))
+
+        if next_step: # if a next step exists, redirect back to experiment detail page
             return redirect(to=reverse('experiment_detail', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
+    # if no next step or active step exists, redirect to publish page
     return redirect(to=reverse('experiment_publish', kwargs={'pk': experiment_id, 'slug': experiment.slug()}))
 
 

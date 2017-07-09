@@ -5,9 +5,11 @@ from pylint_manager.helper import return_result_summary_for_file
 
 
 class ContentFile(object):
-    def __init__(self, name, path):
+    def __init__(self, name, path, type, slug):
         self.name = name
         self.path = path
+        self.type = type
+        self.slug = slug
 
 
 def get_files_for_steps(experiment, github_helper, only_active=False):
@@ -33,7 +35,7 @@ def get_files_for_step(step, experiment, github_helper):
         files = _get_files_in_repository(github_helper, location,
                                          _add_static_results_to_files, experiment)
     else:
-        files = [ContentFile(name=location, path=location)]
+        files = [ContentFile(name=location, path=location, type='file', slug=slugify(location))]
     return files
 
 

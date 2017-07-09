@@ -45,11 +45,11 @@ class MarketplaceTasksTestCase(TestCase):
                                                            language_id=2,
                                                            template_id=2)
 
-        self.r_git_repo = GitRepository.objects.create(name='Sandbox-R-Experiment-6',
+        self.r_git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment-R',
                                                        owner=self.workbench_user,
-                                                       github_url='https://github.com/jlmdegoede/Sandbox-R-Experiment-6.git')
+                                                       github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment-R.git')
 
-        self.r_experiment = Experiment.objects.create(title='Sandbox-R-Experiment-6',
+        self.r_experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment-R',
                                                       description='test',
                                                       owner=self.workbench_user,
                                                       git_repo=self.r_git_repo,

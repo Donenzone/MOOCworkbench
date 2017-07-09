@@ -5,8 +5,8 @@
     "components/jquery": "~2.2.4",
     "jquery-ui": "1.12.1",
     "bootstrap-theme-bootswatch-flatly": "",
-    "highlight": "9.11.0",
-    "chartjs": "2.5.0",
+    "highlight": "9.12.0",
+    "chartjs": "2.6.0",
     "intro.js": ""
   }
 }

@@ -2,6 +2,7 @@ import os
 from unittest.mock import patch
 
 from github.GithubException import GithubException
+from github.Repository import Repository
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -40,22 +41,24 @@ class GitHubHelperTestCase(TestCase):
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_view_files_in_dir(self, mock_social_token):
         """Test viewing files in a repo"""
-        mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
-        github_helper = GitHubHelper(self.user, 'Workbench-Acceptance-Experiment')
-        content_files = github_helper.list_files_in_folder()
-        self.assertIsNotNone(content_files)
-        file_names = [x.name for x in content_files]
-        self.assertTrue('requirements.txt' in file_names)
+        with patch.object(Repository, 'url', 'https://api.github.com/repos/MOOCworkbench/Workbench-Acceptance-Experiment'):
+            mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
+            github_helper = GitHubHelper(self.user, 'Workbench-Acceptance-Experiment')
+            content_files = github_helper.list_files_in_folder()
+            self.assertIsNotNone(content_files)
+            file_names = [x.name for x in content_files]
+            self.assertTrue('requirements.txt' in file_names)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_view_files_in_dir_src_data(self, mock_social_token):
         """Test viewing files in a directory of repo"""
-        mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
-        github_helper = GitHubHelper(self.user, 'Workbench-Acceptance-Experiment')
-        content_files = github_helper.list_files_in_folder('/src/data')
-        self.assertIsNotNone(content_files)
-        file_names = [x.name for x in content_files]
-        self.assertTrue('make_dataset.py' in file_names)
+        with patch.object(Repository, 'url', 'https://api.github.com/repos/MOOCworkbench/Workbench-Acceptance-Experiment'):
+            mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
+            github_helper = GitHubHelper(self.user, 'Workbench-Acceptance-Experiment')
+            content_files = github_helper.list_files_in_folder('/src/data')
+            self.assertIsNotNone(content_files)
+            file_names = [x.name for x in content_files]
+            self.assertTrue('make_dataset.py' in file_names)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_view_files_in_non_existent_dir(self, mock_social_token):

@@ -184,7 +184,11 @@ class RHelper(LanguageHelper):
         shutil.rmtree(os.path.join(git_helper.repo_dir, 'src/packrat'))
 
     def get_requirements_file_location(self):
-        return 'src/packrat/packrat.lock'
+        from marketplace.models import InternalPackage
+        if isinstance(self.exp_or_package, InternalPackage):
+            return 'packrat/packrat.lock'
+        else:
+            return 'src/packrat/packrat.lock'
 
     def static_code_analysis(self):
         return run_rlint

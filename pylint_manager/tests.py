@@ -40,9 +40,13 @@ class PylintManagerTestCase(TestCase):
                                                                            location='/src/data/')
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    def test_run_pylint(self, mock_social_token):
+    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
+    def test_run_pylint(self, mock_clone_url, mock_social_token):
         """Test if to gather pylint results from a GitHub repository"""
-        mock_social_token.return_value = os.environ.get('GITHUB_TOKEN')
+        github_token = os.environ.get('GITHUB_TOKEN')
+        mock_social_token.return_value = github_token
+        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
+                                                                                        'Workbench-Acceptance-Experiment')
         run_pylint(self.experiment)
         pylint_scan = self.experiment.pylint
         pylint_scan_result = PylintScanResult.objects.filter(for_project=pylint_scan)

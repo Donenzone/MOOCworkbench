@@ -12,7 +12,7 @@ class TravisCiHelperTestCases(TestCase):
     def setUp(self):
         socialtoken = os.environ.get('GITHUB_TOKEN')
         if socialtoken:
-            self.github_helper = GitHubHelperReplacement(socialtoken, 'Workbench-Python-Experiment')
+            self.github_helper = GitHubHelperReplacement(socialtoken, 'Workbench-Acceptance-Experiment')
             self.travis_ci_helper = TravisCiHelper(self.github_helper)
         else:
             print("Socialtoken variable not set!")

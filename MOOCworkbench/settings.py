@@ -210,14 +210,14 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "bower_components"),
 ]
 
-logging.basicConfig(level=logging.DEBUG, format=LOG_FMT)
+logging.basicConfig(level=logging.INFO, format=LOG_FMT)
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'debug.log',
             'formatter': 'verbose',
@@ -229,7 +229,7 @@ LOGGING = {
             'formatter': 'verbose',
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
@@ -246,72 +246,72 @@ LOGGING = {
     'loggers': {
         'github': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'build_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'cookiecutter_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'coverage_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'dataschema_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'docs_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'experiments_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'git_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'marketplace': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'pylint_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'quality_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'recommendations': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'requirements_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'user_manager': {
             'handlers': ['file', 'infolog'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
     },

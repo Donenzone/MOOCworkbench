@@ -6,7 +6,7 @@ from experiments_manager.models import ChosenExperimentSteps
 
 
 class ExperimentMeasure(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, editable=False)
     description = models.TextField()
 
     high_message = models.CharField(max_length=255, default='High')

@@ -2,7 +2,8 @@
 Deployment
 ==========
 
-Before you begin, first go to the folder MOOCworkbench/ and edit the file production_settings.py_template with the relevant data. You can set the WEBHOOK_SECRET_KEY as a random string, make sure that ALLOWED_HOSTS contains your FQDN and enter a SECRET_KEY. Make sure to keep this information secure. For the Forgotten password functionality, a valid SMTP server is required, so enter this data now. Finally, for REDIS_HOST, if you deploy with Docker, set this value to 'redis', else to 'localhost' or wherever your own Redis server is reachable.
+Download the ZIP file from the release page to get started, since this already contains all the bower front-end components.
+Before you continue, first go to the folder MOOCworkbench/ and edit the file production_settings.py_template with the relevant data. You can set the WEBHOOK_SECRET_KEY as a random string, make sure that ALLOWED_HOSTS contains your FQDN and enter a SECRET_KEY. Make sure to keep this information secure. For the Forgotten password functionality, a valid SMTP server is required, so enter this data now. Finally, for REDIS_HOST, if you deploy with Docker, set this value to 'redis', else to 'localhost' or wherever your own Redis server is reachable.
 
 Docker
 ------
@@ -37,13 +38,14 @@ Without Docker
 --------------
 If you prefer to run the workbench without Docker, make sure the system you are deploying on meets the following requirements:
 
-- Python 3.5/3.6
+- Python 3.6
 - Redis server
 
 Then, to deploy the workbench:
 
 - (Create a virtual environment)
 - Install the dependencies in this virtualenv with pip3 install -r requirements.txt
+- Install the bower dependencies with: bower install
 - Run ./setup.sh to migrate the database, collect the static files, create an admin user and load initial data
 
 Start the webserver with workers and Celery workers
@@ -54,4 +56,4 @@ Start the webserver with workers and Celery workers
 * celery flower -A MOOCworkbench --address=0.0.0.0 --port=5555
 * pypi-server -p 8001 packages/
 
-Preferably run these commands in for example supervisor.
+Preferably run these commands in for example supervisor. Also, you can start as many Celery and Python workers as you want. We recommend at least two of both.

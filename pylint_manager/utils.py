@@ -94,6 +94,7 @@ def make_relative_path(location):
 
 
 def parse_pylint_results(pylint_results, pylint_scan_result_object):
+    print(pylint_results)
     json_pylint = json.loads(pylint_results)
     for pylint in json_pylint:
         result = PylintResult()

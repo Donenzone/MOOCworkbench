@@ -25,7 +25,7 @@ class PylintManagerTestCase(TestCase):
 
         self.git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment',
                                                      owner=self.workbench_user,
-                                                     github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment.git')
+                                                     github_url='https://github.com/jlmdegoede/Workbench-Acceptance-Experiment.git')
 
         self.experiment = Experiment.objects.create(title='Experiment',
                                                     description='test',
@@ -40,13 +40,10 @@ class PylintManagerTestCase(TestCase):
                                                                            location='/src/data/')
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
-    def test_run_pylint(self, mock_clone_url, mock_social_token):
+    def test_run_pylint(self, mock_social_token):
         """Test if to gather pylint results from a GitHub repository"""
         github_token = os.environ.get('GITHUB_TOKEN')
         mock_social_token.return_value = github_token
-        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
-                                                                                        'Workbench-Acceptance-Experiment')
         run_pylint(self.experiment)
         pylint_scan = self.experiment.pylint
         pylint_scan_result = PylintScanResult.objects.filter(for_project=pylint_scan)

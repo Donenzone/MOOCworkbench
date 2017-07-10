@@ -36,7 +36,7 @@ class MarketplaceTasksTestCase(TestCase):
 
         self.python_git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment',
                                                             owner=self.workbench_user,
-                                                            github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment.git')
+                                                            github_url='https://github.com/jlmdegoede/Workbench-Acceptance-Experiment.git')
 
         self.python_experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment',
                                                            description='test',
@@ -47,7 +47,7 @@ class MarketplaceTasksTestCase(TestCase):
 
         self.r_git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment-R',
                                                        owner=self.workbench_user,
-                                                       github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment-R.git')
+                                                       github_url='https://github.com/jlmdegoede/Workbench-Acceptance-Experiment-R.git')
 
         self.r_experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment-R',
                                                       description='test',
@@ -104,20 +104,19 @@ class MarketplaceTasksTestCase(TestCase):
         github_helper = GitHubHelper('test', self.python_package_name)
         self.assertTrue(github_helper.view_file('requirements.txt'))
 
- #   @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
- #   def test_create_python_package_from_experiment(self, mock_social_token):
- #       """Test to create a Python package from an existing experiment"""
- #       github_token = os.environ.get('GITHUB_TOKEN')
- #       mock_social_token.return_value = github_token
+    @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
+    def test_create_python_package_from_experiment(self, mock_social_token):
+        """Test to create a Python package from an existing experiment"""
+        github_token = os.environ.get('GITHUB_TOKEN')
+        mock_social_token.return_value = github_token
+        task_create_package_from_experiment(self.internal_package.pk,
+                                           self.python_experiment.pk,
+                                            '/src/data/')
 
- #       task_create_package_from_experiment(self.internal_package.pk,
- #                                           self.python_experiment.pk,
- #                                           '/src/data/')
-
- #       self.assertIsNotNone(self.internal_package)
- #       github_helper = GitHubHelper('test', self.python_package_name)
- #       self.assertTrue(github_helper.view_file('requirements.txt'))
- #       self.assertTrue(github_helper.view_file('/{0}/make_dataset.py'.format(self.python_package_name)))
+        self.assertIsNotNone(self.internal_package)
+        github_helper = GitHubHelper('test', self.python_package_name)
+        self.assertTrue(github_helper.view_file('requirements.txt'))
+        self.assertTrue(github_helper.view_file('/{0}/make_dataset.py'.format(self.python_package_name)))
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
     def test_create_r_package_from_experiment(self, mock_social_token):

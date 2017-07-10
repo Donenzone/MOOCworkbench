@@ -34,7 +34,7 @@ class QualityManagerTestCase(TestCase):
 
         self.git_repo = GitRepository.objects.create(name='Workbench-Acceptance-Experiment',
                                                      owner=self.workbench_user,
-                                                     github_url='https://github.com/MOOCworkbench/Workbench-Acceptance-Experiment.git')
+                                                     github_url='https://github.com/jlmdegoede/Workbench-Acceptance-Experiment.git')
         self.python_experiment = Experiment.objects.create(title='Workbench-Acceptance-Experiment',
                                                            description='test',
                                                            owner=self.workbench_user,
@@ -55,12 +55,9 @@ class QualityManagerTestCase(TestCase):
         )
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
-    def test_ci_measurement(self, mock_clone_url, mock_social_token):
+    def test_ci_measurement(self, mock_social_token):
         github_token = os.environ.get('GITHUB_TOKEN')
         mock_social_token.return_value = github_token
-        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
-                                                                                        'Workbench-Acceptance-Experiment')
         ci_measure = CiEnabledMeasurement(self.chosen_step)
         ci_measure.measure()
         ci_measure.save_and_get_result()
@@ -72,12 +69,9 @@ class QualityManagerTestCase(TestCase):
         self.assertTrue(result.raw_values.all())
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
-    def test_docs_measurement(self, mock_clone_url, mock_social_token):
+    def test_docs_measurement(self, mock_social_token):
         github_token = os.environ.get('GITHUB_TOKEN')
         mock_social_token.return_value = github_token
-        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
-                                                                                        'Workbench-Acceptance-Experiment')
         docs_measure = DocsMeasurement(self.chosen_step)
         docs_measure.measure()
         docs_measure.save_and_get_result()
@@ -89,12 +83,9 @@ class QualityManagerTestCase(TestCase):
         self.assertTrue(result.raw_values.all())
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
-    def test_pylint_measurement(self, mock_clone_url, mock_social_token):
+    def test_pylint_measurement(self, mock_social_token):
         github_token = os.environ.get('GITHUB_TOKEN')
         mock_social_token.return_value = github_token
-        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
-                                                                                        'Workbench-Acceptance-Experiment')
         pylint_measure = PylintMeasurement(self.chosen_step)
         pylint_measure.measure()
         pylint_measure.save_and_get_result()
@@ -107,12 +98,9 @@ class QualityManagerTestCase(TestCase):
         self.assertTrue(pylint_results)
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
-    def test_reqs_measurement(self, mock_clone_url, mock_social_token):
+    def test_reqs_measurement(self, mock_social_token):
         github_token = os.environ.get('GITHUB_TOKEN')
         mock_social_token.return_value = github_token
-        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
-                                                                                        'Workbench-Acceptance-Experiment')
         reqs_measure = RequirementsMeasurement(self.chosen_step)
         reqs_measure.measure()
         reqs_measure.save_and_get_result()
@@ -137,12 +125,9 @@ class QualityManagerTestCase(TestCase):
             self.assertTrue(result.raw_values.all())
 
     @patch('git_manager.helpers.github_helper.GitHubHelper._get_social_token')
-    @patch('git_manager.helpers.github_helper.GitHubHelper.get_clone_url')
-    def test_vcs_measurement(self, mock_clone_url, mock_social_token):
+    def test_vcs_measurement(self, mock_social_token):
         github_token = os.environ.get('GITHUB_TOKEN')
         mock_social_token.return_value = github_token
-        mock_clone_url.return_value = "https://{0}@github.com/MOOCworkbench/{1}".format(github_token,
-                                                                                        'Workbench-Acceptance-Experiment')
         vcs_measure = VersionControlUseMeasurement(self.chosen_step)
         vcs_measure.measure()
         vcs_measure.save_and_get_result()
